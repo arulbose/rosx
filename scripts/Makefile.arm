@@ -1,0 +1,50 @@
+CC = arm-linux-gnueabihf
+AS = arm-linux-gnueabihf
+LD = arm-linux-gnueabihf
+
+#CFLAGS = -Wall -O2 -nostdlib -nostartfiles -ffreestanding -mcpu=cortex-a53 -I port/arm -I kernel/include -I apps -I lib/include
+CFLAGS = -Wall -O2 -nostdlib -nostartfiles -ffreestanding -mcpu=cortex-a7 -I arch/arm -I kernel/include -I apps -I lib/include
+CFLAGS += -DCONFIG_SKIP_LOWLEVEL_INIT -DCONFIG_ARM=1
+OBJDIR = out
+
+OBJS_GCC = apps/main.o \
+       kernel/sched.o \
+       kernel/task.o \
+       kernel/queue.o \
+       kernel/mempool.o \
+       kernel/bytepool.o \
+       kernel/event.o \
+       kernel/irq.o \
+       kernel/init.o \
+       kernel/mutex.o \
+       kernel/timer.o \
+       kernel/semaphore.o \
+       lib/string.o \
+       lib/ctype.o \
+       arch/arm/osport.o \
+       arch/arm/lib/div0.o	
+
+OBJS_AS = arch/arm/preempt.o \
+          ubuntu/arm/vectors.o \
+          arch/arm/lib/_udivsi3.o \
+          arch/arm/lib/_divsi3.o
+
+OBJECTS_GCC = $(patsubst %,$(OBJDIR)/%,$(OBJS_GCC))
+OBJECTS_AS = $(patsubst %,$(OBJDIR)/%,$(OBJS_AS))
+
+$(OBJDIR)/%.o: %.c
+	$(CC)-gcc -c -o $@ $< $(CFLAGS)
+
+$(OBJDIR)/%.o: %.S
+	$(AS)-as -o $@ $<
+
+rose.elf: $(OBJECTS_GCC) $(OBJECTS_AS)
+	$(CC)-gcc -P -E arch/arm/rpi_linker.c -o rose.lds $(CFLAGS) 
+	#Import the C defines in to linker script
+	$(LD)-ld -T rose.lds -o $@ $^ 
+	$(CC)-objdump -D rose.elf > rose.list
+	$(CC)-objcopy rose.elf -O binary rose.bin
+	$(CC)-objcopy rose.elf -O ihex rose.hex
+clean:
+	make -f scripts/Makefile.clean
+	mkdir -p out/apps out/kernel out/arch/arm/lib out/lib
