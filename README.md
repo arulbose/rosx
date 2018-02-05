@@ -16,17 +16,28 @@ Currently trying to add support for Raspberry Pi. Working on a Kernel API docume
 
 Folder structure :
 
-apps/ - The actual application using the kernel apis
+apps/ - The actual application using the kernel APIs
+
 arch/ - Arch specific code
+
 include/
+
 kernel/ - Rose kernel files
+
 kernel/include - Rose kernel include files
+
 lib/
+
 out/ - Obj files
+
 scripts/ - Build scripts
+
 testapps/ - Kernel test applications
+
 arm.sh - Arm build script for RPI(incomplete)
+
 x86.sh - Builds a x86 rose simulator
+
 README
 
 X86 SIMULATOR:
