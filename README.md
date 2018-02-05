@@ -12,7 +12,7 @@ ROSE has a tiny kernel which supports
 8. Interrupts
 
 I have currently added support to test the kernel on a x86 environment using macro CONFIG_X86_SIMULATOR. In simulator mode it help to easily fix kernel bugs.
-Currently trying to add support for Raspberry Pi. Working on a Kernel API documentation.
+Currently trying to add support for Raspberry Pi. Working on the Kernel API documentation.
 
 Folder structure :
 
@@ -28,13 +28,13 @@ kernel/include - Rose kernel include files
 
 lib/
 
-out/ - Obj files
+out/ - obj files for the build
 
 scripts/ - Build scripts
 
 testapps/ - Kernel test applications
 
-arm.sh - Arm build script for RPI(incomplete)
+arm.sh - ARM build script for RPI(incomplete)
 
 x86.sh - Builds a x86 rose simulator
 
