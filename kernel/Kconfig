@@ -1,0 +1,229 @@
+# Rose kernel configuration
+
+menu "Rose Kernel setup"
+
+config STACK_ALLOC_DYNAMIC
+	bool
+	prompt "Task dynamic allocation of stack"
+	default n
+	help
+	If you want to allocated task stack size dynamically select as 'Y', you must provide the stack start and size.
+	
+config SYSTEM_STACK_SIZE
+	int 
+	prompt "System stack size"
+	depends on STACK_ALLOC_DYNAMIC
+	default 0
+	help
+	System stack size(4-byte aligned).Provide system stack size to manage dynamic allocation of stack while thread creation
+
+config ISR_STACK_SIZE
+	int
+	prompt "ISRstack size"
+	default 2048
+	help
+	ISR stack size will be allocated dynamically	
+
+config MAX_TASK
+	int
+	prompt "maximum number of tasks"
+	default 32
+	help
+	Maximum tasks supposed to be created. RoseKernal does not limit it. It is limited by the resource available
+
+config IRQ_COUNT
+	int
+	prompt "Number of IRQs used"
+	default 0
+	help
+	define maximum number of IRQs used in the system
+
+config  HZ
+	int
+	prompt "Timer tick frequency"
+	default 100
+	help
+	define timer tick frequency
+
+menu "Enable/Disable Kernel services"
+#File tune parameters of the kernel to get the smallest footprint 
+config SEMAPHORE
+	bool
+	prompt "Semaphore" 
+	default y
+	help
+	Enable or disable kernel service
+
+config SEMAPHORE_COUNT
+        int
+        prompt "Number of dynamic semaphores (0 - 32)"
+        depends on SEMAPHORE
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL
+	bool
+	prompt "Mempool"
+        default y
+        help
+        Enable or disable kernel service
+
+config MEMPOOL_4_BYTES_BLOCK
+	int
+	prompt "Number of 4 bytes block (0 - 32)"
+	depends on MEMPOOL
+	default 0
+	help
+	Range can be from 0 to 32	
+
+config MEMPOOL_8_BYTES_BLOCK
+        int
+        prompt "Number of 8 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL_16_BYTES_BLOCK
+        int
+        prompt "Number of 16 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL_32_BYTES_BLOCK
+        int
+        prompt "Number of 32 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL_64_BYTES_BLOCK
+        int
+        prompt "Number of 64 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL_128_BYTES_BLOCK
+        int
+        prompt "Number of 128 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL_256_BYTES_BLOCK
+        int
+        prompt "Number of 256 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL_512_BYTES_BLOCK
+        int
+        prompt "Number of 512 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL_1024_BYTES_BLOCK
+        int
+        prompt "Number of 1024 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL_2048_BYTES_BLOCK
+        int
+        prompt "Number of 2048 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MEMPOOL_4096_BYTES_BLOCK
+        int
+        prompt "Number of 4096 bytes block (0 - 32)"
+        depends on MEMPOOL
+        default 0
+        help
+        Range can be from 0 to 32
+
+config MUTEX
+	bool
+	prompt "Mutex"
+        default y
+        help
+        Enable or disable kernel service
+
+config MUTEX_COUNT
+        int
+        prompt "Number of dynamic mutex (0 - 32)"
+        depends on MUTEX
+        default 0
+        help
+        Range can be from 0 to 32
+
+config QUEUE
+	bool
+	prompt "Queue"
+        default y
+        help
+        Enable or disable kernel service
+
+config QUEUE_COUNT
+        int
+        prompt "Number of dynamic queue (0 - 32)"
+        depends on QUEUE
+        default 0
+        help
+        Range can be from 0 to 32
+
+config EVENTS
+	bool
+	prompt "Events"
+        default y
+        help
+        Enable or disable kernel service
+
+config EVENT_COUNT
+        int
+        prompt "Number of dynamic event (0 - 32)"
+        depends on EVENTS
+        default 0
+        help
+        Range can be from 0 to 32
+
+config TIMERS
+	bool
+	prompt "Kernel Timers"
+	default y
+	help
+	Enable or disable kernel service
+
+config TIMER_COUNT
+        int
+        prompt "Number of dynamic timers (0 - 32)"
+        depends on TIMERS
+        default 0
+        help
+        Range can be from 0 to 32
+
+config TIMER_DEFAULT_STACK_SIZE
+        int
+        prompt "Timer thread default stack size"
+        depends on TIMERS
+        default 512
+        help
+        Maximum size of stack available for timer thread.
+endmenu
+
+endmenu

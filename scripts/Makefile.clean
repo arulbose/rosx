@@ -1,0 +1,14 @@
+clean:
+	rm -f rose.bin
+	rm -f rose.hex
+	rm -f rose.elf
+	rm -f rose.list
+	rm -f rose.img
+	rm -f rose.bc
+	rm -f rose.lds
+	rm -rf out
+	rm -f rose86
+	rm -f librose.a
+	rm -rf validate
+	rm -f validate.tar.gz
+
