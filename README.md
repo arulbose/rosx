@@ -38,8 +38,6 @@ arm.sh - ARM build script for RPI(incomplete)
 
 x86.sh - Builds a x86 rose simulator
 
-README
-
 X86 SIMULATOR:
 
 To build a binary for X86 simulator run x86.sh. Add the application files in the app/ folder and build the kernel. An exceutable named 'rosex86' will be created.
