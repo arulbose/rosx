@@ -34,11 +34,8 @@ scripts/ - Build scripts
 
 testapps/ - Kernel test applications
 
-arm.sh - ARM build script for RPI(incomplete)
-
-x86.sh - Builds a x86 rose simulator
 
 X86 SIMULATOR:
 
-To build a binary for X86 simulator run x86.sh. Add the application files in the apps/ folder and build the kernel. An exceutable named 'rosex86' will be created.
+To build a binary for X86 simulator run 'make -f scripts/Makefile.x86'. Add the application files in the apps/ folder and build the kernel. An exceutable named 'rosex86' will be created.
 Also the simulator needs system ticks which can be generated using system_clk_100ms or system_clk_10ms executable files generated using scripts/send_signal.c. After running the kernel the tick executable should be run in another shell(in the same folder as 'rosex86')
