@@ -2,10 +2,12 @@ export CONFIG_X86_SIMULATOR
 CC = gcc
 LD = gcc
 AS = gcc
+MKDIR_P = mkdir -p
 
 CFLAGS = -I arch/x86 -Wall -m32 -g -fvar-tracking -DCONFIG_X86_SIMULATOR -I kernel/include -I apps
 LDFLAGS += -m32
 OBJDIR = out
+OUTDIR = out/apps out/kernel out/arch/x86
 
 OBJS_GCC = apps/main.o \
        kernel/sched.o \
@@ -27,6 +29,15 @@ OBJS_AS = arch/x86/preempt.o
 OBJECTS_GCC = $(patsubst %,$(OBJDIR)/%,$(OBJS_GCC))
 OBJECTS_AS = $(patsubst %,$(OBJDIR)/%,$(OBJS_AS))
 
+.PHONY: directories rosex86 clean
+
+all: directories rosex86
+
+directories: $(OUTDIR)
+
+$(OUTDIR):
+	${MKDIR_P} $(OUTDIR)
+	
 $(OBJDIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
@@ -38,4 +49,3 @@ rosex86: $(OBJECTS_GCC) $(OBJECTS_AS)
          
 clean:
 	make -f scripts/Makefile.clean
-	@mkdir -p out/apps out/kernel out/arch/x86
