@@ -1,8 +1,8 @@
 ROSE - Real Time Operating System Experiment
 
-ROSE has a tiny kernel which supports
+ROSE has a tiny preemptive kernel which supports
 
-1. Preemptive kernel
+1. Dynamic task management
 2. Kernel timers
 3. Mutex
 4. Semaphores
