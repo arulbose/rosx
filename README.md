@@ -11,7 +11,7 @@ ROSE has a tiny preemptive kernel which supports
 7. Message queues
 8. Interrupts
 
-I have currently added support to test the kernel on a x86 environment using macro CONFIG_X86_SIMULATOR. In simulator mode it help to easily fix kernel bugs.
+I have currently added support to test the kernel on a x86 environment using macro CONFIG_X86_SIMULATOR. In simulator mode it helps to easily fix kernel bugs.
 Currently trying to add support for Raspberry Pi. Working on the Kernel API documentation.
 
 Folder structure :
