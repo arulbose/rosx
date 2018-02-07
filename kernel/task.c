@@ -25,6 +25,7 @@
  *  @stack_size:	Size of the stack for the task
  *  @func:		Task entry function
  *  task_state:		Task state when created
+ *  time_slice:		The time in ticks the process should run in case of task competing with same priority
  */
 int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_size, void (*func)(void), int task_state, int time_slice)
 {
@@ -55,6 +56,9 @@ int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_
 	strcpy((char *)tcb->name, task_name);	
 	tcb->curr_stack_ptr = stack_ptr;
 	tcb->stack_start_ptr = stack_ptr;
+        if (prio > LEAST_PRIO)
+            prio = LEAST_PRIO; /* Fix it to the LEAST_PRIO */
+
 	tcb->prio = prio;
 #ifdef CONFIG_PRIO_INHERITANCE
 	tcb->orig_prio = prio;

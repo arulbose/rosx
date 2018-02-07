@@ -19,60 +19,59 @@
 #define __TASK_H__
 #define TASK_STR_LEN 8 /* Fixed */
 /**************** OS  Task definitions  **********************************/
-/* TCB-Task control block, expected to have all the details of the task */
+/* TCB-Task control block, expected to have all the details of the task
+ * The number of tasks is limited only by the resource available; Rose kernel by itself
+ * does not limit the number of tasks
+ */
 struct __task_control_block
 {
-        char name[TASK_STR_LEN];
-        void *stack_start_ptr;
-        void *curr_stack_ptr;
-        void *ip;  /* PC*/
-        void *bp; /* Stack frame pointer  */
-	void *preempt; /* Save EIP during preempt*/
-        int stack_size;
-        int prio;
-        void (*func)(void);
-        int state;
+        char name[TASK_STR_LEN]; /* Task name */
+        void *stack_start_ptr;   /* Start of stack for the task */
+        void *curr_stack_ptr;    /* Current stack pointer for the task */
+        void *ip;                /* Current instruction pointer/program counter */
+        void *bp;                /* Stack frame pointer */
+	void *preempt;           /* Save EIP(current instruction pointer) during preempt */
+        int stack_size;          /* Stack size for the task */
+        int prio;                /* Current task priority value 0 has the hisghest priority */
+        void (*func)(void);      /* Pointer to task hanlder */
+        int state;               /* Task current state */
 #ifdef CONFIG_TIME_SLICE
-	int time_slice; /* time slice the task supposed to run */
-	int ticks; /* ticks when 0 task will be pre-empted in co-operative mode */
+	int time_slice;          /* Time slice the task supposed to run; during task inittialization time_slice = ticks */
+	int ticks;               /* Ticks when 0 task will be pre-empted in co-operative mode */
 #endif
 #ifdef CONFIG_PRIO_INHERITANCE
-	int orig_prio;
+	int orig_prio;           /* Priority during task creation */
 #endif
-        unsigned int event_flag;
-        unsigned int event_recv;
-	struct timer_list *timer;
-	struct semaphore *sem;
-	struct mutex *mutex;
-	struct event_group *event;
-	struct __task_control_block *next;
+        unsigned int event_flag; /* Task event flag */
+        unsigned int event_recv; /* Task received events */
+	struct timer_list *timer;/* Pointer to task timer  */
+	struct semaphore *sem;   /* Pointer to task semaphore */
+	struct mutex *mutex;     /* Pointer task mutex */
+	struct event_group *event; /* Pointer to task event group */
+	struct __task_control_block *next; /* pointer to the next task kcontrol block */
 	struct __task_control_block *list; /* used to add in the global list of task */
 };
 
 typedef struct __task_control_block TCB;
-#define TASK_PRIO_MAX 32  /* limited only by resource available */
-#define LEAST_PRIO (CONFIG_MAX_TASK - 1)
+#define LEAST_PRIO (CONFIG_MAX_TASK - 1) /* CONFIG_MAX_TASK is defined by apps/define.h */
+#define HIGH_PRIO 0
 
-/* Globals */
+/* Globals; Application should not to use it directly instead use the revelvant apis */
+
 int __curr_num_task;
 #ifdef CONFIG_STACK_ALLOC_DYNAMIC
 void * __stack_start_ptr;
 void * __curr_stack_ptr;
 #endif
-
 TCB *__curr_running_task;
-
-/* OS */
-TCB __init_task;
 TCB *task_ready_head;
 TCB *__task_list_head;
+TCB __init_task;
 
-unsigned int __temp;
-
-/* Not inteded for the application to use it directly */
 int add_to_ready_q(TCB *p);
 int remove_from_ready_q(TCB *tid);
 
+/* Task state */
 enum{
         TASK_SUSPEND,
         TASK_READY,
