@@ -30,7 +30,7 @@ void init_mutex(struct mutex *mutex)
 }
 
 #if(CONFIG_MUTEX_COUNT > 0)
-/* dynamic creation of mutex */
+/* Runtime creation of mutex */
 struct mutex * create_mutex()
 {
 	struct mutex *mutex = NULL;
@@ -53,7 +53,7 @@ struct mutex * create_mutex()
 	return mutex;	
 }
 
-/* Runtime delete of mutex */
+/* Runtime deletion of mutex */
 void delete_mutex(struct mutex *p)
 {
 	unsigned int imask = enter_critical();

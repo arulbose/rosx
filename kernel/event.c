@@ -42,6 +42,7 @@ void init_event_group(struct event_group *event)
 /* dynamic event calls */
 
 #if(CONFIG_EVENT_COUNT > 0)
+/* Runtime creation of event group */
 struct event_group * create_event_group()
 {
 	struct event_group *event = NULL;
@@ -61,7 +62,7 @@ struct event_group * create_event_group()
 	return event;
 }
 
-/* Delete the event group and notify the task waiting for the events */
+/* Runtime deletion of event group. Notify the task waiting for the events */
 void delete_event_group(struct event_group *p)
 {
 	unsigned int imask = enter_critical();

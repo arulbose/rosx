@@ -32,7 +32,7 @@ void __kernel_enter()
     bytepool_init();
     /* stack init */
     __curr_stack_ptr = __stack_start_ptr; 
-     /* init task(just a place holder needed for the first context switch ) */
+    /* init task(just a place holder needed for the first context switch ) */
     strcpy(__init_task.name, "init"); 
     __curr_running_task = &__init_task;
     __curr_num_task = 0;

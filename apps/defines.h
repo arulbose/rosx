@@ -31,27 +31,27 @@
 /******************************Kernel services config <start> */
 /* Semaphores */
 #define CONFIG_SEMAPHORE
-#define CONFIG_SEMAPHORE_COUNT  10 /* Dynamic max count is 32 */ 
+#define CONFIG_SEMAPHORE_COUNT  10 /* Max count is 32 */ 
 /* Mutex */
 #define CONFIG_MUTEX
-#define CONFIG_MUTEX_COUNT	10 /* Dynamic max count is 32 */ 
+#define CONFIG_MUTEX_COUNT	10 /* Max count is 32 */ 
 /* Queues */
 #define CONFIG_QUEUE
-#define CONFIG_QUEUE_COUNT	10 /* Dynamic max count is 32 */ 
+#define CONFIG_QUEUE_COUNT	10 /* Max count is 32 */ 
 /* Events */
 #define CONFIG_EVENTS
-#define CONFIG_EVENT_COUNT	10 /* Dynamic max count is 32 */
+#define CONFIG_EVENT_COUNT	10 /* Max count is 32 */
 /* Timers */
 #define CONFIG_TIMERS
-#define CONFIG_TIMER_COUNT	10 /* Dynamic max count is 32 */
+#define CONFIG_TIMER_COUNT	10 /* Max count is 32 */
 #define CONFIG_TIMER_DEFAULT_STACK_SIZE 512
 /* Task */
-#define CONFIG_MAX_TASK 32
+#define CONFIG_MAX_TASK 32 /* Limited only by the resource available */
 #define CONFIG_TIME_SLICE
 /* IRQ*/
 #define CONFIG_IRQS		__CONFIG_IRQS
 #define CONFIG_IRQ_COUNT	__CONFIG_IRQ_COUNT 
-#define CONFIG_SHIRQ_COUNT  10 /* Dynamic max count is 32 */
+#define CONFIG_SHIRQ_COUNT  10 /* Max count is 32 */
 
 /* Byte pool */
 #define CONFIG_BYTEPOOL
