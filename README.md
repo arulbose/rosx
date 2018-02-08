@@ -22,13 +22,21 @@ Below are the thing in my TODO list :
 Folder structure :
 
 apps/ - The actual application using the kernel APIs
+
 arch/ - Arch specific code
+
 kernel/ - Rose kernel files
+
 kernel/include - Rose kernel include files
+
 lib/ - C library routines
+
 out/ - obj files for the build
+
 scripts/ - Build scripts
+
 testapps/ - Kernel test applications
+
 include/ - Common include files
 
 X86 SIMULATOR:
