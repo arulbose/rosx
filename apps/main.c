@@ -63,7 +63,7 @@ void task_3(void)
     while(1) {
         ssleep(3);
         count ++;
-        pr_info("task3 %d\n", count);
+        pr_info("task_3 %d\n", count);
     }
 }
 
@@ -74,7 +74,7 @@ void task_2(void)
     while(1) {
         ssleep(9);
         count ++;
-        pr_info("task2 %d\n", count);
+        pr_info("task_2 %d\n", count);
     }
 }
 

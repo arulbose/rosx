@@ -12,28 +12,24 @@ ROSE has a tiny preemptive kernel which supports
 8. Interrupts
 
 I have currently added support to test the kernel on a x86 environment using macro CONFIG_X86_SIMULATOR. In simulator mode it helps to easily fix kernel bugs.
-Currently trying to add support for Raspberry Pi. Working on the Kernel API documentation.
+
+Below are the thing in my TODO list :
+1. Kernel API documentation.
+2. Test tool for the Kernel(there are some unit test cases in testapps/ but not complete enough)
+3. Logger thread which read a common print buffer
+3. terminal emulator for x86 simulator
 
 Folder structure :
 
 apps/ - The actual application using the kernel APIs
-
 arch/ - Arch specific code
-
-include/
-
 kernel/ - Rose kernel files
-
 kernel/include - Rose kernel include files
-
-lib/
-
+lib/ - C library routines
 out/ - obj files for the build
-
 scripts/ - Build scripts
-
 testapps/ - Kernel test applications
-
+include/ - Common include files
 
 X86 SIMULATOR:
 

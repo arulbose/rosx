@@ -20,7 +20,7 @@
 void __sem_handler(void *ptr);
 
 /* Add to semaphore global list */
-/* For static allocation */
+/* static allocation of semaphore */
 void init_semaphore(struct semaphore *sem, int val)
 {
     sem->init_val = val;
@@ -29,7 +29,7 @@ void init_semaphore(struct semaphore *sem, int val)
 }
 
 #if(CONFIG_SEMAPHORE_COUNT > 0)
-/* Initialize semaphore */
+/* Runtime creation of semaphore */
 struct semaphore * create_semaphore(int val)
 {
     struct semaphore *sem = NULL;
@@ -55,7 +55,7 @@ struct semaphore * create_semaphore(int val)
     return sem;
 }
 
-/* Runtime delete of sem */
+/* Runtime deletion of semaphore */
 void delete_semaphore(struct semaphore *p)
 {
     unsigned int imask = enter_critical();
