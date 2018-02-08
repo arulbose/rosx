@@ -33,7 +33,7 @@ struct __task_control_block
 	void *preempt;           /* Save EIP(current instruction pointer) during preempt */
         int stack_size;          /* Stack size for the task */
         int prio;                /* Current task priority value 0 has the hisghest priority */
-        void (*func)(void);      /* Pointer to task hanlder */
+        void (*func)(void);      /* Pointer to task handler */
         int state;               /* Task current state */
 #ifdef CONFIG_TIME_SLICE
 	int time_slice;          /* Time slice the task supposed to run; during task inittialization time_slice = ticks */
