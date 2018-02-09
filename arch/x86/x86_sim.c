@@ -93,7 +93,9 @@ int main()
 
     shm_ptr->pid = pid;
     init_signals();
-    /******* Rose RTOS initialization ********/
+
+    /******** Port specific Rose RTOS initialization <start> ********/
+
     #ifdef CONFIG_STACK_ALLOC_DYNAMIC
     __stack_start_ptr = ((char *)malloc(CONFIG_SYSTEM_STACK_SIZE) + CONFIG_SYSTEM_STACK_SIZE);
     if(!__stack_start_ptr) {
@@ -102,11 +104,21 @@ int main()
     }
     pr_info("__stack_start_ptr = %p\n", __stack_start_ptr);
     #endif
+
+    #ifdef CONFIG_PRINT_BUFFER
+    __printk_buffer_start_ptr = (char *)malloc(CONFIG_PRINT_BUFFER_SIZE);
+    if(!__printk_buffer_start_ptr) {
+  	pr_info("System print buffer allocation failed\n");
+ 	exit(1);
+    }
+    #endif 
+
     __bytepool_start = (unsigned char *)malloc(CONFIG_BYTEPOOL_SIZE);
     if(!__bytepool_start) {
 	pr_info("System bytepool allocation failed\n");
 	exit(1);
     }
+    /******** Port specific Rose RTOS initialization <end> ********/
 
     /* Entry point of Rose RTOS  */
     __kernel_enter();

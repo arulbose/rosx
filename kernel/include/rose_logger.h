@@ -15,35 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __X86_SIM_H__ 
-#define __X86_SIM_H__
+#ifndef __LOGGER_H__
+#define __LOGGER_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
-#include <irq_mapping.h>
+#include <RoseRTOS.h>
 
-#define  __printk(...) 	\
-			{ \
-			printf(__VA_ARGS__); \
-			fflush(stdout); \
-			}
+void __printk_to_buffer(const char *fmt, ...);
+void rose_logger_thread(void);
 
+#ifdef CONFIG_PRINT_BUFFER
+char *__printk_buffer_head;
+char *__printk_buffer_tail;
+char *__printk_buffer_start_ptr;
+#endif
 
-#define  __early_printk(...) 	\
-			{ \
-			printf(__VA_ARGS__); \
-			fflush(stdout); \
-			}
-
-sigset_t mask;
-sigset_t orig_mask;
-struct sigaction act;
-volatile int __context; /* user:0/IRQ:1 to be used by the port critical section code to bypass if already in IRQ context */
-volatile int __critical;
-
-#define __IRQ 1
-#define __USER 0
-
-#endif 
+#endif /* __LOGGER_H__ */

@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __TYPE_H__
-#define __TYPE_H__
+#ifndef __KERNEL_TYPE_H__
+#define __KERNEL_TYPE_H__
+#include <asm/types.h>
 
 /* Special values for "timeout" parameter. */
 #define OS_NO_WAIT                0     /**< The blocking function returns immediately */
@@ -53,11 +54,17 @@ typedef __kernel_size_t         size_t;
 typedef __kernel_ssize_t        ssize_t;
 #endif
 
+#ifndef NULL
+#define NULL 0
+#endif
+
+#if 0
 #undef NULL
 #if defined(__cplusplus)
 #define NULL 0
 #else
 #define NULL ((void *)0)
 #endif
-
 #endif
+
+#endif /* __KERNEL_TYPE_H__ */

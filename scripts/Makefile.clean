@@ -6,6 +6,7 @@ clean:
 	rm -f rose.img
 	rm -f rose.bc
 	rm -f rose.lds
+	rm -f include/asm
 	rm -rf out
 	rm -f rosex86
 	rm -f librose.a

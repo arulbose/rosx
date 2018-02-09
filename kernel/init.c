@@ -19,6 +19,7 @@
 
 static TCB timer0_tcb;
 static TCB event0_tcb;
+static TCB logger0_tcb;
 
 /* App entry point */
 extern void application_init(void);
@@ -39,8 +40,12 @@ void __kernel_enter()
 
     /* create all system threads */
     create_task(&timer0_tcb,"timer0", 0, 0, 8192, rose_timer_thread, TASK_READY, 0); /* system timer thread */
-    create_task(&event0_tcb,"event0", 0, 0, 8192, rose_event_thread, TASK_READY, 0); /* system event process thread */
+    create_task(&event0_tcb,"event0", 0, 0, 8192, rose_event_thread, TASK_READY, 0); /* system event thread */
             
+    /* Logger init */
+    __printk_buffer_head = __printk_buffer_tail = __printk_buffer_start_ptr;
+    create_task(&logger0_tcb,"logger0", (LEAST_PRIO - 1), 0, 8192, rose_logger_thread, TASK_READY, 0); /* system logger thread */
+    
     application_init();	
     /* NO RETURN */
 }
