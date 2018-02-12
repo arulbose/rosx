@@ -11,11 +11,13 @@
  * from hush: simple_itoa() was lifted from boa-0.93.15
  */
 
+#include <common.h>
+#include <charset.h>
 #include <stdarg.h>
-#include <types.h>
-#include <rose_types.h>
+#include <rose/types.h>
+#include <rose/string.h>
+#include <rose/ctype.h>
 #include <div64.h>
-#include <string.h>
 
 #define noinline __attribute__((noinline))
 #ifndef NULL
@@ -567,6 +569,7 @@ int sprintf(char *buf, const char *fmt, ...)
 	return i;
 }
 
+#if 0
 int printf(const char *fmt, ...)
 {
 	va_list args;
@@ -609,7 +612,6 @@ int vprintf(const char *fmt, va_list args)
 	return i;
 }
 
-
 void __assert_fail(const char *assertion, const char *file, unsigned line,
 		   const char *function)
 {
@@ -617,6 +619,7 @@ void __assert_fail(const char *assertion, const char *file, unsigned line,
 	panic("%s:%u: %s: Assertion `%s' failed.", file, line, function,
 	      assertion);
 }
+#endif
 
 char *simple_itoa(ulong i)
 {
@@ -632,6 +635,7 @@ char *simple_itoa(ulong i)
 	return p + 1;
 }
 
+#if 0
 /* We don't seem to have %'d in U-Boot */
 void print_grouped_ull(unsigned long long int_val, int digits)
 {
@@ -647,6 +651,7 @@ void print_grouped_ull(unsigned long long int_val, int digits)
 		grab = 3;
 	}
 }
+#endif
 
 bool str2off(const char *p, loff_t *num)
 {

@@ -18,7 +18,7 @@
 #ifndef __ROSE_DEFINES_H__
 #define __ROSE_DEFINES_H__
 
-#include <interrupt.h>
+#include <asm/interrupt.h>
 /* System stack config */
 #define CONFIG_STACK_ALLOC_DYNAMIC
 #define CONFIG_SYSTEM_STACK_SIZE 65536

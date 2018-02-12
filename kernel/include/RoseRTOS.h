@@ -21,12 +21,11 @@
 /* port file which includes all the defines for the kernel hooks */
 #include <asm/osport.h>
 #include <asm/switch.h>
-#include <string.h>
+#include <rose/string.h>
 /* rose rtos internal */
-#include <rose_types.h>
+#include <rose/types.h>
 #include <rose_defines.h>
 #include <rose_logger.h>
-#include <rose_types.h>
 #include <rose_task.h>
 #include <rose_mutex.h>
 #include <rose_init.h>
@@ -59,7 +58,7 @@
 #define pr_error(...)   
 #endif
 
-#define pr_panic(fmt, ...)   {               \
+#define pr_panic(fmt, args ...)   {               \
                         __printk_to_buffer(fmt, ## args); \
                         while(1); \
                         }

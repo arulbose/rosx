@@ -20,9 +20,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <rose/string.h>
 #include <signal.h>
-#include <irq_mapping.h>
+#include "irq_mapping.h"
 
 #define  __printk(...) 	\
 			{ \

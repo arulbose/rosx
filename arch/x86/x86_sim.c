@@ -82,7 +82,7 @@ int main()
     mem_key   = ftok(".", 'c');
     /* Allocates a System V shared memory segment */
     if( -1 == (shm_id   = shmget(mem_key, sizeof(struct shm_struct), IPC_CREAT | 0666))) {
-	printf("Shget failed %s\n", strerror(errno));
+	printf("Shget failed \n");
 	exit(1);
     }
     /* attaches the System V shared memory segment identified by the shm_id */

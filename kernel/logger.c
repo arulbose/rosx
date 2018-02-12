@@ -17,7 +17,6 @@
 
 #include <RoseRTOS.h>
 #include <stdarg.h>
-#include "types.h"
 
 static int print_buffer_ready = 0;
 
