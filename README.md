@@ -42,3 +42,4 @@ Below are the thing in my TODO list :
 1. Kernel API documentation.
 2. Test tool for the Kernel(there are some unit test cases in testapps/ but not complete enough)
 3. Terminal emulator for x86 simulator
+4. Device core APIs(open/release/read/write/ioctl/poll)
