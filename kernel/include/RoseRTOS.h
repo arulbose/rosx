@@ -19,23 +19,50 @@
 #define __ROSE_RTOS_H__
 
 /* port file which includes all the defines for the kernel hooks */
-#include "osport.h"
-#include "switch.h"
-#include "string.h"
+#include <asm/osport.h>
+#include <asm/switch.h>
+#include <rose/string.h>
 /* rose rtos internal */
-#include "defines.h"
-#include "type.h"
-#include "task.h"
-#include "mutex.h"
-#include "init.h"
-#include "bytepool.h"
-#include "mempool.h"
-#include "queue.h"
-#include "timer.h"
-#include "irq.h"
-#include "sched.h"
-#include "events.h"
-#include "semaphore.h"
+#include <rose/types.h>
+#include <rose_defines.h>
+#include <rose_logger.h>
+#include <rose_task.h>
+#include <rose_mutex.h>
+#include <rose_init.h>
+#include <rose_bytepool.h>
+#include <rose_mempool.h>
+#include <rose_queue.h>
+#include <rose_timer.h>
+#include <rose_irq.h>
+#include <rose_sched.h>
+#include <rose_events.h>
+#include <rose_semaphore.h>
+
+#ifdef CONFIG_PRINT_BUFFER
+/* Log controls in defines.h */
+#ifdef PRINT_INFO
+#define pr_info(fmt, args ...)    __printk_to_buffer(fmt, ## args)
+#else
+#define pr_info(...)    
+#endif
+
+#ifdef PRINT_DEBUG
+#define pr_dbg(fmt, args ...)     __printk_to_buffer(fmt, ## args)
+#else
+#define pr_dbg(...)     
+#endif
+    
+#ifdef PRINT_ERROR
+#define pr_error(fmt, args ...)   __printk_to_buffer(fmt, ## args)
+#else
+#define pr_error(...)   
+#endif
+
+#define pr_panic(fmt, args ...)   {               \
+                        __printk_to_buffer(fmt, ## args); \
+                        }
+
+#else /* CONFIG_PRINT_BUFFER */
 
 /* Log controls in defines.h */
 #ifdef PRINT_INFO
@@ -60,5 +87,6 @@
 			__printk(__VA_ARGS__); \
 			while(1); \
 			}
+#endif /*CONFIG_PRINT_BUFFER*/
 
 #endif /* __ROSE_RTOS_H__ */

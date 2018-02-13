@@ -4,10 +4,10 @@ LD = gcc
 AS = gcc
 MKDIR_P = mkdir -p
 
-CFLAGS = -I arch/x86 -Wall -m32 -g -fvar-tracking -DCONFIG_X86_SIMULATOR -I kernel/include -I apps
+CFLAGS = -I include -Wall -m32 -g -fvar-tracking -DCONFIG_X86_SIMULATOR -D__KERNEL__ -D __GNUC__=4  -I kernel/include -I apps
 LDFLAGS += -m32
 OBJDIR = out
-OUTDIR = out/apps out/kernel out/arch/x86
+OUTDIR = out/apps out/kernel out/arch/x86 out/lib
 
 OBJS_GCC = apps/main.o \
        kernel/sched.o \
@@ -21,6 +21,13 @@ OBJS_GCC = apps/main.o \
        kernel/mutex.o \
        kernel/timer.o \
        kernel/semaphore.o \
+       kernel/logger.o \
+       lib/vsprintf.o \
+       lib/strto.o \
+       lib/string.o \
+       lib/charset.o \
+       lib/div64.o \
+       lib/ctype.o \
        arch/x86/x86_sim.o \
        arch/x86/osport.o	
 
@@ -37,6 +44,7 @@ directories: $(OUTDIR)
 
 $(OUTDIR):
 	${MKDIR_P} $(OUTDIR)
+	ln -s ../arch/x86 include/asm
 	
 $(OBJDIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)

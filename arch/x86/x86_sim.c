@@ -66,7 +66,7 @@ void init_signals()
     act.sa_handler = sig_handler;
  
     if (sigaction(SIGUSR1, &act, 0)) {
- 	perror ("sigaction");
+ 	__early_printk("sigaction error");
 	exit(1);
     }
  
@@ -82,31 +82,43 @@ int main()
     mem_key   = ftok(".", 'c');
     /* Allocates a System V shared memory segment */
     if( -1 == (shm_id   = shmget(mem_key, sizeof(struct shm_struct), IPC_CREAT | 0666))) {
-	printf("Shget failed %s\n", strerror(errno));
+	__early_printk("Shget failed \n");
 	exit(1);
     }
     /* attaches the System V shared memory segment identified by the shm_id */
     if((void *)-1 == (shm_ptr  = (struct shm_struct *) shmat(shm_id, NULL, 0))) {
-	printf("Shmat failed\n");
+	__early_printk("Shmat failed\n");
           exit(1);
     }
 
     shm_ptr->pid = pid;
     init_signals();
-    /******* Rose RTOS initialization ********/
+
+    /******** Port specific Rose RTOS initialization <start> ********/
+
     #ifdef CONFIG_STACK_ALLOC_DYNAMIC
     __stack_start_ptr = ((char *)malloc(CONFIG_SYSTEM_STACK_SIZE) + CONFIG_SYSTEM_STACK_SIZE);
     if(!__stack_start_ptr) {
-  	pr_info("System stack allocation failed\n");
+  	__early_printk("System stack allocation failed\n");
  	exit(1);
     }
-    pr_info("__stack_start_ptr = %p\n", __stack_start_ptr);
+    __early_printk("__stack_start_ptr = %p\n", __stack_start_ptr);
     #endif
+
+    #ifdef CONFIG_PRINT_BUFFER
+    __printk_buffer_start_ptr = (char *)malloc(CONFIG_PRINT_BUFFER_SIZE);
+    if(!__printk_buffer_start_ptr) {
+  	__early_printk("System print buffer allocation failed\n");
+ 	exit(1);
+    }
+    #endif 
+
     __bytepool_start = (unsigned char *)malloc(CONFIG_BYTEPOOL_SIZE);
     if(!__bytepool_start) {
-	pr_info("System bytepool allocation failed\n");
+	__early_printk("System bytepool allocation failed\n");
 	exit(1);
     }
+    /******** Port specific Rose RTOS initialization <end> ********/
 
     /* Entry point of Rose RTOS  */
     __kernel_enter();

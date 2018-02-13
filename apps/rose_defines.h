@@ -15,13 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __DEFINES_H__
-#define __DEFINES_H__
+#ifndef __ROSE_DEFINES_H__
+#define __ROSE_DEFINES_H__
 
-#include <interrupt.h>
+#include <asm/interrupt.h>
 /* System stack config */
 #define CONFIG_STACK_ALLOC_DYNAMIC
 #define CONFIG_SYSTEM_STACK_SIZE 65536
+
+/* Print buffer */
+#define CONFIG_PRINT_BUFFER 
+#ifdef CONFIG_PRINT_BUFFER
+#define CONFIG_PRINT_BUFFER_SIZE 1024
+#endif /* CONFIG_PRINT_BUFFER */
 
 /* Kernel config */
 #define CONFIG_HZ 100
