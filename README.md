@@ -41,5 +41,4 @@ Also the simulator needs system ticks which can be generated using system_clk_10
 Below are the thing in my TODO list :
 1. Kernel API documentation.
 2. Test tool for the Kernel(there are some unit test cases in testapps/ but not complete enough)
-3. Logger thread which read a common print buffer
-3. terminal emulator for x86 simulator
+3. Terminal emulator for x86 simulator
