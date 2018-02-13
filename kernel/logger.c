@@ -42,11 +42,6 @@ void __printk_to_buffer(const char *fmt, ...)
     va_list arg;
     int size;
 
-    /* This should be used with uinlikely for compiler optimization */
-    if(!print_buffer_ready){
-    //    __early_printk(fmt, ...);
-    }
-
     va_start(arg, fmt);
     size = snprintf(NULL, 0, fmt, arg);
 
@@ -67,6 +62,8 @@ void __printk_to_buffer(const char *fmt, ...)
 
 void rose_logger_thread()
 {
+    print_buffer_ready = 1;
+    pr_info("rose_logger_thread ready\n");
     while(1) {
 
         if(__printk_buffer_head != __printk_buffer_tail) {

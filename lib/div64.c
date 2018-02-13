@@ -17,7 +17,6 @@
  * or by defining a preprocessor macro in arch/include/asm/div64.h.
  */
 
-//#include <rose/compat.h>
 #include <rose/kernel.h>
 #include <rose/math64.h>
 

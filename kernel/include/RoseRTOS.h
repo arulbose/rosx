@@ -60,7 +60,6 @@
 
 #define pr_panic(fmt, args ...)   {               \
                         __printk_to_buffer(fmt, ## args); \
-                        while(1); \
                         }
 
 #else /* CONFIG_PRINT_BUFFER */
