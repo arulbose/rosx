@@ -20,6 +20,7 @@
 static TCB timer0_tcb;
 static TCB event0_tcb;
 static TCB logger0_tcb;
+static TCB terminal0_tcb;
 
 /* App entry point */
 extern void application_init(void);
@@ -45,6 +46,9 @@ void __kernel_enter()
     /* Logger init */
     __printk_buffer_head = __printk_buffer_tail = __printk_buffer_start_ptr;
     create_task(&logger0_tcb,"logger0", (LEAST_PRIO - 1), 0, 8192, rose_logger_thread, TASK_READY, 0); /* system logger thread */
+
+    /* terminal */
+    create_task(&terminal0_tcb,"term0", (LEAST_PRIO - 2), 0, 8192, rose_terminal_thread, TASK_READY, 0); /* terminal emulator thread */
     
     application_init();	
     /* NO RETURN */
