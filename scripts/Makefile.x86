@@ -23,6 +23,7 @@ OBJS_GCC = apps/main.o \
        kernel/semaphore.o \
        kernel/logger.o \
        kernel/terminal.o \
+       kernel/device.o \
        lib/vsprintf.o \
        lib/strto.o \
        lib/string.o \

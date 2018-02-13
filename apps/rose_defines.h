@@ -74,10 +74,13 @@
 #define CONFIG_2048_BYTES_BLOCK	0  /* Max count is 32 */
 #define CONFIG_4096_BYTES_BLOCK	0  /* Max count is 32 */
 
+/* Device */
+#define CONFIG_MAX_DEVICE_DESC 5
+
 /******************************Kernel services config <end> */
 /* log control */
 #define PRINT_INFO
 #define PRINT_DEBUG
 #define PRINT_ERROR
 
-#endif
+#endif /* __ROSE_DEFINES_H__ */

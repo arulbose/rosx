@@ -15,36 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef __ROSE_DEVICE_H
+#define __ROSE_DEVICE_H
+
 #include <RoseRTOS.h>
 
-#define CONFIG_MAX_DEVICE_DESC 5
+struct device;
+struct devfile;
 
+struct device_ops {
+    int (*open)(struct devfile *);
+    int (*release)(struct devfile *);
+    int (*read)(struct devfile *, char *, size_t);
+    int (*write)(struct devfile *, const char *, size_t);
+    int (*ioctl)(struct devfile *, unsigned int, void *);
+
+}; 
 /* Main device struct */
 struct device{
-        char device_name[18];
-        unsigned int *device_ops; /* initalized in the device driver initialization call */
+        const char name[16];
+        struct device_ops *device_ops; /* initalized during the device driver initialization call */
         int device_open_count;
 };
 
-static struct devfile {
-    int dd; /* Device descriptor */
-    void *private_data;
+/* Device file passed to device api calls */
+struct devfile {
     struct device *dev;
+    void *private_data;
 };
 
-static struct device_descriptor_list device_desc[CONFIG_MAX_DEVICE_DESC]
-
-/* Add new devices in the list */
-struct device device_table[] = {
-                                 {"simx86", NULL, 0}
-			       };
-
 /* Driver core APIs used by application */
-int open(char *filename, int flags);
-void close(int fd);
-int read(int fd, char *dest, int number_of_bytes);
-int write(int fd, char *src, int number_of_bytes);
-int ioctl(int fd, unsigned int cmd, void *arg);
-int poll(int fd, wait_queue);
+int dev_open(const char *filename, int flags);
+int dev_close(int fd);
+int dev_read(int fd, char *dest, int number_of_bytes);
+int dev_write(int fd, const char *src, int number_of_bytes);
+int dev_ioctl(int fd, unsigned int cmd, void *arg);
 
-/* Driver core APIs used by driver */
+#endif /* __ROSE_DEVICE_H */

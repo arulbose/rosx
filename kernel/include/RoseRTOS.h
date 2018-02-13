@@ -22,10 +22,10 @@
 #include <asm/osport.h>
 #include <asm/switch.h>
 #include <rose/string.h>
+#include <rose/types.h>
 
 /* rose rtos internal */
 #include <rose_version.h>
-#include <rose/types.h>
 #include <rose_defines.h>
 #include <rose_logger.h>
 #include <rose_task.h>
@@ -40,6 +40,7 @@
 #include <rose_events.h>
 #include <rose_semaphore.h>
 #include <rose_terminal.h>
+#include <rose_device.h>
 
 #ifdef CONFIG_PRINT_BUFFER
 /* Log controls in defines.h */
