@@ -117,3 +117,8 @@ int dev_ioctl(int desc_id, unsigned int cmd, void *arg)
     }
     return -ENODEV;
 }
+
+int register_driver(char *name, struct device_ops *ops)
+{
+
+}

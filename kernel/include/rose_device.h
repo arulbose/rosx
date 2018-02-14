@@ -44,6 +44,8 @@ struct devfile {
     void *private_data;
 };
 
+int register_driver(char *, struct device_ops *);
+
 /* Driver core APIs used by application */
 int dev_open(const char *filename, int flags);
 int dev_close(int fd);
