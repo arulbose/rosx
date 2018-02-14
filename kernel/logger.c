@@ -41,6 +41,7 @@ void __printk_to_buffer(const char *fmt, ...)
 {
     va_list arg;
     int size;
+    unsigned int imask;
 
     va_start(arg, fmt);
     size = snprintf(NULL, 0, fmt, arg);
@@ -50,6 +51,7 @@ void __printk_to_buffer(const char *fmt, ...)
  	pr_error("Invalid print request; exceeeds print buffer capacity Requested: %d Available: %d\n" , (size + 1), CONFIG_PRINT_BUFFER_SIZE );
         return;
      }
+    imask = enter_critical();
 
     CHECK_AND_FIX_BUFFER_OVERFLOW(__printk_buffer_head, (size + 1))
 
@@ -57,17 +59,26 @@ void __printk_to_buffer(const char *fmt, ...)
     vsprintf(__printk_buffer_head, fmt, arg);
     __printk_buffer_head = __printk_buffer_head + (size + 1);
 
+    exit_critical(imask);
+
     va_end (arg);
 }
 
 void rose_logger_thread()
 {
+    int dd;
     print_buffer_ready = 1;
-    pr_info("rose_logger_thread ready\n");
+    __early_printk("rose_logger_thread ready\n");
+
+    if (0 < (dd = dev_open(CONFIG_SERIAL, 0))) {
+        __early_printk("Failed to open serial device\n");
+       while(1); 
+    }
+
     while(1) {
 
         if(__printk_buffer_head != __printk_buffer_tail) {
-           __printk("%c", *__printk_buffer_tail);
+           dev_write(dd, __printk_buffer_tail, 1);
            MOVE_BUFFER_POINTER(__printk_buffer_tail, 1)
 	}
 

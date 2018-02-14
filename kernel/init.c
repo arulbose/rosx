@@ -39,6 +39,9 @@ void __kernel_enter()
     __curr_running_task = &__init_task;
     __curr_num_task = 0;
 
+    /* driver initialization */
+    driver_init();
+
     /* create all system threads */
     create_task(&timer0_tcb,"timer0", 0, 0, 8192, rose_timer_thread, TASK_READY, 0); /* system timer thread */
     create_task(&event0_tcb,"event0", 0, 0, 8192, rose_event_thread, TASK_READY, 0); /* system event thread */

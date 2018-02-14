@@ -18,6 +18,8 @@
 #include <RoseRTOS.h>
 #include <rose/errno.h>
 
+extern int x86_simulator_init();
+
 static struct devfile desc[CONFIG_MAX_DEVICE_DESC];
 
 /* Add new devices in the list */
@@ -120,5 +122,24 @@ int dev_ioctl(int desc_id, unsigned int cmd, void *arg)
 
 int register_driver(char *name, struct device_ops *ops)
 {
+    int device_table_id;
 
+    for(device_table_id = 0; device_table_id < (sizeof(device_table)/sizeof(struct device)); device_table_id ++ )
+    {
+        if(0 == strcmp(name, device_table[device_table_id].name))
+        { /* Device found */
+           if(device_table[device_table_id].device_ops != NULL) {
+               __early_printk("Registeration failed %s\n", name );
+               return ENODEV;
+           }
+           device_table[device_table_id].device_ops = ops; 
+           return 0;
+        }
+    }
+    return -ENODEV;
+}
+
+void driver_init()
+{
+    x86_simulator_init();
 }

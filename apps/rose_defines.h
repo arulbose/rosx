@@ -21,7 +21,7 @@
 #include <asm/interrupt.h>
 /* System stack config */
 #define CONFIG_STACK_ALLOC_DYNAMIC
-#define CONFIG_SYSTEM_STACK_SIZE 65536
+#define CONFIG_SYSTEM_STACK_SIZE (8192 * 10)
 
 /* Print buffer */
 #define CONFIG_PRINT_BUFFER 
@@ -76,7 +76,7 @@
 
 /* Device */
 #define CONFIG_MAX_DEVICE_DESC 5
-
+#define CONFIG_SERIAL "simx86"
 /******************************Kernel services config <end> */
 /* log control */
 #define PRINT_INFO

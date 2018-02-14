@@ -42,9 +42,11 @@ struct device{
 struct devfile {
     struct device *dev;
     void *private_data;
+    int flags;
 };
 
 int register_driver(char *, struct device_ops *);
+void driver_init(void);
 
 /* Driver core APIs used by application */
 int dev_open(const char *filename, int flags);
