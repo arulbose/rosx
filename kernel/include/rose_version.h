@@ -1,0 +1,6 @@
+#ifndef __CONFIG_RELEASE_VERSION_H
+#define __CONFIG_RELEASE_VERSION_H
+
+#define CONFIG_RELEASE_VERSION "v0_3"
+
+#endif
