@@ -20,21 +20,6 @@
 
 static int print_buffer_ready = 0;
 
-/* Helper macro to align buffer pointer to cycle within the boundary */
-#define MOVE_BUFFER_POINTER(ptr, size) { \
-			if((ptr + size) > (__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE) ) \
-				ptr = __printk_buffer_start_ptr; \
-			else	\
-				ptr = ptr + size; \
-			}
-
-#define CHECK_AND_FIX_BUFFER_OVERFLOW(ptr, size) { \
-							if((__printk_buffer_head + (size + 1)) > (__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE)){ \
-						        	/* Size cannot fit move the head to start of the buffer and also set to skipped mem to NULL */ \
-        							memset(__printk_buffer_start_ptr, '\0', (__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE - __printk_buffer_head)); \
-       								 __printk_buffer_head = __printk_buffer_start_ptr; \
-    							} \
-						}
 /* Store the print output in the buffer; Take care of buffer overflow and truncate and complain if the a single print exceeds the maximum capacity of the buffer
 */
 void __printk_to_buffer(const char *fmt, ...)
@@ -53,7 +38,11 @@ void __printk_to_buffer(const char *fmt, ...)
      }
     imask = enter_critical();
 
-    CHECK_AND_FIX_BUFFER_OVERFLOW(__printk_buffer_head, (size + 1))
+    if((__printk_buffer_head + (size + 1)) > (__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE)){
+        /* Size cannot fit move the head to start of the buffer and also set to skipped mem to NULL */ 
+        memset(__printk_buffer_head, '\0', (__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE - __printk_buffer_head));
+        __printk_buffer_head = __printk_buffer_start_ptr;
+     } 
 
     /* All good */
     vsprintf(__printk_buffer_head, fmt, arg);
@@ -71,16 +60,19 @@ void rose_logger_thread()
     __early_printk("rose_logger_thread ready\n");
 
     if (0 < (dd = dev_open(CONFIG_SERIAL, 0))) {
-        __early_printk("Failed to open serial device\n");
+       __early_printk("Failed to open serial device\n");
        while(1); 
     }
 
     while(1) {
-
         if(__printk_buffer_head != __printk_buffer_tail) {
            dev_write(dd, __printk_buffer_tail, 1);
-           MOVE_BUFFER_POINTER(__printk_buffer_tail, 1)
-	}
+           if((__printk_buffer_tail + 1) > (__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE) ) {
+               __printk_buffer_tail = __printk_buffer_start_ptr;
+           }else{
+               __printk_buffer_tail = __printk_buffer_tail + 1;
+           }
 
+	}
     }
 }
