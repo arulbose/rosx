@@ -79,6 +79,8 @@ enum{
         TASK_RUNNING,
         TASK_COMPLETE,
         TASK_ABORT,
+        TASK_INTERRUPTIBLE,
+        TASK_UN_INTERRUPTIBLE,
 
 }TASK_STATE;
 

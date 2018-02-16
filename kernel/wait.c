@@ -20,28 +20,30 @@
 /* Rose Wait Q
  * */
 
-int add_to_wait_queue(struct wait_queue *wq)
+int add_to_wait_queue(struct wait_queue *wq, int task_state)
 {
     TCB *tmp;
 
     unsigned int imask = enter_critical();
     
-    __curr_running_task->state = TASK_SUSPEND;
+    __curr_running_task->state = task_state;
     __curr_running_task->wq = wq;
     remove_from_ready_q(__curr_running_task);
     __curr_running_task->next = NULL;
   
-    if(!(wq->task)) {
-        wq->task = __curr_running_task;
-    
-    if(!(__sys_wait_list->next)) {
-        __sys_wait_list->next = __curr;
+    wq->task = __curr_running_task;
+
+    /* Add the waiting task to the sys wait queue */    
+    if(!(__sys_wait_list)) {
+        __sys_wait_list = wq;
     }else{
-        tmp = __sys_wait_list->task;
-        while(tmp){
+        /* add wait queue to the tail of sytem wait list */
+        tmp = __sys_wait_list;
+        while(tmp->next){
             tmp = tmp->next;
         }
-        tmp = wq;
+        tmp->next = wq;
+        wq->prev = tmp;
     }
 
     exit_critical(imask);
@@ -52,22 +54,28 @@ int add_to_wait_queue(struct wait_queue *wq)
 int wakeup(struct wait_queue *wq)
 {
     unsigned int imask = enter_critical();
-        
-    /* wake up all task waiting on the event q, let the task return proper error code */
-    while(wq->task){
-        wq->task->state = TASK_READY;
-        add_to_ready_q(wq->task);
-        wq->task->wait_queue = NULL;
-        wq->task = wq->task->next; /* move to the next task in the queue */
-   }
+    
+    if(!__sys_wait_list)
+        return -ENXIO;
+
+    if(__sys_wait_list == wq) {
+        /* The first node is the task to be removed */
+        __sys_wait_list = wq->next;
+    }else{
+        /* Cut and connect the chain */
+        wq->prev->next = wq->next;
+        wq->next->prev = wq->prev;
+    }
+ 
     exit_critical(imask);
     return 0;
 }
 
 void rose_event_thread()
 {
+   
     while(1) {
-
+    /* wake up only threads which are TASK_INTERRUPTIBLE */
 
     }
 }

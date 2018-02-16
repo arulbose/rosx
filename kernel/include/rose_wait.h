@@ -22,6 +22,7 @@ struct wait_queue{
         TCB *task; /* task waiting for the event */
         /* Add all local tracking stuff here */
         struct wait_queue *next; /* Will be hooked to the system wait queue list */
+        struct wait_queue *prev; /* Will be hooked to the system wait queue list */
 };
 
 #define wait_event(wq, condition)                                       \
@@ -33,13 +34,27 @@ struct wait_queue{
 #define __wait_event(struct wait_queue *wq, int condition)              \
 do {                                                                    \
         for(;;){                                                        \
-           add_to_wait_queue(wq);                                       \
+           add_to_wait_queue(wq, TASK_INTERRUPTIBLE);                   \
            if(condition)                                                \
               break;                                                    \
            rose_sched();                                                \
         }                                                               \
 }while(0)
 
+
+/*  For indefinite wait  */
+#define wait_on(wq)                                                     \
+({                                                                      \
+         __wait_on(wq);                                                 \
+})
+
+#define __wait_on(struct wait_queue *wq)                                \
+do {                                                                    \
+        for(;;){                                                        \
+           add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE);                 \
+           rose_sched();                                                \
+        }                                                               \
+}while(0)
 
 #define DEFINE_WAITQUEUE(wq)    \
       struct waitqueue wq = __WAITQUEUE_INIT(wq)
@@ -48,6 +63,7 @@ do {                                                                    \
            {                    \
              .task = NULL;       \
              .next = NULL;       \
+             .prev = NULL;       \
            }
 
 int add_to_wait_queue(struct wait_queue *wq);
