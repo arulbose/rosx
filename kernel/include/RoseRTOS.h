@@ -41,6 +41,7 @@
 #include <rose_semaphore.h>
 #include <rose_terminal.h>
 #include <rose_device.h>
+#include <rose_wait.h>
 
 #ifdef CONFIG_PRINT_BUFFER
 /* Log controls in defines.h */

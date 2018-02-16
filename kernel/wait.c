@@ -71,11 +71,33 @@ int wakeup(struct wait_queue *wq)
     return 0;
 }
 
-void rose_event_thread()
-{
-   
-    while(1) {
-    /* wake up only threads which are TASK_INTERRUPTIBLE */
+/* Runs in the context of rose_event_thread()
+* Wake all the thread; will be called from event_group thread */
 
+void __rose_wake()
+{
+    if(!__sys_wait_list)
+        return -ENXIO;
+    
+    tmp = __sys_wait_list;
+
+    /* Wake up all waiting task if TASK_INTERRUPTIBLE */
+    while(tmp->next)
+    {
+        if(tmp->task->status == TASK_INTERRUPTIBLE) {
+        /* Wake task */
+            if(tmp == __sys_wait_list) {
+                __sys_wait_list = tmp->next;
+                __sys_wait_list->prev = NULL;
+            } else {
+               
+               tmp->prev->next = tmp->next;
+               tmp->next->prev = tmp->prev; 
+            }
+                tmp->task->status = TASK_READY;
+                tmp->task->wq = NULL;
+                add_to_ready_q(tmp->task);      
+        } 
+            tmp = tmp->next;
     }
 }

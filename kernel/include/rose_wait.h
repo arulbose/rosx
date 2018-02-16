@@ -18,6 +18,11 @@
 #ifndef __ROSE_WAIT_H__
 #define __ROSE_WAIT_H__
 
+/* Below are the currently supported
+ * wait_event(struct wait_queue *wq, condition)
+ * wait_on(struct wait_queue *wq)
+ * wake_up(struct wait_queue *)
+*/
 struct wait_queue{
         TCB *task; /* task waiting for the event */
         /* Add all local tracking stuff here */
@@ -68,6 +73,6 @@ do {                                                                    \
 
 int add_to_wait_queue(struct wait_queue *wq);
 int wake_up(struct wait_queue *);
-void rose_event_thread();
+void __rose_wake(void);
 
 #endif

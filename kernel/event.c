@@ -174,6 +174,8 @@ static int process_event(struct event_group *head, unsigned int flag)
 		exit_critical(imask);
 		return OS_ERR;
 	}
+        /* Wake thread sleeping on the wait queues */
+        __rose_wake();
 
 	start = prev = head->task;
 	while(start != NULL) {
