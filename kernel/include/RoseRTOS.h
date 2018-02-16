@@ -23,6 +23,7 @@
 #include <asm/switch.h>
 #include <rose/string.h>
 #include <rose/types.h>
+#include <rose/errno.h>
 
 /* rose rtos internal */
 #include <rose_version.h>

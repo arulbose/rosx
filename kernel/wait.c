@@ -1,5 +1,5 @@
 /* Rose RT-Kernel
- * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
+ * Copyright (C) 2018 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,11 @@
 /* Rose Wait Q
  * */
 
+static struct wait_queue *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
+
 int add_to_wait_queue(struct wait_queue *wq, int task_state)
 {
-    TCB *tmp;
+    struct wait_queue *ride;
 
     unsigned int imask = enter_critical();
     
@@ -38,12 +40,12 @@ int add_to_wait_queue(struct wait_queue *wq, int task_state)
         __sys_wait_list = wq;
     }else{
         /* add wait queue to the tail of sytem wait list */
-        tmp = __sys_wait_list;
-        while(tmp->next){
-            tmp = tmp->next;
+        ride = __sys_wait_list;
+        while(ride->next){
+            ride = ride->next;
         }
-        tmp->next = wq;
-        wq->prev = tmp;
+        ride->next = wq;
+        wq->prev = ride;
     }
 
     exit_critical(imask);
@@ -72,32 +74,34 @@ int wakeup(struct wait_queue *wq)
 }
 
 /* Runs in the context of rose_event_thread()
-* Wake all the thread; will be called from event_group thread */
+ * Wake all the thread; will be called from event_group thread */
 
 void __rose_wake()
 {
+    struct wait_queue *ride;
+
     if(!__sys_wait_list)
-        return -ENXIO;
+        return;
     
-    tmp = __sys_wait_list;
+    ride = __sys_wait_list;
 
     /* Wake up all waiting task if TASK_INTERRUPTIBLE */
-    while(tmp->next)
+    while(ride->next)
     {
-        if(tmp->task->status == TASK_INTERRUPTIBLE) {
+        if(ride->task->state == TASK_INTERRUPTIBLE) {
         /* Wake task */
-            if(tmp == __sys_wait_list) {
-                __sys_wait_list = tmp->next;
+            if(ride == __sys_wait_list) {
+                __sys_wait_list = ride->next;
                 __sys_wait_list->prev = NULL;
             } else {
                
-               tmp->prev->next = tmp->next;
-               tmp->next->prev = tmp->prev; 
+               ride->prev->next = ride->next;
+               ride->next->prev = ride->prev; 
             }
-                tmp->task->status = TASK_READY;
-                tmp->task->wq = NULL;
-                add_to_ready_q(tmp->task);      
+                ride->task->state = TASK_READY;
+                ride->task->wq = NULL;
+                add_to_ready_q(ride->task);      
         } 
-            tmp = tmp->next;
+            ride = ride->next;
     }
 }

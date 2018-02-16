@@ -48,7 +48,7 @@ struct __task_control_block
 	struct semaphore *sem;   /* Pointer to task semaphore */
 	struct mutex *mutex;     /* Pointer task mutex */
 	struct event_group *event; /* Pointer to task event group */
-        struct wait_q *wq;         /* Pointer to task wait queue */
+        struct wait_queue *wq;         /* Pointer to task wait queue */
 	struct __task_control_block *next; /* pointer to the next task kcontrol block */
 	struct __task_control_block *list; /* used to add in the global list of task */
 };

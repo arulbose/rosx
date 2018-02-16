@@ -18,6 +18,8 @@
 #ifndef __ROSE_WAIT_H__
 #define __ROSE_WAIT_H__
 
+#include<rose_task.h>
+
 /* Below are the currently supported
  * wait_event(struct wait_queue *wq, condition)
  * wait_on(struct wait_queue *wq)
@@ -36,7 +38,7 @@ struct wait_queue{
                 __wait_event(wq, condition);                            \
 })
 
-#define __wait_event(struct wait_queue *wq, int condition)              \
+#define __wait_event(wq, condition)                                     \
 do {                                                                    \
         for(;;){                                                        \
            add_to_wait_queue(wq, TASK_INTERRUPTIBLE);                   \
@@ -46,14 +48,13 @@ do {                                                                    \
         }                                                               \
 }while(0)
 
-
 /*  For indefinite wait  */
 #define wait_on(wq)                                                     \
 ({                                                                      \
          __wait_on(wq);                                                 \
 })
 
-#define __wait_on(struct wait_queue *wq)                                \
+#define __wait_on(wq)                                                   \
 do {                                                                    \
         for(;;){                                                        \
            add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE);                 \
@@ -71,7 +72,7 @@ do {                                                                    \
              .prev = NULL;       \
            }
 
-int add_to_wait_queue(struct wait_queue *wq);
+int add_to_wait_queue(struct wait_queue *wq, int);
 int wake_up(struct wait_queue *);
 void __rose_wake(void);
 
