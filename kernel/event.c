@@ -98,7 +98,7 @@ int clear_event_flag(unsigned int flag)
 /* Task removed from ready queue and added in wait queue; task will be waked-up by notify_event(). 
  * In case of event occured when the task is not waiting on the event queue, event will miss;
  */
-int wait_for_event(struct event_group *p, int flag)
+int wait_for_events(struct event_group *p, int flag)
 {
 	TCB *tmp;
 
