@@ -6,7 +6,8 @@ ROSE has a tiny preemptive kernel which supports
 2. Kernel timers
 3. Mutex
 4. Semaphores
-5. Events
+5. Event groups
+6. Wait/Wake
 6. Memory byte/block pool
 7. Message queues
 8. Interrupts
