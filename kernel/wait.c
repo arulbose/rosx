@@ -101,7 +101,8 @@ void __rose_wake()
             if(ride == __sys_wait_list) {
                 /* Need to move the head */
                 __sys_wait_list = ride->next;
-                __sys_wait_list->prev = NULL;
+                if(__sys_wait_list)
+                    __sys_wait_list->prev = NULL;
             } else {
                
                ride->prev->next = ride->next;
