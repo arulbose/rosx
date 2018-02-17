@@ -38,10 +38,10 @@ __UNLOCKED
 
 /* -------------- Application system calls ---------------- */
 
-#define DEFINE_MUTEX(l)    \
-      struct mutex (l) = __MUTEX_INIT(l)
+#define DEFINE_MUTEX(m)    \
+      struct mutex (m) = __MUTEX_INIT(m)
 
-#define __MUTEX_INIT(l)           \
+#define __MUTEX_INIT(m)           \
            {                      \
              .lock = __UNLOCKED,  \
              .owner = NULL,       \

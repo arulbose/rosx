@@ -71,7 +71,7 @@ do {                                                                    \
 }while(0)
 
 #define DEFINE_WAITQUEUE(wq)    \
-      struct wait_queue wq = __WAITQUEUE_INIT(wq)
+      struct wait_queue (wq) = __WAITQUEUE_INIT(wq)
 
 #define __WAITQUEUE_INIT(wq)    \
            {                    \
