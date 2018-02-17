@@ -167,15 +167,17 @@ static int process_event(struct event_group *head, unsigned int flag)
 	TCB *start = NULL;
 	TCB *prev = NULL;
 
+
 	unsigned int imask = enter_critical();
 	
+        /* Wake thread sleeping on the wait queues */
+        __rose_wake();
+
 	if(head == NULL) {
 		pr_error( "In notify_event: no event_group to notify\n");
 		exit_critical(imask);
 		return OS_ERR;
 	}
-        /* Wake thread sleeping on the wait queues */
-        __rose_wake();
 
 	start = prev = head->task;
 	while(start != NULL) {

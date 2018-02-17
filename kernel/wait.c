@@ -37,6 +37,7 @@ int add_to_wait_queue(struct wait_queue *wq, int task_state)
 
     /* Add the waiting task to the sys wait queue */    
     if(!(__sys_wait_list)) {
+        /* Empty; add the first node */
         __sys_wait_list = wq;
     }else{
         /* add wait queue to the tail of sytem wait list */
@@ -57,8 +58,10 @@ int wakeup(struct wait_queue *wq)
 {
     unsigned int imask = enter_critical();
     
-    if(!__sys_wait_list)
+    if(!__sys_wait_list){
+        __early_printk("Invalid wakeup call\n");
         return -ENXIO;
+    }
 
     if(__sys_wait_list == wq) {
         /* The first node is the task to be removed */
@@ -68,8 +71,13 @@ int wakeup(struct wait_queue *wq)
         wq->prev->next = wq->next;
         wq->next->prev = wq->prev;
     }
- 
+    
+    wq->task->state = TASK_READY;
+    wq->task->wq = NULL; 
+    add_to_ready_q(wq->task);
+
     exit_critical(imask);
+
     return 0;
 }
 
@@ -86,11 +94,12 @@ void __rose_wake()
     ride = __sys_wait_list;
 
     /* Wake up all waiting task if TASK_INTERRUPTIBLE */
-    while(ride->next)
+    while(ride)
     {
         if(ride->task->state == TASK_INTERRUPTIBLE) {
         /* Wake task */
             if(ride == __sys_wait_list) {
+                /* Need to move the head */
                 __sys_wait_list = ride->next;
                 __sys_wait_list->prev = NULL;
             } else {
@@ -98,10 +107,10 @@ void __rose_wake()
                ride->prev->next = ride->next;
                ride->next->prev = ride->prev; 
             }
-                ride->task->state = TASK_READY;
-                ride->task->wq = NULL;
-                add_to_ready_q(ride->task);      
+            ride->task->state = TASK_READY;
+            ride->task->wq = NULL;
+            add_to_ready_q(ride->task);      
+            ride = ride->next; /* move to the next wq */
         } 
-            ride = ride->next;
     }
 }
