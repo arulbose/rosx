@@ -37,7 +37,18 @@ __UNLOCKED
 #define NO_WAIT_LOCK 2
 
 /* -------------- Application system calls ---------------- */
-void init_mutex(struct mutex *mutex);
+
+#define DEFINE_MUTEX(l)    \
+      struct mutex (l) = __MUTEX_INIT(l)
+
+#define __MUTEX_INIT(l)           \
+           {                      \
+             .lock = __UNLOCKED,  \
+             .owner = NULL,       \
+             .task = NULL,        \
+             .next = NULL,        \
+           }
+
 #if(CONFIG_MUTEX_COUNT > 0)
 struct mutex * create_mutex(void);
 void delete_mutex(struct mutex *p);

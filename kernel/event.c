@@ -30,16 +30,7 @@ static int process_event(struct event_group *, unsigned int flag);
  * */
 /* A event group created can be shared with multiple thread for synchronization */
 
-/* static initialization */
-void init_event_group(struct event_group *event)
-{
-	unsigned int imask = enter_critical();
-	event->task = NULL;
-        event->next = NULL;
-	exit_critical(imask);
-}
-
-/* dynamic event calls */
+/* Create dynamic event create */
 
 #if(CONFIG_EVENT_COUNT > 0)
 /* Runtime creation of event group */

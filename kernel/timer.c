@@ -17,6 +17,8 @@
 
 #include <RoseRTOS.h>
 
+DEFINE_EVENTGROUP(timer_events);
+
 int timer_tick_irq_handler(int irq, void *a)
 {
 	/* Wake up timer thread and return */
@@ -54,9 +56,10 @@ void rose_timer_thread()
 	struct timer_list *start = NULL;
 
         unsigned int tick = 0;
+
         /* put the timer thread in the ready queue; system thread priority */
 	pr_info( "In rose_timer_thread\n");
-	init_event_group(&timer_events);
+
 	/* request timer interrupt */
 	if(OS_OK != request_irq(TIMER0_INT, &timer_tick_irq_handler, 0, "timer_irq", 0)) {
                 pr_panic("TIMER0_INT0 irq alloc failed\n");
