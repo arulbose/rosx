@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* An example application */
+/* An example Kernel timer  application */
 
 #include <RoseRTOS.h>
 

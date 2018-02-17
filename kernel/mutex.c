@@ -199,7 +199,7 @@ static int __mutex_timeout(struct mutex *p, unsigned int timeout)
 }
 
 /* Task sleep if lock not available; add to timer list if time out is greater than 0 */
-int mutex_lock(struct mutex *p, unsigned int timeout)
+int mutex_lock(struct mutex *p, int timeout)
 {
 	TCB *t1;
 
