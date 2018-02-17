@@ -98,7 +98,7 @@ int clear_event_flag(unsigned int flag)
 /* Task removed from ready queue and added in wait queue; task will be waked-up by notify_event(). 
  * In case of event occured when the task is not waiting on the event queue, event will miss;
  */
-int wait_for_event(struct event_group *p, int flag)
+int wait_for_events(struct event_group *p, int flag)
 {
 	TCB *tmp;
 
@@ -167,8 +167,12 @@ static int process_event(struct event_group *head, unsigned int flag)
 	TCB *start = NULL;
 	TCB *prev = NULL;
 
+
 	unsigned int imask = enter_critical();
 	
+        /* Wake thread sleeping on the wait queues */
+        __rose_wake();
+
 	if(head == NULL) {
 		pr_error( "In notify_event: no event_group to notify\n");
 		exit_critical(imask);

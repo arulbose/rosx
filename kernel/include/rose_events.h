@@ -34,7 +34,7 @@ void delete_event_group(struct event_group *p);
 #endif
 int set_event_flag(unsigned int flag);
 int clear_event_flag(unsigned int flag);
-int wait_for_event(struct event_group *, int flag);
+int wait_for_events(struct event_group *, int flag);
 void notify_event(struct event_group *, unsigned int flag);
-
-#endif
+int wait_event(struct event_group *, int condition);
+#endif /* __EVENTS_H__*/
