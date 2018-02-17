@@ -24,10 +24,18 @@ struct event_group{
         struct event_group *next;
 };
 
+#define DEFINE_EVENTGROUP(event)    \
+      struct event_group (event) = __EVENTGROUP_INIT(event)
+
+#define __EVENTGROUP_INIT(event)    \
+           {                     \
+             .task = NULL,       \
+             .next = NULL        \
+           }
+
 void rose_event_thread();
 
 /* -------------- Application system calls ---------------- */
-void init_event_group(struct event_group *p);
 #if(CONFIG_EVENT_COUNT > 0)
 struct event_group * create_event_group(void);
 void delete_event_group(struct event_group *p);
@@ -37,4 +45,5 @@ int clear_event_flag(unsigned int flag);
 int wait_for_events(struct event_group *, int flag);
 void notify_event(struct event_group *, unsigned int flag);
 int wait_event(struct event_group *, int condition);
+
 #endif /* __EVENTS_H__*/

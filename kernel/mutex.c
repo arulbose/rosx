@@ -20,15 +20,6 @@
 static int __mutex_timeout(struct mutex *p, unsigned int timeout);
 void __mutex_handler(void *ptr);
 
-/* for static allocation */
-void init_mutex(struct mutex *mutex)
-{
-    mutex->lock = __UNLOCKED;
-    mutex->owner = NULL;
-    mutex->next = NULL;
-    mutex->task = NULL;
-}
-
 #if(CONFIG_MUTEX_COUNT > 0)
 /* Runtime creation of mutex */
 struct mutex * create_mutex()
