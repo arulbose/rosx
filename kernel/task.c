@@ -44,7 +44,7 @@ int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_
 	if(!stack_ptr) {
 
   		if(((char *)__stack_start_ptr - CONFIG_SYSTEM_STACK_SIZE) > ((char *)__curr_stack_ptr - stack_size)){
-	        	pr_error( "%s %s\n", "Stack size overflow\n", task_name);
+	        	pr_panic( "%s %s\n", "Stack size overflow\n", task_name);
 			exit_critical(imask);
 			return OS_ERR;
 		}

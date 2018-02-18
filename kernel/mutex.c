@@ -90,6 +90,7 @@ int mutex_unlock(struct mutex *p)
 #ifdef CONFIG_PRIO_INHERITANCE
 		if(p->owner->prio != p->owner->orig_prio) {
 		    p->owner->prio = p->owner->orig_prio;
+                    pr_dbg("Mutex owner %s back to original prio %d\n", p->owner->name, p->owner->prio);
 		    /* Back to its original priority */
 		    remove_from_ready_q(p->owner);
 		    add_to_ready_q(__curr_running_task);
@@ -239,6 +240,7 @@ int mutex_lock(struct mutex *p, int timeout)
 #ifdef CONFIG_PRIO_INHERITANCE
 	if(p->owner->prio > __curr_running_task->prio) {
 	    p->owner->prio = __curr_running_task->prio;  /* Let the owner inherit the prio of the task */
+            pr_dbg("Mutex owner %s new prio %d\n", p->owner->name, p->owner->prio);
 	    if(p->owner->state == TASK_READY) { /* Re-arrange the task in the ready queue */
                  remove_from_ready_q(p->owner);
 		 add_to_ready_q(p->owner);

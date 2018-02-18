@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-/* An example Mutex application */
+/* An example mutex timeout */
 
 #include <RoseRTOS.h>
+
+/* An example application - Mutex with priority inheritance to avoid priority inversion */
 
 void idle_task(void);
 void task_1(void);
@@ -35,7 +36,7 @@ struct priv {
 };
 
 struct priv MY_PRIV = {10};
-DEFINE_MUTEX(m);	
+DEFINE_MUTEX(m);
 
 /* Application main task expected to do all required App specific initialization before enabling interrupts */
 void application_init(void)
@@ -43,7 +44,7 @@ void application_init(void)
     /* Create all application task  */
     create_task(&idle_tcb,"idle", LEAST_PRIO, 0, 8192, idle_task, TASK_READY, 0);	
     create_task(&task_1_tcb,"task1", 3, 0, 8192, task_1, TASK_READY, 0);	
-    create_task(&task_2_tcb,"task2", 2, 0, 8192, task_2, TASK_READY, 0);	
+    create_task(&task_2_tcb,"task2", 5, 0, 8192, task_2, TASK_READY, 0);	
     create_task(&task_3_tcb,"task3", 1, 0, 8192, task_3, TASK_READY, 0);
     
     rose_sched();
@@ -53,12 +54,12 @@ void task_3(void)
 {
 	while(1) {
 			
+		ssleep(5);
 		mutex_lock(&m, OS_WAIT_FOREVER);
-		MY_PRIV.num  = 13;
-		pr_info("Acquired mutex task_3\n");
-		ssleep(3);
+                __early_printk("Mutex taken by task 3 \n");
 		mutex_unlock(&m);
-		pr_info("Release mutex task_3\n");
+                __early_printk("Mutex unlock task 3 \n");
+                suspend_task(&task_1_tcb);
 		suspend_task(MYSELF);
 	}
 
@@ -66,27 +67,33 @@ void task_3(void)
 
 void task_2(void)
 {
-	pr_info("entering task_2\n");
+	__early_printk("entering task_2\n");
+
 	while(1) {
-		mutex_lock(&m, OS_WAIT_FOREVER);
-		pr_info("Acquired mutex task_2\n");
-		MY_PRIV.num  = 12;
+#if 1
+		if(OS_OK != mutex_lock(&m, OS_WAIT_FOREVER)) {
+			__early_printk("Mutex timedout task 2 \n");
+			suspend_task(MYSELF);
+		} else {
+			__early_printk("got the mutex task 2\n");
+
+		}
+                ssleep(9);
 		mutex_unlock(&m);
-		pr_info("Release mutex task_2\n");
+#endif
+                __early_printk("Mutex unlock task 2 \n");
 		suspend_task(MYSELF);
 	}
 }
 
 void task_1(void)
 {
-	pr_info("entering task_1\n");
-	while(1) {
-		mutex_lock(&m, OS_WAIT_FOREVER);
-		pr_info("Acquired mutex task_1\n");
-		MY_PRIV.num  = 11;
-		mutex_unlock(&m);
-		pr_info("Release mutex task_1\n");
-		suspend_task(MYSELF);
+	__early_printk("entering task_1\n");
+        ssleep(7);
+	__early_printk("task_1 coming out of sleep\n");
+	while(1) 
+	{
+       
 	}
 }
 
@@ -97,7 +104,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-            //pr_info("I ");
+            //__early_printk("I ");
 	    c = a + b;
         }
 }
