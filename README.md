@@ -6,9 +6,9 @@
 Below are the services supported by the kernel.
 
 ##### 1. Rose Scheduler
-      a. Preemptive             : Threads with lower priority are preempted in favour of higher priority threads
-      b. Round robin scheduling : Same prority threads are atleast executed for the time slice given.
-      c. Priority inheritance   : Implemented as part of mutex services to avoid priority inversion
+      Preemptive             : Threads with lower priority are preempted in favour of higher priority threads
+      Round robin scheduling : Same priority threads are atleast executed for the time slice given.
+      Priority inheritance   : Implemented as part of mutex services to avoid priority inversion
 ##### 2. Dynamic thread management
       Threads can be created either during initialization or execution context of other threads. There is no limit to thread creation and is limited to only by the resources(memory) available.
 ##### 3. Application kernel timers services
@@ -43,11 +43,11 @@ Below are the services supported by the kernel.
       
 ## Getting Started
 
-Currently the kernel is not ported to any hardware. There are some porting code in the source for ARM Raspberry pi but not complete. I have ported the kernel to work on a 32-bit x86 simulator which runs on a x86 or x86_64 bit machine. The x86 simulator runs the rose kernel threads as if running on a actual bare metal hardware(where the rose scheduler handles the application threads). As the priority is to stabilize the kernel the x86 simulator environment gives great flexibity in debugging kernel using gdb.
+Currently the kernel is not ported to any hardware. There are some porting code in the source for ARM Raspberry pi but not complete. I have ported the kernel to work on a 32-bit x86 simulator which runs on a x86 or x86_64 bit machine. The x86 simulator runs the Rose kernel threads as if running on a actual bare metal hardware(where the rose scheduler handles the application threads). As the priority is to stabilize the kernel the x86 simulator environment gives greater flexibity in debugging kernel using gdb.
 
 ### Prerequisites for running the rose kernel in the x86 simulator mode
 
-Any Ubuntu, Debain, Fedora or any other Linux flavor should be able to build the kernel. I personally use Debain machine. If you are running on x86_64 please install libc 32-bit (/lib32/libc.so.6). Below are the library dependencies for the rose kernel to be built. `rosex86` is the rose kernel binary which has the application threads as well the x86 simulator.
+Any Ubuntu, Debain, Fedora or any other Linux flavor should be able to build the kernel. I personally use Debain machine. If you are running on x86_64 please install libc 32-bit (/lib32/libc.so.6). Below are the library dependencies for the rose kernel to be built. `rosex86` is the Rose kernel binary which has the application threads as well the x86 simulator.
 ```
 $ ldd rosex86
 	linux-gate.so.1 (0xf77b3000)
@@ -77,7 +77,7 @@ git clone https://github.com/arulbose/rose.git
 cd rose
 make -f scripts/Makefile.x86 
 ```
-that it. It builds a executable named `rosex86` which has the kernel, applications and x86 simualtor port built-in.
+thats it. It builds a executable named `rosex86` which has the kernel, applications and x86 simualtor port built-in.
 
 To run
 
@@ -88,7 +88,7 @@ To run
 ***************************************************************
 < The below are the application thread prints >
 ```
-In the x86 simulator mode the fake interruts are send to the kernel interrupt management service using Linux signals. The run the rose kernel the 'rosex86' should be fed with ticks. There are 2 ticks binaries in rose/testapps/system_clk_100ms(100 ms ticks) and rose/testapps/system_clk_10ms(10ms ticks). You can run either of them in a diffrent terminal after running the 'rosex86'
+In the x86 simulator mode fake interruts are sent to the kernel interrupt management service using Linux signals. To run the Rose kernel, 'rosex86' process should be fed with clock ticks. There are 2 clock ticks binaries in rose/testapps/system_clk_100ms(100 ms ticks) and rose/testapps/system_clk_10ms(10ms ticks). You can run either of them in a different terminal after executing 'rosex86'
 
 ```
 cd rose
