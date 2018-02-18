@@ -18,6 +18,7 @@ Below are the services supported by the kernel.
       Supports Priority inheritance to avoid priority inversion.
       Supports Mutex timeout
 ##### 5. Counting semaphores
+      Supports static or dynamic creation of Mutex.
 ##### 6. Event Groups
       Supports static or dynamic creation of event groups
       Inter-thread event notification and synchronization between group of threads.
