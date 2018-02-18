@@ -1,7 +1,7 @@
 # ROSE - Real Time Operating System Experiment
 
 ## Introduction
-  I have tried to write a RTOS based on my experience and understanding on OS concepts. I just started for fun and to keep myself busy and in touch with the what I have learnt(as I tend to forgot). As the title says it is an 'experiment' and it might not be even be close to any of the successful RTOS out there. Nevertheless I have tried to make the kernel which is simple to understand as well added kernel services of what any decent RTOS should have. The development is on-going and would appreciate your contribution to ROSE. Please do mail me if you would like to collabrate in this project. Email: bose.arul@gmail.com
+  I have tried to write a RTOS based on my experience and understanding on OS concepts. I just started for fun and to keep myself busy and in touch with the what I have learnt(as I tend to forget). As the title says it is an 'experiment' and it might not be even close to any of the successful RTOS out there. Nevertheless I have tried to make the kernel which is simple to understand as well added kernel services of what any decent RTOS should have. The development is on-going and would appreciate your contribution to ROSE. Please do mail me if you would like to collabrate in this project. Email: bose.arul@gmail.com
 
 Below are the services supported by the kernel.
 
