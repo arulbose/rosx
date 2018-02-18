@@ -42,7 +42,7 @@ Below are the services supported by the kernel.
       
 ## Getting Started
 
-Currently the kernel is not ported to any hardware. There are some porting code in the source for ARM Raspberry pi but not complete. I have ported the kernel to work on a 32 bit x86 simulator which runs on a x86 or x86_64 bit machine. The x86 simulator runs the rose kernel threads as if running on a actual bare metal hardware(where the rose scheduler handles the application threads). As the priority is to stabile the kernel the x86 simulator environment gives great flexibity in debugging kernel using gdb.
+Currently the kernel is not ported to any hardware. There are some porting code in the source for ARM Raspberry pi but not complete. I have ported the kernel to work on a 32-bit x86 simulator which runs on a x86 or x86_64 bit machine. The x86 simulator runs the rose kernel threads as if running on a actual bare metal hardware(where the rose scheduler handles the application threads). As the priority is to stabilize the kernel the x86 simulator environment gives great flexibity in debugging kernel using gdb.
 
 ### Prerequisites for running the rose kernel in the x86 simulator mode
 
