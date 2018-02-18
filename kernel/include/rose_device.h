@@ -26,8 +26,8 @@ struct devfile;
 struct device_ops {
     int (*open)(struct devfile *);
     int (*release)(struct devfile *);
-    int (*read)(struct devfile *, char *, size_t);
-    int (*write)(struct devfile *, const char *, size_t);
+    int (*read)(struct devfile *, void *, size_t);
+    int (*write)(struct devfile *, const void *, size_t);
     int (*ioctl)(struct devfile *, unsigned int, void *);
 
 }; 
@@ -36,12 +36,12 @@ struct device{
         const char name[16];
         struct device_ops *device_ops; /* initalized during the device driver initialization call */
         int device_open_count;
+        void *private_data;
 };
 
 /* Device file passed to device api calls */
 struct devfile {
     struct device *dev;
-    void *private_data;
     int flags;
 };
 
@@ -51,8 +51,8 @@ void driver_init(void);
 /* Driver core APIs used by application */
 int dev_open(const char *filename, int flags);
 int dev_close(int fd);
-int dev_read(int fd, char *dest, int number_of_bytes);
-int dev_write(int fd, const char *src, int number_of_bytes);
+int dev_read(int fd, void *dest, size_t);
+int dev_write(int fd, const void *src, size_t);
 int dev_ioctl(int fd, unsigned int cmd, void *arg);
 
 #endif /* __ROSE_DEVICE_H */

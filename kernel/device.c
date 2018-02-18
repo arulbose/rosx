@@ -24,7 +24,7 @@ static struct devfile desc[CONFIG_MAX_DEVICE_DESC];
 
 /* Add new devices in the list */
 static struct device device_table[] = {
-                                 {"simx86", NULL, 0}
+                                 {"simx86", NULL, 0, NULL}
 			       };
 
 /* Driver core APIs used by application */
@@ -49,7 +49,6 @@ int dev_open(const char *filename, int flags)
                 {
                     /* initialize device file desc */
                     desc[desc_id].dev = &device_table[device_table_id];
-                    desc[desc_id].private_data = NULL;
                     /* Now call the respective driver open */ 
                     if(0 == (ret =  desc[desc_id].dev->device_ops->open(&desc[desc_id]))){
                         desc[desc_id].dev->device_open_count ++; /* Increment device count */
@@ -57,7 +56,6 @@ int dev_open(const char *filename, int flags)
                     }else{
                       /* Device open failed at driver level ; do clean-up and return error */
                       desc[desc_id].dev = NULL;
-                      desc[desc_id].private_data = NULL;
                       return ret; /* Just pass the driver error */
                     }
                 }            
@@ -78,7 +76,6 @@ int dev_close(int desc_id)
             /* success do all clean up */
             desc[desc_id].dev->device_open_count --;
             desc[desc_id].dev = NULL;
-            desc[desc_id].private_data = NULL;
             return 0;
         }else{
             return ret; /* Return device specific error */
@@ -87,23 +84,23 @@ int dev_close(int desc_id)
     return -ENODEV;
 }
 
-int dev_read(int desc_id, char *dest, int number_of_bytes)
+int dev_read(int desc_id, void *dest, size_t size)
 {
     int ret;
     if(desc[desc_id].dev != NULL) {
         /* Call device release */
-        ret = desc[desc_id].dev->device_ops->read(&desc[desc_id], dest, number_of_bytes );
+        ret = desc[desc_id].dev->device_ops->read(&desc[desc_id], dest, size);
         return ret;
     }
     return -ENODEV;
 }
 
-int dev_write(int desc_id, const char *src, int number_of_bytes)
+int dev_write(int desc_id, const void *src, size_t size)
 {
     int ret;
     if(desc[desc_id].dev != NULL) {
         /* Call device release */
-        ret = desc[desc_id].dev->device_ops->write(&desc[desc_id], src, number_of_bytes );
+        ret = desc[desc_id].dev->device_ops->write(&desc[desc_id], src, size);
         return ret;
     }
     return -ENODEV;

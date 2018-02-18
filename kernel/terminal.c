@@ -26,7 +26,10 @@ void rose_terminal_thread()
     pr_info("*************************************************************** \n");
 
     while(1) {
-		suspend_task(MYSELF);
-
+              #ifdef CONFIG_X86_SIMULATOR
+	      suspend_task(MYSELF);
+              #else
+              /* Add waitqueue for real serial ports */
+              #endif
     }
 }
