@@ -1,46 +1,117 @@
-ROSE - Real Time Operating System Experiment
+# ROSE - Real Time Operating System Experiment
 
-ROSE has a tiny preemptive kernel which supports
+## Introduction
+  I have tried to write a RTOS based on my experience and understanding on OS concepts. I just started for fun and to keep myself busy and in touch with the what I have learnt(as I tend to forgot). As the title says it is an 'experiment' and it might not be even be close to any of the successful RTOS out there. Nevertheless I have tried to make the kernel which is simple to understand as well added kernel services of what any decent RTOS should have. The development is on-going and would appreciate your contribution to ROSE. Please do mail me if you would like to collabrate in this project. Email: bose.arul@gmail.com
 
-1. Dynamic task management
-2. Kernel timers
-3. Mutex
-4. Semaphores
-5. Event groups
-6. Wait/Wake
-6. Memory byte/block pool
-7. Message queues
-8. Interrupts
+Below are the services supported by the kernel.
 
-I have currently added support to test the kernel on a x86 environment using macro CONFIG_X86_SIMULATOR. In simulator mode it helps to easily fix kernel bugs.
+##### 1. Rose Scheduler
+      a. Preemptive             : Threads with lower priority are preempted in favour of higher priority threads
+      b. Round robin scheduling : Same prority threads are atleast executed for the time slice given.
+      c. Priority inheritance   : Implemented as part of mutex services to avoid priority inversion
+##### 2. Dynamic thread management
+      Threads can be created either during initialization or execution context of other threads. There is no limit to thread creation and is limited to only by the resources(memory) available.
+##### 3. Application kernel timers services
+      Supports static or dynamic creation of timers. Dynamic management of timers.
+##### 4. Mutex services
+      Supports static or dynamic creation of Mutex.
+      Supports Priority inheritance to avoid priority inversion.
+      Supports Mutex timeout
+##### 5. Counting semaphores
+##### 6. Event Groups
+      Supports static or dynamic creation of event groups
+      Inter-thread event notification and synchronization between group of threads.
+      Participating threads can use 32 event flags at the same time.
+##### 7. Wait Queues and Wake services
+      Supports static or dynamic creation of wait queues.
+      Threads can wait(sleep) on queues till a given condtion is met or can wait till it is waked up by another thread.
+##### 8. Memory bytepool
+      Time sensitive memory allocation using fixed memory blocks.
+      Application can dynamically request  and free memory block from 1 byte to 2048 bytes.
+##### 9. Mempool
+      Used by kernel services to dynamically create kernel services structures to meet real time constraints(not avialble for applications)
+##### 10. Message queues
+      Used for passing messages between threads
+      Supports fixed size messages. Message sizes are 1, 2, 4, 8, and 16 32-bit words
+      Support dynamic creation of message queues
+##### 11. Interrupt management service
+      Dynamic request and free of interrupt. 
+      Supports shared of interrupts
+##### 12. Device driver management
+      Driver core support Linux like open/release/read/write/ioctl api calls
+      
+## Getting Started
 
-Folder structure :
+Currently the kernel is not ported to any hardware. There are some porting code in the source for ARM Raspberry pi but not complete. I have ported the kernel to work on a 32 bit x86 simulator which runs on a x86 or x86_64 bit machine. The x86 simulator runs the rose kernel threads as if running on a actual bare metal hardware(where the rose scheduler handles the application threads). As the priority is to stabile the kernel the x86 simulator environment gives great flexibity in debugging kernel using gdb.
 
-apps/ - The actual application using the kernel APIs
+### Prerequisites for running the rose kernel in the x86 simulator mode
 
-arch/ - Arch specific code
+Any Ubuntu, Debain, Fedora or any other Linux flavor should be able to build the kernel. I personally use Debain machine. If you are running on x86_64 please install libc 32-bit (/lib32/libc.so.6). Below are the library dependencies for the rose kernel to be built. `rosex86` is the rose kernel binary which has the application threads as well the x86 simulator.
+```
+$ ldd rosex86
+	linux-gate.so.1 (0xf77b3000)
+	libc.so.6 => /lib32/libc.so.6 (0xf75fc000)
+	/lib/ld-linux.so.2 (0xf77b6000)
+```
 
-kernel/ - Rose kernel files
-
+### Folder structure
+```
+apps/          - The actual application using the kernel APIs
+arch/          - Arch specific code
+kernel/        - Rose kernel files
 kernel/include - Rose kernel include files
+drivers/       - All device drivers
+include/       - Common include files
+lib/           - Common C library routines
+scripts/       - Build scripts
+testapps/      - Kernel test applications
+utils/         - Utilties for test or debugging
+out/           - obj files for the build
+```
 
-lib/ - C library routines
+### Building the rose kernel in the x86 simulator mode
 
-out/ - obj files for the build
+```
+git clone https://github.com/arulbose/rose.git
+cd rose
+make -f scripts/Makefile.x86 
+```
+that it. It builds a executable named `rosex86` which has the kernel, applications and x86 simualtor port built-in.
 
-scripts/ - Build scripts
+To run
 
-testapps/ - Kernel test applications
+```
+./rosex86
+*************************************************************** 
+*********** ROSE Real Time operating system experiment v0_x ***** 
+***************************************************************
+< The below are the application thread prints >
+```
+In the x86 simulator mode the fake interruts are send to the kernel interrupt management service using Linux signals. The run the rose kernel the 'rosex86' should be fed with ticks. There are 2 ticks binaries in rose/testapps/system_clk_100ms(100 ms ticks) and rose/testapps/system_clk_10ms(10ms ticks). You can run either of them in a diffrent terminal after running the 'rosex86'
 
-include/ - Common include files
+```
+cd rose
+./system_clk_100ms
 
-X86 SIMULATOR:
+```
+## Running the tests
 
-To build a binary for X86 simulator run 'make -f scripts/Makefile.x86'. Add the application files in the apps/ folder and build the kernel. An exceutable named 'rosex86' will be created.
-Also the simulator needs system ticks which can be generated using system_clk_100ms or system_clk_10ms executable files generated using scripts/send_signal.c. After running the kernel the tick executable should be run in another shell(in the same folder as 'rosex86')
+All application files should be in rose/apps folder. There is a reference application named rose/apps/main.c. You can write you own application with a different file name. Make sure to add the application file name in to scripts/Makefile.x86. The other test reference applications c files are present in rose/testapps.
 
-Below are the thing in my TODO list :
-1. Kernel API documentation.
-2. Test tool for the Kernel(there are some unit test cases in testapps/ but not complete enough)
-3. Terminal emulator for x86 simulator
-4. Device core API(poll)
+
+## Contributing
+
+Please contact bose.arul@gmail.com
+
+## Versioning
+
+
+## Authors
+
+* Arul Bose (bose.arul@gmail.com)
+
+
+## License
+
+This project is licensed under GNU GENERAL PUBLIC LICENSE Version 3 - see the [LICENSE.md](LICENSE.md) file for details
+
