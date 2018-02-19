@@ -42,11 +42,9 @@ Below are the services supported by the kernel.
       Driver core support Linux like open/release/read/write/ioctl api calls
       
 ## Getting Started
-
 Currently the kernel is not ported to any hardware. There are some porting code in the source for ARM Raspberry pi but not complete. I have ported the kernel to work on a 32-bit x86 simulator which runs on a x86 or x86_64 bit machine. The x86 simulator runs the Rose kernel threads as if running on a actual bare metal hardware(where the rose scheduler handles the application threads). As the priority is to stabilize the kernel the x86 simulator environment gives greater flexibity in debugging kernel using gdb.
 
 ### Prerequisites for running the rose kernel in the x86 simulator mode
-
 Any Ubuntu, Debain, Fedora or any other Linux flavor should be able to build the kernel. I personally use Debain machine. If you are running on x86_64 please install libc 32-bit (/lib32/libc.so.6). Below are the library dependencies for the rose kernel to be built. `rosex86` is the Rose kernel binary which has the application threads as well the x86 simulator.
 ```
 $ ldd rosex86
@@ -71,7 +69,6 @@ out/           - obj files for the build
 ```
 
 ### Building the rose kernel in the x86 simulator mode
-
 ```
 git clone https://github.com/arulbose/rose.git
 cd rose
@@ -96,23 +93,19 @@ cd rose
 
 ```
 ## Running the tests
-
 All application files should be in rose/apps folder. There is a reference application named rose/apps/main.c. You can write you own application with a different file name. Make sure to add the application file name in to scripts/Makefile.x86. The other test reference applications c files are present in rose/testapps.
 
 
 ## Contributing
-
 Please contact bose.arul@gmail.com
 
 ## Versioning
 
 
 ## Authors
-
 * Arul Bose (bose.arul@gmail.com)
 
 
 ## License
-
 This project is licensed under GNU GENERAL PUBLIC LICENSE Version 3 - see the [LICENSE.md](LICENSE.md) file for details
 
