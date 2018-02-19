@@ -69,6 +69,7 @@ int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_
 #ifdef CONFIG_TIME_SLICE
 	tcb->time_slice = time_slice;
 	tcb->ticks = time_slice;
+	tcb->timer = NULL;
 #endif
 	tcb->list = NULL;
 	/* port specific initialiation <start>*/
