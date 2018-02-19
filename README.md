@@ -37,7 +37,7 @@ Below are the services supported by the kernel.
       Support dynamic creation of message queues
 ##### 11. Interrupt management service
       Dynamic request and free of interrupt. 
-      Supports shared of interrupts
+      Supports interrupt sharing
 ##### 12. Device driver management
       Driver core support Linux like open/release/read/write/ioctl api calls
       
