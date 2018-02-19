@@ -90,10 +90,9 @@ In the x86 simulator mode fake interruts are sent to the kernel interrupt manage
 ```
 cd rose
 ./system_clk_100ms
-
 ```
 ## Running the tests
-All application files should be in rose/apps folder. There is a reference application named rose/apps/main.c. You can write you own application with a different file name. Make sure to add the application file name in to scripts/Makefile.x86. The other test reference applications c files are present in rose/testapps.
+All application files should be in rose/apps folder. There is a reference application named main.c in rose/apps folder. The apps/rose_defines.h file has the kernel configuration for the application threads. You can write you own application files with a different kernel configuration. Make sure to add the application file names in to makefile scripts/Makefile.x86. The other test reference applications c files are present in rose/testapps.
 
 
 ## Contributing
