@@ -43,9 +43,9 @@ static int x86_sim_release(struct devfile *dev)
     return 0;
 }
 
-static int x86_sim_write(struct devfile *dev, const char *src, size_t size)
+static int x86_sim_write(struct devfile *dev, const void *src, size_t size)
 {
-     __printk("%c", *src); /* X86 native print */
+    __printk("%c", *(char *)src); /* X86 native print */
     return size;
 }
 
