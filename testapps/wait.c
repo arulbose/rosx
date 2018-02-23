@@ -35,9 +35,9 @@ struct priv {
 };
 
 struct priv MY_PRIV = {10};
-DEFINE_WAIT(w1);	
+DEFINE_WAITQUEUE(wq);	
 
-gvalue = 0;
+int gvalue = 0;
 
 /* Application main task expected to do all required App specific initialization before enabling interrupts */
 void application_init(void)
@@ -55,8 +55,8 @@ void task_3(void)
 {
 	pr_info("entering task_3\n");
 	while(1) {
-            wait_event(&w1, (gvalue == 1));
-            pr_info("Value change detecte\n");
+            wait_queue(&wq, (gvalue == 1));
+            pr_info("Task_3 Value change detected\n");
             suspend_task(MYSELF);
 	}
 
@@ -66,9 +66,8 @@ void task_2(void)
 {
 	pr_info("entering task_2\n");
 	while(1) {
-                gvalue = 1; 
-                ssleep(1);
-                wait_event(&w1, (gvalue == 2));
+                wait_queue(&wq, (gvalue == 1));
+                pr_info("Task_2 Value change detected\n");
 		suspend_task(MYSELF);
 	}
 }
@@ -77,8 +76,7 @@ void task_1(void)
 {
 	pr_info("entering task_1\n");
 	while(1) {
-                ssleep(3);
-                gvalue = 2;
+                gvalue = 1;
 		suspend_task(MYSELF);
 	}
 }

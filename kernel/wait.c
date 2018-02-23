@@ -94,20 +94,23 @@ int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
         t->next = __curr_running_task;
     }
     /* Check if the waitqueue is already in the list */
-    if(wq->next == NULL && wq->prev == NULL) {
         /* Now add the waitqueue to the sys wait queue */    
-        if(!(__sys_wait_list)) {
+    if(!(__sys_wait_list)) {
             /* Empty; add the first node */
             __sys_wait_list = wq;
-        }else{
-            /* add wait queue to the tail of sytem wait list */
-            ride = __sys_wait_list;
-            while(ride->next){
-                ride = ride->next;
+    }else{
+        /* add wait queue to the tail of sytem wait list */
+        ride = __sys_wait_list;
+        while(ride->next){
+            if(ride == wq){
+                break; /* wq is already in the list */
             }
+            ride = ride->next;
+        }
+        if(!(ride == wq)) { /* wq is already in the list */
             ride->next = wq;
             wq->prev = ride;
-       }
+        }
    }
     /* Wait timeout;Avoid starting the timer is already started */
     if((timeout > 0) && (__curr_running_task->timeout == __TIMER_OFF)) {
@@ -123,14 +126,17 @@ int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
 /* Wakeup all the task waiting on the wait queue */
 int wakeup(struct wait_queue *wq)
 {
+    TCB *ready;
+  
     unsigned int imask = enter_critical();
     
     TCB *t = wq->task;
     
     while(t) {
-        t->state = TASK_READY;   
-        add_to_ready_q(t);
+        t->state = TASK_READY; 
+        ready = t;  
         t = t->next;
+        add_to_ready_q(ready);
     }    
     wq->task = NULL;
     /* Remove the queue from the sys queue list */
@@ -156,23 +162,26 @@ static void wake_task_in_the_queue(struct wait_queue **ride)
 {
     TCB *tn;
     TCB *tp;
+    TCB *ready;
     tn = tp = (*ride)->task;
-
+    
     while(tn){
         if((tn->state == TASK_INTERRUPTIBLE) || \
            (tn->timeout == E_OS_TIMEOUT) ) {
             /* Wake up task with state TASK_INTERRUPTIBLE or E_OS_TIMEOUT */
             tn->state = TASK_READY;
-            add_to_ready_q(tn);
+            ready = tn;
             if(tn == (*ride)->task){
                 /* Move the head of the queue */
                 tn = tn->next;
                 (*ride)->task = tn;
                 tp = tn;
+                add_to_ready_q(ready);
            }else{
                /* Remove the task if in between the task chain */
-               tp = tn->next;
-               tn = tp->next;
+               tn = tn->next;
+               tp->next = tn;
+               add_to_ready_q(ready);
            }
                     
        }else { /* !TASK_INTERRUPTIBLE && !E_OS_TIMEOUT */
@@ -207,10 +216,10 @@ void __rose_wake()
                 /* If the task list is empty for the queue the move the head to the next one  */
                 __sys_wait_list = ride->next;
                  wq->prev = wq->next = NULL;
+                if(__sys_wait_list){
+                    __sys_wait_list->prev = NULL;
+                }
             }
-            if(__sys_wait_list)
-                __sys_wait_list->prev = NULL;
-
         }else{ /* !(ride == __sys_wait_list) */
              wake_task_in_the_queue(&ride);  
              if(ride->task == NULL) {
