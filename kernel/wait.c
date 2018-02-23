@@ -21,8 +21,9 @@
  * */
 
 static struct wait_queue *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
-static void __wait_timeout(struct wait_queue *wq, int timeout);
+static void __wait_timeout(void);
 static void __wait_handler(void *ptr);
+static void wake_task_in_the_queue(struct wait_queue **ride);
 
 int __finish_wait(struct wait_queue *wq)
 {
@@ -51,11 +52,11 @@ static void __wait_timeout()
 {
     struct timer_list *timer = NULL;
 
-    if (!(timer = create_timer(__wait_handler, __curr_running_task, timeout)){
+    if (!(timer = create_timer(__wait_handler, __curr_running_task,  __curr_running_task->timeout))){
         pr_panic("Timer creation failed\n");
     }
-    __curr_running_task->timer = &timer;
-    start_timer(&timer);
+    __curr_running_task->timer = timer;
+    start_timer(timer);
     __curr_running_task->timeout = __TIMER_ON;
 }
 
@@ -137,8 +138,40 @@ int wakeup(struct wait_queue *wq)
     return 0;
 }
 
+/* Wake all the task in this queue */
+static void wake_task_in_the_queue(struct wait_queue **ride)
+{
+    TCB *tn;
+    TCB *tp;
+    tn = tp = (*ride)->task;
+
+    while(tn){
+        if((tn->state == TASK_INTERRUPTIBLE) || \
+           (tn->timeout == E_OS_TIMEOUT) ) {
+            /* Wake up task with state TASK_INTERRUPTIBLE or E_OS_TIMEOUT */
+            tn->state = TASK_READY;
+            add_to_ready_q(tn);
+            if(tn == (*ride)->task){
+                /* Move the head of the queue */
+                tn = tn->next;
+                (*ride)->task = tn;
+                tp = tn;
+           }else{
+               /* Remove the task if in between the task chain */
+               tp = tn->next;
+               tn = tp->next;
+           }
+                    
+       }else { /* !TASK_INTERRUPTIBLE && !E_OS_TIMEOUT */
+                    tp = tn;
+                    tn = tn->next;
+             }
+    }
+
+}
+
 /* Runs in the context of rose_event_thread()
- * Wake all the thread; will be called from event_group thread */
+ * Wake all the tasks in a queue list; Will be called from event_group thread */
 
 void __rose_wake()
 {
@@ -150,26 +183,32 @@ void __rose_wake()
     
     ride = __sys_wait_list;
 
-    /* Wake up all waiting task if TASK_INTERRUPTIBLE */
+    /* Walk through each queue in the queue list and wake up all the task
+     * if TASK_INTERRUPTIBLE or E_OS_TIMEOUT
+     */
     while(ride)
     {
-        if(ride->task->state == TASK_INTERRUPTIBLE || ride->task->timeout == E_OS_TIMEOUT ) {
-        /* Wake task */
-            if(ride == __sys_wait_list) {
-                /* Need to move the head */
+        if(ride == __sys_wait_list) {
+            wake_task_in_the_queue(&ride);  
+            if(ride->task == NULL) {
+                 wq = ride;
+                /* If the task list is empty for the queue the move the head to the next one  */
                 __sys_wait_list = ride->next;
-                if(__sys_wait_list)
-                    __sys_wait_list->prev = NULL;
-            } else {
-               /* Remove the task from the waitqueue */ 
-               ride->prev->next = ride->next;
-               ride->next->prev = ride->prev; 
+                 wq->prev = wq->next = NULL;
             }
-            ride->task->state = TASK_READY;
-            add_to_ready_q(ride->task);
-            wq = ride;
-            wq->prev = wq->next = NULL;
-            ride = ride->next; /* move to the next wq */
-        } 
+            if(__sys_wait_list)
+                __sys_wait_list->prev = NULL;
+
+        }else{ /* !(ride == __sys_wait_list) */
+             wake_task_in_the_queue(&ride);  
+             if(ride->task == NULL) {
+                 wq = ride;
+                 /* Remove the task from the waitqueue */ 
+                 ride->prev->next = ride->next;
+                 ride->next->prev = ride->prev; 
+                 wq->prev = wq->next = NULL;
+             }
+       }
+       ride = ride->next; /* move to the next wq */
     }
 }
