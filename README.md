@@ -28,7 +28,7 @@ Below are the services supported by the kernel.
       Threads can wait(sleep) on queues till a given condtion is met or can wait till it is waked up by another thread.
 ##### 8. Memory bytepool
       Time sensitive memory allocation using fixed memory blocks.
-      Application can dynamically request  and free memory block from 1 byte to 2048 bytes.
+      Application can dynamically request  and free memory block from 1 byte to 4096 bytes.
 ##### 9. Mempool
       Used by kernel services to dynamically create kernel services structures to meet real time constraints(not avialble for applications)
 ##### 10. Message queues
