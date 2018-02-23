@@ -117,7 +117,7 @@ int dev_ioctl(int desc_id, unsigned int cmd, void *arg)
     return -ENODEV;
 }
 
-void poll_wait (struct devfile *d, struct wait_queue *wq, struct poll_table *p)
+void poll_wait (struct devfile *d, struct wait_event *wq, struct poll_table *p)
 {
     /* Timeout support will be added later */
     wait_on(wq);

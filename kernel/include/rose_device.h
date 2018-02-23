@@ -62,6 +62,6 @@ int dev_read(int fd, void *dest, size_t);
 int dev_write(int fd, const void *src, size_t);
 int dev_ioctl(int fd, unsigned int cmd, void *arg);
 int dev_poll(int desc_id, unsigned int events, int timeout);
-void poll_wait (struct devfile *, struct wait_queue *, struct poll_table *);
+void poll_wait (struct devfile *, struct wait_event *, struct poll_table *);
 
 #endif /* __ROSE_DEVICE_H */

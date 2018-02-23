@@ -20,11 +20,11 @@
 /* Rose Wait Q
  * */
 
-static struct wait_queue *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
-static void __wait_timeout(struct wait_queue *wq, int timeout);
+static struct wait_event *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
+static void __wait_timeout(struct wait_event *wq, int timeout);
 static void __wait_handler(void *ptr);
 
-int __finish_wait(struct wait_queue *wq)
+int __finish_wait(struct wait_event *wq)
 {
     int ret = 0;
 
@@ -47,7 +47,7 @@ int __finish_wait(struct wait_queue *wq)
 
 }
 
-static void __wait_timeout(struct wait_queue *wq, int timeout)
+static void __wait_timeout(struct wait_event *wq, int timeout)
 {
     struct timer_list timer;
 
@@ -59,13 +59,13 @@ static void __wait_timeout(struct wait_queue *wq, int timeout)
 
 static void __wait_handler(void *ptr)
 {
-    struct wait_queue *wq = (struct wait_queue *)ptr;
+    struct wait_event *wq = (struct wait_event *)ptr;
     wq->timeout = E_OS_TIMEOUT;
 }
 
-int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
+int __add_to_wait_event(struct wait_event *wq, int task_state, int timeout)
 {
-    struct wait_queue *ride;
+    struct wait_event *ride;
 
     unsigned int imask = enter_critical();
     
@@ -100,7 +100,7 @@ int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
     return 0;
 }
 
-int wakeup(struct wait_queue *wq)
+int wakeup(struct wait_event *wq)
 {
     unsigned int imask = enter_critical();
     
@@ -137,8 +137,8 @@ int wakeup(struct wait_queue *wq)
 
 void __rose_wake()
 {
-    struct wait_queue *ride;
-    struct wait_queue *wq;
+    struct wait_event *ride;
+    struct wait_event *wq;
 
     if(!__sys_wait_list)
         return;

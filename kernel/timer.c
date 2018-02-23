@@ -66,7 +66,7 @@ void rose_timer_thread()
        }
 	/* Parse the timer list and wake up expired timers */
 	while(1) {
-		event_flag = wait_for_events(&timer_events, TIMER_EVENT_IRQ_EVENT); 
+		event_flag = wait_event_group(&timer_events, TIMER_EVENT_IRQ_EVENT); 
 		//pr_info("jiffies %u\n", jiffies);
 	
 		imask = enter_critical();	
