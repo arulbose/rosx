@@ -39,7 +39,7 @@ Below are the services supported by the kernel.
       Dynamic request and free of interrupt. 
       Supports interrupt sharing
 ##### 12. Device driver management
-      Driver core support Linux like open/release/read/write/ioctl api calls
+      Driver core support Linux like open/release/read/write/ioctl/poll api calls
       
 ## Getting Started
 Currently the kernel is not ported to any hardware. There are some porting code in the source for ARM Raspberry pi but not complete. I have ported the kernel to work on a 32-bit x86 simulator which runs on a x86 or x86_64 bit machine. The x86 simulator runs the Rose kernel threads as if running on a actual bare metal hardware(where the rose scheduler handles the application threads). As the priority is to stabilize the kernel the x86 simulator environment gives greater flexibity in debugging kernel using gdb.
