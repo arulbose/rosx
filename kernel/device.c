@@ -117,6 +117,26 @@ int dev_ioctl(int desc_id, unsigned int cmd, void *arg)
     return -ENODEV;
 }
 
+void poll_wait (struct devfile *d, struct wait_queue *wq, struct poll_table *p)
+{
+    /* Timeout support will be added later */
+    wait_on(wq);
+}
+
+int dev_poll(int desc_id, unsigned int events, int timeout)
+{
+    int ret;
+    struct poll_table poll;
+    
+    if(desc[desc_id].dev != NULL) {
+        poll.events = events;
+        poll.timeout = timeout;
+        ret = desc[desc_id].dev->device_ops->poll(&desc[desc_id], &poll);
+        return ret;
+    }
+    return -ENODEV;
+}
+
 int register_driver(char *name, struct device_ops *ops)
 {
     int device_table_id;

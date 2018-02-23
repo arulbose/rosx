@@ -22,6 +22,7 @@
 
 struct device;
 struct devfile;
+struct poll_table;
 
 struct device_ops {
     int (*open)(struct devfile *);
@@ -29,6 +30,7 @@ struct device_ops {
     int (*read)(struct devfile *, void *, size_t);
     int (*write)(struct devfile *, const void *, size_t);
     int (*ioctl)(struct devfile *, unsigned int, void *);
+    int (*poll)(struct devfile *, struct poll_table *);
 
 }; 
 /* Main device struct */
@@ -45,6 +47,11 @@ struct devfile {
     int flags;
 };
 
+struct poll_table {
+    unsigned int events;
+    int timeout;
+};
+
 int register_driver(char *, struct device_ops *);
 void driver_init(void);
 
@@ -54,5 +61,7 @@ int dev_close(int fd);
 int dev_read(int fd, void *dest, size_t);
 int dev_write(int fd, const void *src, size_t);
 int dev_ioctl(int fd, unsigned int cmd, void *arg);
+int dev_poll(int desc_id, unsigned int events, int timeout);
+void poll_wait (struct devfile *, struct wait_queue *, struct poll_table *);
 
 #endif /* __ROSE_DEVICE_H */
