@@ -23,35 +23,35 @@
 #include<rose_task.h>
 
 /* Below are the currently supported
- * wait_event(struct wait_event *wq, condition)
- * wait_on(struct wait_event *wq)
- * wake_up(struct wait_event *)
+ * wait_queue(struct wait_queue *wq, condition)
+ * wait_on(struct wait_queue *wq)
+ * wake_up(struct wait_queue *)
  */
 
-struct wait_event{
+struct wait_queue{
         TCB *task; /* task waiting for the event */
         /* Add all local tracking stuff here */
         int timeout; /* to trace the wait timeout */
-        struct wait_event *next;
-        struct wait_event *prev;
+        struct wait_queue *next;
+        struct wait_queue *prev;
 };
 
-int __finish_wait(struct wait_event *wq);
-int __add_to_wait_event(struct wait_event *wq, int, int);
+int __finish_wait(struct wait_queue *wq);
+int __add_to_wait_queue(struct wait_queue *wq, int, int);
 
-#define wait_event_timeout(wq, condition, timeout)                      \
+#define wait_queue_timeout(wq, condition, timeout)                      \
 ({                                                                      \
         int __ret = 0;                                                  \
         if (!(condition)){                                              \
-            __wait_event_timeout(wq, condition, timeout, __ret);        \
+            __wait_queue_timeout(wq, condition, timeout, __ret);        \
         }                                                               \
         __ret;                                                          \
 })
 
-#define __wait_event_timeout(wq, condition, timeout, ret)               \
+#define __wait_queue_timeout(wq, condition, timeout, ret)               \
 do {                                                                    \
         for(;;){                                                        \
-           __add_to_wait_event(wq, TASK_INTERRUPTIBLE, timeout);        \
+           __add_to_wait_queue(wq, TASK_INTERRUPTIBLE, timeout);        \
            rose_sched();                                                \
            if((condition) || (E_OS_TIMEOUT == ((wq)->timeout) )) {      \
                break;                                                   \
@@ -60,18 +60,18 @@ do {                                                                    \
         }                                                               \
 }while(0)
 
-#define wait_event(wq, condition)                                       \
+#define wait_queue(wq, condition)                                       \
 ({									\
         int __ret = 0;                                                  \
         if (!(condition))                                               \
-                __wait_event(wq, condition, __ret);                     \
+                __wait_queue(wq, condition, __ret);                     \
         __ret;                                                          \
 })
 
-#define __wait_event(wq, condition, ret)                                \
+#define __wait_queue(wq, condition, ret)                                \
 do {                                                                    \
         for(;;){                                                        \
-           __add_to_wait_event(wq, TASK_INTERRUPTIBLE, 0);              \
+           __add_to_wait_queue(wq, TASK_INTERRUPTIBLE, 0);              \
            rose_sched();                                                \
            if(condition) {                                              \
                break;                                                   \
@@ -90,7 +90,7 @@ do {                                                                    \
 
 #define __wait_on(wq, ret)                                              \
 do {                                                                    \
-        __add_to_wait_event(wq, TASK_UNINTERRUPTIBLE, 0);               \
+        __add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE, 0);               \
         rose_sched();                                                   \
        (ret) =  __finish_wait(wq);                                      \
 }while(0)
@@ -105,24 +105,23 @@ do {                                                                    \
 
 #define __wait_on_timeout(wq, timeout, ret)                             \
 do {                                                                    \
-       __add_to_wait_event(wq, TASK_UNINTERRUPTIBLE, timeout);          \
+       __add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE, timeout);          \
        rose_sched();                                                    \
        (ret) =  __finish_wait(wq);                                      \
 }while(0)
 
 
 #define DEFINE_WAIT(wq)     \
-    struct wait_event wq = __WAITEVENT_INIT(wq)
+    struct wait_queue wq = __WAITEVENT_INIT(wq)
 
 #define __WAITEVENT_INIT(wq)     \
            {                     \
              .task = NULL,       \
              .next = NULL,       \
              .prev = NULL,       \
-             .timeout = 0        \
            }
 
 void __rose_wake(void);
-int wakeup(struct wait_event *);
+int wakeup(struct wait_queue *);
 
 #endif /* __ROSE_WAIT_H__ */

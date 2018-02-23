@@ -20,11 +20,11 @@
 /* Rose Wait Q
  * */
 
-static struct wait_event *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
-static void __wait_timeout(struct wait_event *wq, int timeout);
+static struct wait_queue *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
+static void __wait_timeout(struct wait_queue *wq, int timeout);
 static void __wait_handler(void *ptr);
 
-int __finish_wait(struct wait_event *wq)
+int __finish_wait(struct wait_queue *wq)
 {
     int ret = 0;
 
@@ -47,52 +47,70 @@ int __finish_wait(struct wait_event *wq)
 
 }
 
-static void __wait_timeout(struct wait_event *wq, int timeout)
+static void __wait_timeout()
 {
-    struct timer_list timer;
+    struct timer_list *timer = NULL;
 
-    init_timer(&timer, __wait_handler, wq, timeout);
+    if (!(timer = create_timer(__wait_handler, __curr_running_task, timeout)){
+        pr_panic("Timer creation failed\n");
+    }
     __curr_running_task->timer = &timer;
     start_timer(&timer);
-    wq->timeout = __TIMER_ON;
+    __curr_running_task->timeout = __TIMER_ON;
 }
 
 static void __wait_handler(void *ptr)
 {
-    struct wait_event *wq = (struct wait_event *)ptr;
-    wq->timeout = E_OS_TIMEOUT;
+    TCB *t = (TCB *)ptr;
+    stop_timer(t->timer);
+    delete_timer(t->timer);
+    t->timeout = E_OS_TIMEOUT;
+    t->timer = NULL;
 }
 
-int __add_to_wait_event(struct wait_event *wq, int task_state, int timeout)
+int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
 {
-    struct wait_event *ride;
+    struct wait_queue *ride;
+    TCB *t;
 
     unsigned int imask = enter_critical();
-    
+
+   /* Put the current task to sleep in its waitqueue */    
     __curr_running_task->state = task_state;
     __curr_running_task->wq = wq;
     remove_from_ready_q(__curr_running_task);
     __curr_running_task->next = NULL;
-  
-    wq->task = __curr_running_task;
-
-    /* Add the waiting task to the sys wait queue */    
-    if(!(__sys_wait_list)) {
-        /* Empty; add the first node */
-        __sys_wait_list = wq;
+ 
+    /* Add the tasks in its wait_queue */ 
+    if(!(wq->task)) {
+        wq->task = __curr_running_task;
     }else{
-        /* add wait queue to the tail of sytem wait list */
-        ride = __sys_wait_list;
-        while(ride->next){
-            ride = ride->next;
+        t = wq->task;
+        while(t->next){
+            t = t->next;
         }
-        ride->next = wq;
-        wq->prev = ride;
+        t->next = __curr_running_task;
     }
-    /* Wait timeout */
-    if((timeout > 0) && (wq->timeout == __TIMER_OFF)) {
-        exit_critical(imask); /* __wait_timeout will sleep hence exit critical */
-        __wait_timeout(wq, timeout);
+    /* Check if the waitqueue is already in the list */
+    if(wq->next == NULL && wq->prev == NULL) {
+        /* Now add the waitqueue to the sys wait queue */    
+        if(!(__sys_wait_list)) {
+            /* Empty; add the first node */
+            __sys_wait_list = wq;
+        }else{
+            /* add wait queue to the tail of sytem wait list */
+            ride = __sys_wait_list;
+            while(ride->next){
+                ride = ride->next;
+            }
+            ride->next = wq;
+            wq->prev = ride;
+       }
+   }
+    /* Wait timeout;Avoid starting the timer is already started */
+    if((timeout > 0) && (__curr_running_task->timeout == __TIMER_OFF)) {
+        __curr_running_task->timeout = timeout;
+        __wait_timeout();
     }
 
     exit_critical(imask);
@@ -100,32 +118,19 @@ int __add_to_wait_event(struct wait_event *wq, int task_state, int timeout)
     return 0;
 }
 
-int wakeup(struct wait_event *wq)
+/* Wakeup all the task waiting on thge wait queue */
+int wakeup(struct wait_queue *wq)
 {
     unsigned int imask = enter_critical();
     
-    if(!__sys_wait_list) {
-        exit_critical(imask);
-        return -ENXIO;
-    }
-
-    if((wq->next == NULL) && (wq->prev == NULL) ){
-        exit_critical(imask);
-        __early_printk("No wait in the wait list\n");
-        return -ENXIO;
-    }
-
-    if(__sys_wait_list == wq) {
-        /* The first node is the task to be removed */
-        __sys_wait_list = wq->next;
-    }else{
-        /* Cut and connect the chain */
-        wq->prev->next = wq->next;
-        wq->next->prev = wq->prev;
-    }
+    TCB *t = wq->task;
     
-    wq->task->state = TASK_READY;
-    add_to_ready_q(wq->task);
+    while(t) {
+        t->state = TASK_READY;   
+        add_to_ready_q(t);
+        t = t->next;
+    }    
+    wq->task = NULL;
 
     exit_critical(imask);
 
@@ -137,8 +142,8 @@ int wakeup(struct wait_event *wq)
 
 void __rose_wake()
 {
-    struct wait_event *ride;
-    struct wait_event *wq;
+    struct wait_queue *ride;
+    struct wait_queue *wq;
 
     if(!__sys_wait_list)
         return;
@@ -148,7 +153,7 @@ void __rose_wake()
     /* Wake up all waiting task if TASK_INTERRUPTIBLE */
     while(ride)
     {
-        if(ride->task->state == TASK_INTERRUPTIBLE) {
+        if(ride->task->state == TASK_INTERRUPTIBLE || ride->task->timeout == E_OS_TIMEOUT ) {
         /* Wake task */
             if(ride == __sys_wait_list) {
                 /* Need to move the head */
@@ -156,7 +161,7 @@ void __rose_wake()
                 if(__sys_wait_list)
                     __sys_wait_list->prev = NULL;
             } else {
-               /* Remove the task from the waitqueu list */ 
+               /* Remove the task from the waitqueue */ 
                ride->prev->next = ride->next;
                ride->next->prev = ride->prev; 
             }

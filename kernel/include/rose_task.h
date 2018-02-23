@@ -44,11 +44,12 @@ struct __task_control_block
 #endif
         unsigned int event_flag; /* Task event flag */
         unsigned int event_recv; /* Task received events */
+        int timeout;             /* Used for store if the task is waiting on a waitqueue */
 	struct timer_list *timer;/* Pointer to task timer  */
 	struct semaphore *sem;   /* Pointer to task semaphore */
 	struct mutex *mutex;     /* Pointer task mutex */
 	struct event_group *event; /* Pointer to task event group */
-        struct wait_event *wq;         /* Pointer to task wait event */
+        struct wait_queue *wq;         /* Pointer to task wait event */
 	struct __task_control_block *next; /* pointer to the next task kcontrol block */
 	struct __task_control_block *list; /* used to add in the global list of task */
 };

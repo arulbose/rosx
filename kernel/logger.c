@@ -67,7 +67,7 @@ void rose_logger_thread()
     }
 
     while(1) {
-        if(0 == wait_event(&w, (__printk_buffer_head != __printk_buffer_tail))) {
+        if(0 == wait_queue(&w, (__printk_buffer_head != __printk_buffer_tail))) {
            dev_write(dd, __printk_buffer_tail, 1);
            if((__printk_buffer_tail + 1) > (__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE) ) {
               /* Buffer roll over */
