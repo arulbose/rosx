@@ -25,22 +25,23 @@ static void __wait_timeout(void);
 static void __wait_handler(void *ptr);
 static void wake_task_in_the_queue(struct wait_queue **ride);
 
-int __finish_wait(struct wait_queue *wq)
+int __finish_wait()
 {
     int ret = 0;
 
     unsigned int imask = enter_critical();
+    /* Find the current task */
 
-    if(wq->task->timer != NULL) {
+    if(__curr_running_task->timer != NULL) {
         /* Stop the timer and remove the timer from the list */
-        remove_from_timer_list(wq->task->timer, &active_timer_head);
-        wq->task->timer = NULL;    
+        remove_from_timer_list(__curr_running_task->timer, &active_timer_head);
+        __curr_running_task->timer = NULL;    
     }
-    if(wq->timeout == E_OS_TIMEOUT) {
+    if(__curr_running_task->timeout == E_OS_TIMEOUT) {
         ret = E_OS_TIMEOUT;
     }
-    wq->timeout = __TIMER_OFF;
-    wq->task->wq = NULL;
+    __curr_running_task->timeout = __TIMER_OFF;
+    __curr_running_task->wq = NULL;
 
     exit_critical(imask);
 
@@ -119,7 +120,7 @@ int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
     return 0;
 }
 
-/* Wakeup all the task waiting on thge wait queue */
+/* Wakeup all the task waiting on the wait queue */
 int wakeup(struct wait_queue *wq)
 {
     unsigned int imask = enter_critical();
@@ -132,6 +133,18 @@ int wakeup(struct wait_queue *wq)
         t = t->next;
     }    
     wq->task = NULL;
+    /* Remove the queue from the sys queue list */
+    if(wq == __sys_wait_list) {
+         __sys_wait_list = wq->next;
+         if(__sys_wait_list) {
+              __sys_wait_list->prev = NULL;
+         }
+    }else{
+         /* Remove the task from the waitqueue */
+         wq->prev->next = wq->next;
+         wq->next->prev = wq->prev;
+         wq->prev = wq->next = NULL;     
+    }
 
     exit_critical(imask);
 
@@ -182,7 +195,6 @@ void __rose_wake()
         return;
     
     ride = __sys_wait_list;
-
     /* Walk through each queue in the queue list and wake up all the task
      * if TASK_INTERRUPTIBLE or E_OS_TIMEOUT
      */

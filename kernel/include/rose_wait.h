@@ -31,12 +31,11 @@
 struct wait_queue{
         TCB *task; /* task waiting for the event */
         /* Add all local tracking stuff here */
-        int timeout; /* to trace the wait timeout */
         struct wait_queue *next;
         struct wait_queue *prev;
 };
 
-int __finish_wait(struct wait_queue *wq);
+int __finish_wait();
 int __add_to_wait_queue(struct wait_queue *wq, int, int);
 
 #define wait_queue_timeout(wq, condition, timeout)                      \
@@ -111,7 +110,7 @@ do {                                                                    \
 }while(0)
 
 
-#define DEFINE_WAIT(wq)     \
+#define DEFINE_WAITQUEUE(wq)     \
     struct wait_queue wq = __WAITEVENT_INIT(wq)
 
 #define __WAITEVENT_INIT(wq)     \

@@ -56,7 +56,7 @@ void __printk_to_buffer(const char *fmt, ...)
 void rose_logger_thread()
 {
     int dd;
-    DEFINE_WAIT(w);
+    DEFINE_WAITQUEUE(w);
 
     print_buffer_ready = 1;
     __early_printk("rose_logger_thread ready\n");
