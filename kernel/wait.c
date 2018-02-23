@@ -21,16 +21,49 @@
  * */
 
 static struct wait_queue *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
+static void __wait_timeout(struct wait_queue *wq, int timeout);
+static void __wait_handler(void *ptr);
 
-/* Waiting on the timeout queue if mutex has also timeout */
-static int __wait_timeout(struct wait_queue *wq, int timeout)
+int __finish_wait(struct wait_queue *wq)
 {
-   if(OS_ERR == msleep(TICKS_TO_MS(timeout)) {
-       ssleep(TICKS_TO_SECS);
-   }
+    int ret = 0;
+
+    unsigned int imask = enter_critical();
+
+    if(wq->task->timer != NULL) {
+        /* Stop the timer and remove the timer from the list */
+        remove_from_timer_list(wq->task->timer, &active_timer_head);
+        wq->task->timer = NULL;    
+    }
+    if(wq->timeout == E_OS_TIMEOUT) {
+        ret = E_OS_TIMEOUT;
+    }
+    wq->timeout = __TIMER_OFF;
+    wq->task->wq = NULL;
+
+    exit_critical(imask);
+
+    return ret;
+
 }
 
-int add_to_wait_queue(struct wait_queue *wq, int task_state)
+static void __wait_timeout(struct wait_queue *wq, int timeout)
+{
+    struct timer_list timer;
+
+    init_timer(&timer, __wait_handler, wq, timeout);
+    __curr_running_task->timer = &timer;
+    start_timer(&timer);
+    wq->timeout = __TIMER_ON;
+}
+
+static void __wait_handler(void *ptr)
+{
+    struct wait_queue *wq = (struct wait_queue *)ptr;
+    wq->timeout = E_OS_TIMEOUT;
+}
+
+int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
 {
     struct wait_queue *ride;
 
@@ -57,9 +90,9 @@ int add_to_wait_queue(struct wait_queue *wq, int task_state)
         wq->prev = ride;
     }
     /* Wait timeout */
-    if(timeout > 0) {
-                exit_critical(imask); /* __mutex_timeout will sleep hence exit critical */
-                return __wait_timeout(wq, timeout);
+    if((timeout > 0) && (wq->timeout == __TIMER_OFF)) {
+        exit_critical(imask); /* __wait_timeout will sleep hence exit critical */
+        __wait_timeout(wq, timeout);
     }
 
     exit_critical(imask);
@@ -71,8 +104,14 @@ int wakeup(struct wait_queue *wq)
 {
     unsigned int imask = enter_critical();
     
-    if(!__sys_wait_list){
-        __early_printk("Invalid wakeup call\n");
+    if(!__sys_wait_list) {
+        exit_critical(imask);
+        return -ENXIO;
+    }
+
+    if((wq->next == NULL) && (wq->prev == NULL) ){
+        exit_critical(imask);
+        __early_printk("No wait in the wait list\n");
         return -ENXIO;
     }
 
@@ -86,7 +125,6 @@ int wakeup(struct wait_queue *wq)
     }
     
     wq->task->state = TASK_READY;
-    wq->task->wq = NULL; 
     add_to_ready_q(wq->task);
 
     exit_critical(imask);
@@ -100,6 +138,7 @@ int wakeup(struct wait_queue *wq)
 void __rose_wake()
 {
     struct wait_queue *ride;
+    struct wait_queue *wq;
 
     if(!__sys_wait_list)
         return;
@@ -117,13 +156,14 @@ void __rose_wake()
                 if(__sys_wait_list)
                     __sys_wait_list->prev = NULL;
             } else {
-               
+               /* Remove the task from the waitqueu list */ 
                ride->prev->next = ride->next;
                ride->next->prev = ride->prev; 
             }
             ride->task->state = TASK_READY;
-            ride->task->wq = NULL;
-            add_to_ready_q(ride->task);      
+            add_to_ready_q(ride->task);
+            wq = ride;
+            wq->prev = wq->next = NULL;
             ride = ride->next; /* move to the next wq */
         } 
     }

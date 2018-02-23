@@ -367,10 +367,15 @@ void remove_from_timer_list(struct timer_list *p, struct timer_list **head)
     exit_critical(imask);
 }
 
-/* convert ticks to system time in ms */
-unsigned int get_time_ms(void)
+inline int MSECS_TO_TICKS(int m)
 {
-    return (jiffies/CONFIG_HZ); 
+    int __ret = 0;
+    if(!m)
+       return  __ret;
+    if((m) < (1000/CONFIG_HZ)) {
+        return 1;
+    }else{
+        return ((m) / (1000/CONFIG_HZ));
+    }
 }
-
 
