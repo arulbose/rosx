@@ -54,6 +54,6 @@ struct mutex * create_mutex(void);
 void delete_mutex(struct mutex *p);
 #endif
 int mutex_unlock(struct mutex *p);
-int mutex_lock(struct mutex *p, int ticks);
+int mutex_lock(struct mutex *p, int ticks); /* Ticks or Jiffies */
 
 #endif

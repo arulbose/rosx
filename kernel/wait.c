@@ -22,6 +22,14 @@
 
 static struct wait_queue *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
 
+/* Waiting on the timeout queue if mutex has also timeout */
+static int __wait_timeout(struct wait_queue *wq, int timeout)
+{
+   if(OS_ERR == msleep(TICKS_TO_MS(timeout)) {
+       ssleep(TICKS_TO_SECS);
+   }
+}
+
 int add_to_wait_queue(struct wait_queue *wq, int task_state)
 {
     struct wait_queue *ride;
@@ -47,6 +55,11 @@ int add_to_wait_queue(struct wait_queue *wq, int task_state)
         }
         ride->next = wq;
         wq->prev = ride;
+    }
+    /* Wait timeout */
+    if(timeout > 0) {
+                exit_critical(imask); /* __mutex_timeout will sleep hence exit critical */
+                return __wait_timeout(wq, timeout);
     }
 
     exit_critical(imask);

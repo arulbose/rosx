@@ -187,19 +187,6 @@ int __add_timer(struct timer_list *p, void (*func)(void *), int delay, TCB *tid)
 	return OS_OK;
 }
 
-unsigned int msecs_to_ticks(unsigned int time)
-{
-    time = time/CONFIG_HZ;
-    if(!time)
-        time = 1; /* The resolution of the ms timer is CONFIG_HZ */
-    return time;
-}
-
-unsigned int secs_to_ticks(unsigned int secs)
-{
-       return (secs * 1000/CONFIG_HZ); 
-
-}
 /* Static init of timers */
 int init_timer(struct timer_list *timer, void (*timer_handler)(void *), void *priv, unsigned int ticks)
 {

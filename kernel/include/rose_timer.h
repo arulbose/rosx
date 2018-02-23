@@ -73,4 +73,19 @@ unsigned int ssecs_to_ticks(unsigned int secs);
 int msleep(unsigned int msecs);
 int ssleep(unsigned int secs);
 
+/* Handy defines */
+#define TICKS_TO_MS(ticks) (((ticks) * (1000/CONFIG_HZ)))
+#define TICKS_TO_SECS(ticks) (TICKS_TO_MS(ticks) * 1000)
+#define MSECS_TO_TICKS(m) 
+                          {                                      \
+                              int __ret = 0;                     \ 
+                              if(!m)                             \
+                                 __ret;                          \
+                              if((m) < (1000/CONFIG_HZ))         \
+                                  __ret = 1;                     \
+                              __ret = ((ms) / (1000/CONFIG_HZ)); \
+                          }
+
+#define SECS_TO_TICKS(s)  ((s) * (1000/CONFIG_HZ))
+
 #endif

@@ -30,9 +30,31 @@
 struct wait_queue{
         TCB *task; /* task waiting for the event */
         /* Add all local tracking stuff here */
+        int timeout; /* to trace the wait timeout */
         struct wait_queue *next;
         struct wait_queue *prev;
 };
+
+#define wait_event_timeout(wq, condition)                               \        
+({                                                                      \
+        int __ret = 0;                                                  \
+        if (!(condition))                                               \
+                __wait_event_timeout(wq, condition, __ret);             \        
+        __ret;                                                          \
+})
+
+#define __wait_event_timeout(wq, condition, timeout, ret)               \
+do {                                                                    \
+        for(;;){                                                        \
+           ret = add_to_wait_queue(wq, TASK_INTERRUPTIBLE, timeout);    \
+           if(condition || (E_OS_TIMEOUT == ret)) {                     \
+               wakeup(wq);                                              \
+               break;                                                   \
+            }                                                           \
+           rose_sched();                                                \
+           timeout = wq->timeout;					\
+        }                                                               \
+}while(0)
 
 #define wait_event(wq, condition)                                       \
 ({									\
@@ -45,7 +67,7 @@ struct wait_queue{
 #define __wait_event(wq, condition, ret)                                \
 do {                                                                    \
         for(;;){                                                        \
-           add_to_wait_queue(wq, TASK_INTERRUPTIBLE);                   \
+           add_to_wait_queue(wq, TASK_INTERRUPTIBLE, 0);                \
            if(condition) {                                              \
                wakeup(wq);                                              \
                break;                                                   \
@@ -65,7 +87,7 @@ do {                                                                    \
 #define __wait_on(wq, ret)                                              \
 do {                                                                    \
         for(;;){                                                        \
-           add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE);                 \
+           add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE, 0);              \
            rose_sched();                                                \
         }                                                               \
 }while(0)
