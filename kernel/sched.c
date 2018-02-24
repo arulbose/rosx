@@ -21,17 +21,17 @@ void rose_sched()
 {
 	unsigned int a = 0;
 
-	if((__curr_running_task != task_ready_head)){
+	if((__curr_running_task != __task_ready_head)){
 	  __need_resched = 0;
 	  a = enter_critical();
-	  __sched__(__curr_running_task, task_ready_head); /* port specific call */ 
+	  __sched__(__curr_running_task, __task_ready_head); /* port specific call */ 
 	}
 }
 
 /* Up the current running task */
 void __switch_to()
 {
-        __curr_running_task = task_ready_head;
+        __curr_running_task = __task_ready_head;
 	__curr_running_task->state = TASK_RUNNING;
 #ifdef CONFIG_TIME_SLICE
 	if(__curr_running_task->time_slice && !__curr_running_task->ticks) { /* time_slice should be greater than 0 and ticks should be 0 to reload */

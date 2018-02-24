@@ -136,7 +136,7 @@ int wakeup(struct wait_queue *wq)
         t->state = TASK_READY; 
         ready = t;  
         t = t->next;
-        add_to_ready_q(ready);
+        __add_to_ready_q(ready);
     }    
     wq->task = NULL;
     /* Remove the queue from the sys queue list */
@@ -176,12 +176,12 @@ static void wake_task_in_the_queue(struct wait_queue **ride)
                 tn = tn->next;
                 (*ride)->task = tn;
                 tp = tn;
-                add_to_ready_q(ready);
+                __add_to_ready_q(ready);
            }else{
                /* Remove the task if in between the task chain */
                tn = tn->next;
                tp->next = tn;
-               add_to_ready_q(ready);
+               __add_to_ready_q(ready);
            }
                     
        }else { /* !TASK_INTERRUPTIBLE && !E_OS_TIMEOUT */

@@ -34,8 +34,8 @@ int timer_tick_irq_handler(int irq, void *a)
                 /* re-arrange the ready queue so that same prio process will not be starved */
                 remove_from_ready_q(__curr_running_task);
                 __curr_running_task->state = TASK_READY; /* TASK_RUNNING->TASK_READY */
-                add_to_ready_q(__curr_running_task);
-		if(__curr_running_task != task_ready_head) { /* check if pre-emption is needed */
+                __add_to_ready_q(__curr_running_task);
+		if(__curr_running_task != __task_ready_head) { /* check if pre-emption is needed */
                     __need_resched = 1;
 		}else{
 			__curr_running_task->ticks = __curr_running_task->time_slice; /* No pre-emption required; reload the ticks */
@@ -90,7 +90,7 @@ void rose_timer_thread()
 					}else{
 						/* In case of non handler type calls like msleep() or wait on timeout */
                         			start->task->state = TASK_READY;
-                        			add_to_ready_q(start->task);
+                                                __add_to_ready_q(start->task);
 						start->task->timer = NULL;
 						remove_from_timer_list(start, &active_timer_head);
 					}

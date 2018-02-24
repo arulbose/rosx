@@ -56,14 +56,16 @@ struct event_group * create_event_group()
 /* Runtime deletion of event group. Notify the task waiting for the events */
 void delete_event_group(struct event_group *p)
 {
+        TCB *ready;
 	unsigned int imask = enter_critical();
 
         /* wake up all task waiting on the event q, let the task return proper error code */
         while(p->task){
             p->task->state = TASK_READY;
-            add_to_ready_q(p->task);
             p->task->event = NULL;
+            ready = p->task;
             p->task = p->task->next; /* move to the next task in the queue */
+            __add_to_ready_q(ready);
         }
 
 	__free_pool(p, EVENT_POOL);
@@ -181,14 +183,14 @@ static int process_event(struct event_group *head, unsigned int flag)
 			/* Remove from the event group list */
 			  if(start == head->task){
                                 head->task = start->next;
-				add_to_ready_q(start);
+				__add_to_ready_q(start);
 					if(head->task == NULL)
 						break; /* no more node to parse */
 				prev = head->task;
 				start = head->task->next;
                           }else{
 				prev->next = start->next;
-				add_to_ready_q(start);
+				__add_to_ready_q(start);
 				start = prev->next;
                           }
 

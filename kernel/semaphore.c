@@ -58,6 +58,7 @@ struct semaphore * create_semaphore(int val)
 /* Runtime deletion of semaphore */
 void delete_semaphore(struct semaphore *p)
 {
+    TCB *ready;
     unsigned int imask = enter_critical();
 
     /* wake up all task waiting on the sem q, let the task return proper error code */
@@ -69,8 +70,9 @@ void delete_semaphore(struct semaphore *p)
            remove_from_timer_list(p->task->timer, &active_timer_head);
            p->task->timer = NULL;
        }
-            add_to_ready_q(p->task);
+            ready = p->task;
             p->task = p->task->next; /* move to the next task in the queue */
+            __add_to_ready_q(ready);
     }
 
     __free_pool(p, SEMAPHORE_POOL);
@@ -94,7 +96,7 @@ int semaphore_post(struct semaphore *sem)
 		sem->task = sem->task->next; /* move the next task in the sem wait queue */
 		t->state = TASK_READY;
 		t->sem = NULL;
-		add_to_ready_q(t);
+		__add_to_ready_q(t);
 		sem->curr_val ++; /* inc the count as one task is woke up from the wait queue */
 	}
 

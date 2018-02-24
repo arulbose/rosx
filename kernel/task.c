@@ -79,7 +79,7 @@ int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_
 	tcb->ip =  tcb->func;
 
 	if(task_state == TASK_READY)
-		add_to_ready_q(tcb);
+		__add_to_ready_q(tcb);
 
 	/* add the task to the global list of tasks */
 	if(!__task_list_head){
@@ -100,7 +100,7 @@ int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_
 }
 
 /* Sort based on task priority while adding to the ready list */
-int add_to_ready_q(TCB * new)
+int __add_to_ready_q(TCB * new)
 {
 	TCB *start = NULL;	
 	TCB *prev = NULL;	
@@ -108,20 +108,20 @@ int add_to_ready_q(TCB * new)
 	int prio = new->prio;
 
 	if(!(new->state == TASK_READY || new->state == TASK_RUNNING) ){
-	    pr_error( "add_to_ready_q: task is not in ready state %s, %d\n", new->name, new->state);
+	    pr_error( "__add_to_ready_q: task is not in ready state %s, %d\n", new->name, new->state);
 	    return OS_ERR;
 	}
 
 	new->next = NULL;
 
 	imask = enter_critical();
-	if(!task_ready_head){ 
-	    task_ready_head = new;
+	if(!__task_ready_head){ 
+	    __task_ready_head = new;
 	    exit_critical(imask);
 	    return OS_OK;
 	}
 	
-	start = task_ready_head;
+	start = __task_ready_head;
 
 	while(start) {	
 		
@@ -143,9 +143,9 @@ int add_to_ready_q(TCB * new)
 				}
 			}else{
 				new->next = start;
-				if(start == task_ready_head){
+				if(start == __task_ready_head){
 				    /* In case head prio is less */
-			            task_ready_head = new;	
+			            __task_ready_head = new;	
 				    goto done;	
 				}else{
 				    /* In case prio is less in the middle */
@@ -162,7 +162,7 @@ int add_to_ready_q(TCB * new)
 	prev->next = new; 
 
 done:
-     if(__curr_running_task != task_ready_head){
+     if(__curr_running_task != __task_ready_head){
            __need_resched = 1; /* Used for pre-emptive re-scheduling */
      }
         exit_critical(imask);
@@ -178,16 +178,16 @@ int remove_from_ready_q(TCB * rmv)
 
 	imask = enter_critical();
 
- 	start = task_ready_head;
+ 	start = __task_ready_head;
 
         while(start != NULL) {
 
                 /* Always head will have the high priority task */
                 if(start == rmv ) {
 
-                        if(start == task_ready_head){
+                        if(start == __task_ready_head){
                                 /* In case head is the task */
-                                task_ready_head = start->next;
+                                __task_ready_head = start->next;
 				rmv->next = NULL;
 				exit_critical(imask);
 				return OS_OK;
@@ -249,7 +249,7 @@ int set_task_prio(TCB *tcb, int prio)
 	tcb->prio = prio;
 	if(tcb->state == TASK_READY) {
 		remove_from_ready_q(tcb);
-		add_to_ready_q(tcb);
+		__add_to_ready_q(tcb);
 	}
 	return OS_OK;
 }
@@ -302,7 +302,7 @@ int resume_task(TCB *tcb)
 		return OS_ERR;
 
 	tcb->state = TASK_READY;
-	add_to_ready_q(tcb);
+	__add_to_ready_q(tcb);
 
 	return OS_OK;
 }

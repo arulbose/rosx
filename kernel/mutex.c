@@ -47,6 +47,7 @@ struct mutex * create_mutex()
 /* Runtime deletion of mutex */
 void delete_mutex(struct mutex *p)
 {
+        TCB *ready;
 	unsigned int imask = enter_critical();
 
 	/* wake up all task waiting on the mutext q, let the task return proper error code */	
@@ -58,8 +59,9 @@ void delete_mutex(struct mutex *p)
                 remove_from_timer_list(p->task->timer, &active_timer_head);
                 p->task->timer = NULL;
             }
-	    add_to_ready_q(p->task);
+            ready = p->task;
 	    p->task = p->task->next; /* move to the next task in the queue */
+	    __add_to_ready_q(ready);
 	}
 
 	p->owner = NULL;
@@ -93,7 +95,7 @@ int mutex_unlock(struct mutex *p)
                     pr_dbg("Mutex owner %s back to original prio %d\n", p->owner->name, p->owner->prio);
 		    /* Back to its original priority */
 		    remove_from_ready_q(p->owner);
-		    add_to_ready_q(__curr_running_task);
+		    __add_to_ready_q(__curr_running_task);
 		}
 #endif
 	    t = p->task;
@@ -122,7 +124,7 @@ int mutex_unlock(struct mutex *p)
 			p->owner->state = TASK_READY;
 			p->owner->mutex = NULL;
 			p->lock = __LOCKED;
-			add_to_ready_q(p->owner);
+			__add_to_ready_q(p->owner);
 	    }
        } 
 
@@ -171,7 +173,7 @@ void __mutex_handler(void *ptr)
 
    if(mutex->owner->state == TASK_READY) {
         remove_from_ready_q(mutex->owner);
-        add_to_ready_q(mutex->owner);    /* rearrange the prio of the owner */
+        __add_to_ready_q(mutex->owner);    /* rearrange the prio of the owner */
     }
 #endif
 
@@ -180,7 +182,7 @@ void __mutex_handler(void *ptr)
     task->mutex = NULL;
     /* Put the expired timer task in to ready queue */
     task->state = TASK_READY;
-    add_to_ready_q(task);
+    __add_to_ready_q(task);
 }
 
 /* Waiting on the timeout queue if mutex has also timeout */
@@ -243,7 +245,7 @@ int mutex_lock(struct mutex *p, int timeout)
             pr_dbg("Mutex owner %s new prio %d\n", p->owner->name, p->owner->prio);
 	    if(p->owner->state == TASK_READY) { /* Re-arrange the task in the ready queue */
                  remove_from_ready_q(p->owner);
-		 add_to_ready_q(p->owner);
+		 __add_to_ready_q(p->owner);
 	    }
 	}
 #endif

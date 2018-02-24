@@ -66,11 +66,11 @@ void * __stack_start_ptr;
 void * __curr_stack_ptr;
 #endif
 TCB *__curr_running_task;
-TCB *task_ready_head;
+TCB *__task_ready_head;
 TCB *__task_list_head;
 TCB __init_task;
 
-int add_to_ready_q(TCB *p);
+int __add_to_ready_q(TCB *p);
 int remove_from_ready_q(TCB *tid);
 
 /* Task state */

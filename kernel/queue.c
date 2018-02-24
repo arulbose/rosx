@@ -178,7 +178,7 @@ int write_to_queue(struct queue *q, char *n, int size)
 	       q->task->timer = NULL;
 	    }
 	  q->task->state = TASK_READY;
-	  add_to_ready_q(q->task); 	
+	  __add_to_ready_q(q->task);	
 	  q->task = NULL; /* Clear the waiting task */	
 	}
          
