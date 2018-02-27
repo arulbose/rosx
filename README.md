@@ -25,7 +25,8 @@ Below are the services supported by the kernel.
       Participating threads can use 32 event flags at the same time.
 ##### 7. Wait Queues and Wake services
       Supports static or dynamic creation of wait queues.
-      Threads can wait(sleep) on queues till a given condtion is met or can wait till it is waked up by another thread.
+      Threads can wait(sleep) on queues till a given condition is met or can wait till it is waked up by another thread.
+      Waitqueue condition with timeout
 ##### 8. Memory bytepool
       Time sensitive memory allocation using fixed memory blocks.
       Application can dynamically request  and free memory block from 1 byte to 4096 bytes.
