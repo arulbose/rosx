@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* Wait/Wake macros based on include/linux/wait.h */
+/* Wait/Wake macros implemention reference - Linux include/linux/wait.h */
 
 #ifndef __ROSE_WAIT_H__
 #define __ROSE_WAIT_H__
