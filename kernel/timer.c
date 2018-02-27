@@ -66,7 +66,7 @@ void rose_timer_thread()
        }
 	/* Parse the timer list and wake up expired timers */
 	while(1) {
-		event_flag = wait_for_events(&timer_events, TIMER_EVENT_IRQ_EVENT); 
+		event_flag = wait_event_group(&timer_events, TIMER_EVENT_IRQ_EVENT); 
 		//pr_info("jiffies %u\n", jiffies);
 	
 		imask = enter_critical();	
@@ -187,19 +187,6 @@ int __add_timer(struct timer_list *p, void (*func)(void *), int delay, TCB *tid)
 	return OS_OK;
 }
 
-unsigned int msecs_to_ticks(unsigned int time)
-{
-    time = time/CONFIG_HZ;
-    if(!time)
-        time = 1; /* The resolution of the ms timer is CONFIG_HZ */
-    return time;
-}
-
-unsigned int secs_to_ticks(unsigned int secs)
-{
-       return (secs * 1000/CONFIG_HZ); 
-
-}
 /* Static init of timers */
 int init_timer(struct timer_list *timer, void (*timer_handler)(void *), void *priv, unsigned int ticks)
 {
@@ -380,10 +367,15 @@ void remove_from_timer_list(struct timer_list *p, struct timer_list **head)
     exit_critical(imask);
 }
 
-/* convert ticks to system time in ms */
-unsigned int get_time_ms(void)
+inline int MSECS_TO_TICKS(int m)
 {
-    return (jiffies/CONFIG_HZ); 
+    int __ret = 0;
+    if(!m)
+       return  __ret;
+    if((m) < (1000/CONFIG_HZ)) {
+        return 1;
+    }else{
+        return ((m) / (1000/CONFIG_HZ));
+    }
 }
-
 

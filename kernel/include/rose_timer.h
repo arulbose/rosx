@@ -67,10 +67,17 @@ void mod_timer(struct timer_list *p, unsigned int delay);
 void ndelay();
 void udelay();
 void mdelay();
-unsigned int get_time_ms(void);
-unsigned int msecs_to_ticks(unsigned int msecs);
-unsigned int ssecs_to_ticks(unsigned int secs);
 int msleep(unsigned int msecs);
 int ssleep(unsigned int secs);
 
-#endif
+/* Handy inlines*/
+inline int MSECS_TO_TICKS(int m);
+/* Handy defines */
+#define TICKS_TO_MS(ticks) (((ticks) * (1000/CONFIG_HZ)))
+#define TICKS_TO_SECS(ticks) (TICKS_TO_MS(ticks) * 1000)
+#define SECS_TO_TICKS(s)  ((s) * (1000/CONFIG_HZ))
+
+#define __TIMER_OFF 0
+#define __TIMER_ON  1
+
+#endif /* __TIMER_H__ */

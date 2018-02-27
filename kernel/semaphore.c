@@ -139,7 +139,7 @@ static int __sem_timeout(struct semaphore *p, unsigned int timeout)
 {
     struct timer_list timer;
 
-    init_timer(&timer, __sem_handler, __curr_running_task, msecs_to_ticks(timeout));
+    init_timer(&timer, __sem_handler, __curr_running_task, timeout);
     start_timer(&timer);
     __curr_running_task->timer = &timer;
     suspend_task(MYSELF);

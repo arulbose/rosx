@@ -66,6 +66,7 @@ int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_
 	tcb->stack_size = stack_size;
 	tcb->func = func;
 	tcb->state = task_state;
+        tcb->timeout = __TIMER_OFF;
 #ifdef CONFIG_TIME_SLICE
 	tcb->time_slice = time_slice;
 	tcb->ticks = time_slice;
