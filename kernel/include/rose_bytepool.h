@@ -23,7 +23,7 @@ unsigned char *__bytepool_start; /* Address must be 32 bit aligned */
 void bytepool_init();
 
 /* -------------- Application system calls ---------------- */
-void *salloc(int size);
+void *salloc(int size); /* Simple time sensitive allocation from the bytepool; size is number of bytes */
 void sfree(void *);
 
 #endif

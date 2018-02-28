@@ -170,7 +170,7 @@ done:
 }
 
 /* remove from ready runqueue  */
-int remove_from_ready_q(TCB * rmv)
+int __remove_from_ready_q(TCB * rmv)
 {
 	TCB *start = NULL;	
 	TCB *prev = NULL;	
@@ -219,7 +219,7 @@ int abort_task(TCB *tcb)
 
 	/* releive all the resource that the task curently holds*/
 	if(tcb->state == TASK_READY) {
-		 remove_from_ready_q(tcb);
+		 __remove_from_ready_q(tcb);
 	}
 	/* TODO Remove form any waitqueues/return resources  and then change the state to task_abort */
 	tcb->state = TASK_ABORT;
@@ -234,7 +234,7 @@ int complete_task(TCB *tcb)
 	if(tcb != __curr_running_task)
 		return OS_ERR;
 
-	remove_from_ready_q(tcb);
+	__remove_from_ready_q(tcb);
 	tcb->state = TASK_COMPLETE;
 	rose_sched();
 	return OS_OK;
@@ -248,7 +248,7 @@ int set_task_prio(TCB *tcb, int prio)
 
 	tcb->prio = prio;
 	if(tcb->state == TASK_READY) {
-		remove_from_ready_q(tcb);
+		__remove_from_ready_q(tcb);
 		__add_to_ready_q(tcb);
 	}
 	return OS_OK;
@@ -283,13 +283,13 @@ int suspend_task(TCB *tcb)
 {
 	if(!tcb) {
 
-	    remove_from_ready_q(__curr_running_task);
+	    __remove_from_ready_q(__curr_running_task);
             __curr_running_task->state = TASK_SUSPEND;
             rose_sched();
 
 	}else{
 		if(tcb->state == TASK_READY) {
-		   remove_from_ready_q(tcb);
+		   __remove_from_ready_q(tcb);
                    tcb->state = TASK_SUSPEND;
 		}
 	}

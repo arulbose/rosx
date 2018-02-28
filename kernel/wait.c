@@ -34,7 +34,7 @@ int __finish_wait()
 
     if(__curr_running_task->timer != NULL) {
         /* Stop the timer and remove the timer from the list */
-        remove_from_timer_list(__curr_running_task->timer, &active_timer_head);
+        __remove_from_timer_list(__curr_running_task->timer, &__active_timer_head);
         __curr_running_task->timer = NULL;    
     }
     if(__curr_running_task->timeout == E_OS_TIMEOUT) {
@@ -80,7 +80,7 @@ int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
    /* Put the current task to sleep in its waitqueue */    
     __curr_running_task->state = task_state;
     __curr_running_task->wq = wq;
-    remove_from_ready_q(__curr_running_task);
+    __remove_from_ready_q(__curr_running_task);
     __curr_running_task->next = NULL;
  
     /* Add the tasks in its wait_queue */ 

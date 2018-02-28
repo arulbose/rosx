@@ -53,6 +53,7 @@
 #define CONFIG_TIMER_DEFAULT_STACK_SIZE 512
 /* Task */
 #define CONFIG_MAX_TASK 32 /* Limited only by the resource available */
+#define CONFIG_TASK_STR_LEN 8 /* Max name size of task */
 #define CONFIG_TIME_SLICE
 /* IRQ*/
 #define CONFIG_IRQS		__CONFIG_IRQS

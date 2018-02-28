@@ -17,7 +17,7 @@
 
 #ifndef __TASK_H__
 #define __TASK_H__
-#define TASK_STR_LEN 8 /* Fixed */
+#define TASK_STR_LEN CONFIG_TASK_STR_LEN /* Fixed */
 /**************** OS  Task definitions  **********************************/
 /* TCB-Task control block, expected to have all the details of the task
  * The number of tasks is limited only by the resource available; Rose kernel by itself
@@ -71,7 +71,7 @@ TCB *__task_list_head;
 TCB __init_task;
 
 int __add_to_ready_q(TCB *p);
-int remove_from_ready_q(TCB *tid);
+int __remove_from_ready_q(TCB *tid);
 
 /* Task state */
 enum{
@@ -85,7 +85,7 @@ enum{
 
 }TASK_STATE;
 
-/* macro used for self suspend */
+/* Macro used for self suspend */
 #define MYSELF 0
 /* -------------- Application system calls ---------------- */
 int create_task(TCB *, char *task_name, int prio, void *stack_ptr, int stack_size, void (*func)(void), int task_state, int time_slice);

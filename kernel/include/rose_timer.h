@@ -33,7 +33,7 @@ struct timer_list {
         struct timer_list *prev;
 	};
 /* timer interrupt */
-int timer_tick_irq_handler(int irq, void *a);
+int __timer_tick_irq_handler(int irq, void *a);
 
 #ifdef LOG_DBG
 /* Debug data */
@@ -45,15 +45,15 @@ int g_timer_pool_used;
 #define __TIMER_DISABLED ~(__TIMER_ENABLED)
 
 volatile unsigned int jiffies;
-struct event_group timer_events;
-struct timer_list *active_timer_head;
+struct event_group __timer_events;
+struct timer_list *__active_timer_head;
 
 /* Internal functions */
 void rose_timer_thread(void);
-int tick_timer(void);
+int __tick_timer(void);
 int __add_timer(struct timer_list *, void (*func)(void *), int ticks, TCB *tid);
-void add_to_active_timer_list(struct timer_list *p);
-void remove_from_timer_list(struct timer_list *p, struct timer_list **head);
+void __add_to_active_timer_list(struct timer_list *p);
+void __remove_from_timer_list(struct timer_list *p, struct timer_list **head);
 
 /* -------------- Application system calls ---------------- */
 int init_timer(struct timer_list *timer, void (*timer_handler)(void *), void *priv, unsigned int delay);

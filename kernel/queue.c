@@ -92,7 +92,7 @@ int read_from_queue(struct queue *p, char *n, int size, int timeout)
 			    /* If OS_NO_WAIT then suspend the task reading from the queue */
 		    	    p->task = __curr_running_task;
 		    	    __curr_running_task->state = TASK_SUSPEND;
-	 	    	    remove_from_ready_q(__curr_running_task);
+	 	    	    __remove_from_ready_q(__curr_running_task);
 		    	    exit_critical(imask);
 		    	    rose_sched();
 	 	    	    imask = enter_critical();
@@ -174,7 +174,7 @@ int write_to_queue(struct queue *q, char *n, int size)
 	if(q->task) {
 	/* Make sure if the task is waiting on this queue and waiting for the timeout on this queue */	
 	    if(q->task->timer) {
-	       remove_from_timer_list(q->task->timer, &active_timer_head);
+	       __remove_from_timer_list(q->task->timer, &__active_timer_head);
 	       q->task->timer = NULL;
 	    }
 	  q->task->state = TASK_READY;

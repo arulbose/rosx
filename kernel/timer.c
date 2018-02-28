@@ -17,14 +17,14 @@
 
 #include <RoseRTOS.h>
 
-DEFINE_EVENTGROUP(timer_events);
+DEFINE_EVENTGROUP(__timer_events);
 
-int timer_tick_irq_handler(int irq, void *a)
+int __timer_tick_irq_handler(int irq, void *a)
 {
 	/* Wake up timer thread and return */
 	//pr_info("timer interrupt received\n");
 	jiffies ++;
-	notify_event(&timer_events, TIMER_EVENT_IRQ_EVENT);
+	notify_event(&__timer_events, TIMER_EVENT_IRQ_EVENT);
 
 #ifdef CONFIG_TIME_SLICE
     /* Check if time slice is enabled */
@@ -32,7 +32,7 @@ int timer_tick_irq_handler(int irq, void *a)
              __curr_running_task->ticks--;
              if(!__curr_running_task->ticks) { /* once timer expires; sched */
                 /* re-arrange the ready queue so that same prio process will not be starved */
-                remove_from_ready_q(__curr_running_task);
+                __remove_from_ready_q(__curr_running_task);
                 __curr_running_task->state = TASK_READY; /* TASK_RUNNING->TASK_READY */
                 __add_to_ready_q(__curr_running_task);
 		if(__curr_running_task != __task_ready_head) { /* check if pre-emption is needed */
@@ -61,19 +61,19 @@ void rose_timer_thread()
 	pr_info( "In rose_timer_thread\n");
 
 	/* request timer interrupt */
-	if(OS_OK != request_irq(TIMER0_INT, &timer_tick_irq_handler, 0, "timer_irq", 0)) {
+	if(OS_OK != request_irq(TIMER0_INT, &__timer_tick_irq_handler, 0, "timer_irq", 0)) {
                 pr_panic("TIMER0_INT0 irq alloc failed\n");
        }
 	/* Parse the timer list and wake up expired timers */
 	while(1) {
-		event_flag = wait_event_group(&timer_events, TIMER_EVENT_IRQ_EVENT); 
+		event_flag = wait_event_group(&__timer_events, TIMER_EVENT_IRQ_EVENT); 
 		//pr_info("jiffies %u\n", jiffies);
 	
 		imask = enter_critical();	
 		if ((event_flag & TIMER_EVENT_IRQ_EVENT) == TIMER_EVENT_IRQ_EVENT){
 				
 			clear_event_flag(TIMER_EVENT_IRQ_EVENT);
-        		start = active_timer_head;
+        		start = __active_timer_head;
 		        tick = jiffies;
 			/* parse the timer list for expired timers */		
 	   		while(start != NULL)
@@ -83,7 +83,7 @@ void rose_timer_thread()
                 		{
 					if(start->handler != NULL ) {
 						/* remove from active list to idle list */
-						remove_from_timer_list(start, &active_timer_head);
+						__remove_from_timer_list(start, &__active_timer_head);
 						start->flag &= __TIMER_DISABLED;
 						/* Handler should be quick to finish its job */
 						start->handler(start->priv);
@@ -92,9 +92,9 @@ void rose_timer_thread()
                         			start->task->state = TASK_READY;
                                                 __add_to_ready_q(start->task);
 						start->task->timer = NULL;
-						remove_from_timer_list(start, &active_timer_head);
+						__remove_from_timer_list(start, &__active_timer_head);
 					}
-					start = active_timer_head;/** Reset the timer head as new timer may be added by mod_timer call **/
+					start = __active_timer_head;/** Reset the timer head as new timer may be added by mod_timer call **/
 				} else {
                 		    break; /* No expired timers in the active list */
 				}
@@ -174,11 +174,11 @@ int __add_timer(struct timer_list *p, void (*func)(void *), int delay, TCB *tid)
        p->prev = NULL;
 	
 	if(func == NULL){
-		add_to_active_timer_list(p);
+		__add_to_active_timer_list(p);
 		tid->timer = p; /* Will help to know if task is waiting on a timer */
 		/* Sleep on the timer list; until woken up by timer thread  */
 		tid->state = TASK_SUSPEND;
-                remove_from_ready_q(tid);
+                __remove_from_ready_q(tid);
 		rose_sched();
 	}else{
 		p->flag &= __TIMER_DISABLED;
@@ -265,7 +265,7 @@ void start_timer(struct timer_list *p)
 	if(p->flag & __TIMER_ENABLED) {
 		pr_error( "start_timer: Timer already started TID %s\n", p->task->name);
 	} else {
-		add_to_active_timer_list(p);
+		__add_to_active_timer_list(p);
 	}
 }
 
@@ -275,7 +275,7 @@ void start_timer(struct timer_list *p)
 void stop_timer(struct timer_list *p)
 {
 	if(p->flag & __TIMER_ENABLED) {
-        		remove_from_timer_list(p, &active_timer_head);
+        		__remove_from_timer_list(p, &__active_timer_head);
 			p->flag &= __TIMER_DISABLED;
 	} else {
 		pr_error( "stop_timer: Timer already stopped TID %s\n", p->task->name);
@@ -283,7 +283,7 @@ void stop_timer(struct timer_list *p)
 }
 
 /* Always add the timer with the short expiry to the start of the active list */ 
-void add_to_active_timer_list(struct timer_list *p)
+void __add_to_active_timer_list(struct timer_list *p)
 {
 	struct timer_list *start = NULL;
 	unsigned int tick;
@@ -298,24 +298,24 @@ void add_to_active_timer_list(struct timer_list *p)
 	p->next = NULL;
 
 	/* If the list is empty */
-	if(!active_timer_head) { /* Case 1: If list is empty*/
-		active_timer_head = p;
+	if(!__active_timer_head) { /* Case 1: If list is empty*/
+		__active_timer_head = p;
 		exit_critical(imask);
 		return;		
 	}
 
 	/* add the timer in the active timer list */
-	start = active_timer_head;
+	start = __active_timer_head;
 
 	 while(start != NULL) {
 
                 /* Always head will have low timer values */
                 if(start->time_expiry >= tick) { 
-                        if(start == active_timer_head){ /* Case 2: In case the new timer is added before the timer head */
+                        if(start == __active_timer_head){ /* Case 2: In case the new timer is added before the timer head */
                                 /* Insert the new timer as head */
-                                active_timer_head->prev = p;
-                                p->next = active_timer_head;
-                                active_timer_head = p;
+                                __active_timer_head->prev = p;
+                                p->next = __active_timer_head;
+                                __active_timer_head = p;
 				exit_critical(imask);
 				return; /* Done inserting in the active list */
                         }else{
@@ -340,14 +340,14 @@ void add_to_active_timer_list(struct timer_list *p)
 }
 
 /* Used to remove a timer from idle or active timer list */
-void remove_from_timer_list(struct timer_list *p, struct timer_list **head)
+void __remove_from_timer_list(struct timer_list *p, struct timer_list **head)
 {
     unsigned int imask;
 
     imask = enter_critical();
 
     if(*head == NULL){
-	pr_error( "Timer error remove_from_timer_list\n"); /* change with panic */
+	pr_error( "Timer error __remove_from_timer_list\n"); /* change with panic */
 	exit_critical(imask);
 	return;
     }

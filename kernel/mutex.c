@@ -94,7 +94,7 @@ int mutex_unlock(struct mutex *p)
 		    p->owner->prio = p->owner->orig_prio;
                     pr_dbg("Mutex owner %s back to original prio %d\n", p->owner->name, p->owner->prio);
 		    /* Back to its original priority */
-		    remove_from_ready_q(p->owner);
+		    __remove_from_ready_q(p->owner);
 		    __add_to_ready_q(__curr_running_task);
 		}
 #endif
@@ -172,7 +172,7 @@ void __mutex_handler(void *ptr)
     }
 
    if(mutex->owner->state == TASK_READY) {
-        remove_from_ready_q(mutex->owner);
+        __remove_from_ready_q(mutex->owner);
         __add_to_ready_q(mutex->owner);    /* rearrange the prio of the owner */
     }
 #endif
@@ -223,7 +223,7 @@ int mutex_lock(struct mutex *p, int timeout)
 	/* Put the task to sleep in the mutex wait list */
 	__curr_running_task->state = TASK_SUSPEND;
 	__curr_running_task->mutex = p;
-	remove_from_ready_q(__curr_running_task);
+	__remove_from_ready_q(__curr_running_task);
 	__curr_running_task->next = NULL;
 
         /* Add the task to the mutex sleep queue */
@@ -244,7 +244,7 @@ int mutex_lock(struct mutex *p, int timeout)
 	    p->owner->prio = __curr_running_task->prio;  /* Let the owner inherit the prio of the task */
             pr_dbg("Mutex owner %s new prio %d\n", p->owner->name, p->owner->prio);
 	    if(p->owner->state == TASK_READY) { /* Re-arrange the task in the ready queue */
-                 remove_from_ready_q(p->owner);
+                 __remove_from_ready_q(p->owner);
 		 __add_to_ready_q(p->owner);
 	    }
 	}

@@ -103,7 +103,7 @@ int wait_event_group(struct event_group *p, int flag)
 
 	__curr_running_task->state = TASK_SUSPEND;
 	__curr_running_task->event = p;
-	remove_from_ready_q(__curr_running_task);
+	__remove_from_ready_q(__curr_running_task);
 	__curr_running_task->next = NULL;
 
 	  if(!(p->task)) {

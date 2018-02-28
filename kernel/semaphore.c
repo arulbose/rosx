@@ -59,7 +59,7 @@ void delete_semaphore(struct semaphore *p)
        p->task->sem = NULL;
        /* Make sure if the task is waiting for the timeout on the semaphore list */
        if(p->task->timer) {
-           remove_from_timer_list(p->task->timer, &active_timer_head);
+           __remove_from_timer_list(p->task->timer, &__active_timer_head);
            p->task->timer = NULL;
        }
             ready = p->task;
@@ -180,7 +180,7 @@ int semaphore_wait(struct semaphore *sem, int timeout)
      __curr_running_task->state = TASK_SUSPEND;
      __curr_running_task->sem = sem;
      __curr_running_task->timeout = __TIMER_OFF;
-     remove_from_ready_q(__curr_running_task);
+     __remove_from_ready_q(__curr_running_task);
      __curr_running_task->next = NULL;
 
     /* Add the task to the sem sleep queue */	
