@@ -56,7 +56,7 @@ void delete_mutex(struct mutex *p)
 	    p->task->mutex = NULL;
 	    /* Make sure if the task is waiting for the timeout on the mutex list */
             if(p->task->timer) {
-                remove_from_timer_list(p->task->timer, &active_timer_head);
+                stop_timer(p->task->timer);
                 p->task->timer = NULL;
             }
             ready = p->task;
@@ -105,7 +105,7 @@ int mutex_unlock(struct mutex *p)
 	    		p->task = p->task->next; /* move to the next task waiting in the queue */
 			 /* Make sure if the task is waiting for the timeout on the mutex list */
 			 if(t->timer) {
-               			remove_from_timer_list(t->timer, &active_timer_head);
+               			stop_timer(t->timer);
                			t->timer = NULL;
             		}
 			/* give the lock to the next task waiting in the queue */

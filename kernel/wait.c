@@ -61,10 +61,10 @@ static void __wait_timeout()
     __curr_running_task->timeout = __TIMER_ON;
 }
 
+/* Timer context */
 static void __wait_handler(void *ptr)
 {
     TCB *t = (TCB *)ptr;
-    stop_timer(t->timer);
     delete_timer(t->timer);
     t->timeout = E_OS_TIMEOUT;
     t->timer = NULL;

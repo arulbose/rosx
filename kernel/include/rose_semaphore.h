@@ -26,8 +26,17 @@ struct semaphore {
     struct semaphore *next;
 };
 
+#define DEFINE_SEMAPHORE(s,v) \
+    struct semaphore (s) = __SEMAPHORE_INIT(v)
+
+#define __SEMAPHORE_INIT(v)        \
+{          .init_val = (v),        \
+            .curr_val = (v),       \
+            .task = NULL,          \
+            .next = NULL,          \
+}
+
 /* -------------- Application system calls ---------------- */
-void init_semaphore(struct semaphore *sem, int val);
 #if(CONFIG_SEMAPHORE_COUNT > 0)
 struct semaphore * create_semaphore(int val);
 void delete_semaphore(struct semaphore *sem);

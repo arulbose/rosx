@@ -269,8 +269,9 @@ void start_timer(struct timer_list *p)
 	}
 }
 
-/* stop_timer should be callled to disable the timer from then it will be not added to active timer list 
- * unil enabled by start_timer*/
+/* stop_timer should be called to disable the timer 
+ * from then it will be not added to active timer list 
+ * until t is re-enabled by start_timer */
 void stop_timer(struct timer_list *p)
 {
 	if(p->flag & __TIMER_ENABLED) {

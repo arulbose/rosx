@@ -15,11 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* An example mutex timeout */
+/* An example Semaphore application */
 
 #include <RoseRTOS.h>
-
-/* An Example Mutex with time out application */
 
 void idle_task(void);
 void task_1(void);
@@ -36,7 +34,7 @@ struct priv {
 };
 
 struct priv MY_PRIV = {10};
-DEFINE_MUTEX(m);
+DEFINE_SEMAPHORE(s, 1);	
 
 /* Application main task expected to do all required App specific initialization before enabling interrupts */
 void application_init(void)
@@ -52,33 +50,27 @@ void application_init(void)
 
 void task_3(void)
 {
+    pr_info("Entering task_3\n");
 	while(1) {
-			
-		mutex_lock(&m, OS_WAIT_FOREVER);
-                pr_info("Mutex lock task 3 \n");
-		ssleep(12);
-		mutex_unlock(&m);
-                pr_info("Mutex unlock task 3 \n");
+	        	
+                semaphore_wait(&s, OS_WAIT_FOREVER);
+                pr_info("Task 3 Acquired semaphore\n");
+                ssleep(6);
+                semaphore_post(&s);
+                pr_info("Task 3 Released semaphore\n");
 		suspend_task(MYSELF);
 	}
-
 }
 
 void task_2(void)
 {
 	pr_info("entering task_2\n");
-
 	while(1) {
-#if 1
-		if(OS_OK != mutex_lock(&m, SECS_TO_TICKS(7) )) {
-			pr_info("Mutex timedout task 2 \n");
-			suspend_task(MYSELF);
-		} else {
-			pr_info("got the mutex task 2\n");
-
-		}
-		mutex_unlock(&m);
-#endif
+                semaphore_wait(&s, OS_WAIT_FOREVER);
+                pr_info("Task 2 Acquired semaphore\n");
+                ssleep(3);
+                semaphore_post(&s);
+                pr_info("Task 2 Released semaphore\n");
 		suspend_task(MYSELF);
 	}
 }
@@ -86,18 +78,12 @@ void task_2(void)
 void task_1(void)
 {
 	pr_info("entering task_1\n");
-	while(1) 
-	{
-		#if 1
-		if(OS_OK != mutex_lock(&m, SECS_TO_TICKS(10))) {
-                        pr_info("Mutex timedout task 1 \n");
-				suspend_task(MYSELF);
-                } else {
-                        pr_info("got the mutex task 1\n");
-
-                }
-		mutex_unlock(&m);
-		#endif
+	while(1) {
+                semaphore_wait(&s, OS_WAIT_FOREVER);
+                pr_info("Task 1 Acquired semaphore\n");
+                ssleep(1);
+                semaphore_post(&s);
+                pr_info("Task 1 Released semaphore\n");
 		suspend_task(MYSELF);
 	}
 }

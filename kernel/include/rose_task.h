@@ -44,7 +44,7 @@ struct __task_control_block
 #endif
         unsigned int event_flag; /* Task event flag */
         unsigned int event_recv; /* Task received events */
-        int timeout;             /* Used for store if the task is waiting on a waitqueue */
+        int timeout;             /* Used for store if the task is waiting on a waitqueue/semaphore */
 	struct timer_list *timer;/* Pointer to task timer  */
 	struct semaphore *sem;   /* Pointer to task semaphore */
 	struct mutex *mutex;     /* Pointer task mutex */
