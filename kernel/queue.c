@@ -20,11 +20,11 @@
 /* Queues */
 
 #if(CONFIG_QUEUE_COUNT > 0)
-/* Max size of block is 16: more than that use pointer */
+/* Max size of block is 16 32-bit words: more than that use a pointer */
 struct queue * create_queue(char *name, int size_of_block, int num_of_blocks, unsigned int flag)
 {
 	struct queue *queue;
-	if(size_of_block > 16 || size_of_block <= 0 || num_of_blocks == 0){
+	if(size_of_block > 64 || size_of_block <= 0 || num_of_blocks == 0){
 		pr_error( "create_queue: Check params \n");
 		return NULL;
 	}
