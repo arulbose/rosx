@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* Time slice test application */
 #include <RoseRTOS.h>
 
 void idle_task(void);

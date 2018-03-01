@@ -35,9 +35,9 @@ int system_irq(int irq_num, void *a);
 void application_init(void)
 {
     /* Create all application task  */
-    create_task(&idle_tcb,"idle", LEAST_PRIO, 0, 8192, idle_task, TASK_READY);	
-    create_task(&task1_tcb,"task1", 2, 0, 8192, task1, TASK_READY);	
-    create_task(&task2_tcb,"task2", 3, 0, 8192, task2, TASK_READY);	
+    create_task(&idle_tcb,"idle", LEAST_PRIO, 0, 8192, idle_task, TASK_READY,0);	
+    create_task(&task1_tcb,"task1", 2, 0, 8192, task1, TASK_READY,0);	
+    create_task(&task2_tcb,"task2", 3, 0, 8192, task2, TASK_READY,0);	
 
 	  if(OS_OK != request_irq(0, &system_irq, 0, "sys_irq", 0)) {
                 pr_error("request_irq failed\n");
