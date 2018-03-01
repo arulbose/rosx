@@ -72,7 +72,7 @@ void task_2(void)
 	while(1) {
 #if 1
 		if(OS_OK != mutex_lock(&m, OS_WAIT_FOREVER)) {
-			__early_printk("Mutex timedout task 2 \n");
+			__early_printk("Failed to get Mutex task 2 \n");
 			suspend_task(MYSELF);
 		} else {
 			__early_printk("got the mutex task 2\n");
