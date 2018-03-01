@@ -31,6 +31,7 @@ OBJS_GCC = apps/main.o \
        lib/string.o \
        lib/charset.o \
        lib/div64.o \
+       lib/rbtree.o \
        lib/ctype.o \
        arch/x86/x86_sim.o \
        arch/x86/osport.o	
