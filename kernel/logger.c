@@ -29,7 +29,7 @@ void __printk_to_buffer(const char *fmt, ...)
     unsigned int imask;
 
     va_start(arg, fmt);
-    size = snprintf(NULL, 0, fmt, arg);
+    size = vsnprintf(NULL, 0, fmt, arg);
 
     /* Check if the size fits within the boundary; if yes, drop the string and complain */
     if((size + 1) > CONFIG_PRINT_BUFFER_SIZE) {
