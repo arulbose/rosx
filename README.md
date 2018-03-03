@@ -86,10 +86,11 @@ To run
 ***************************************************************
 < The below are the application thread prints >
 ```
-In the x86 simulator mode fake interruts are sent to the kernel interrupt management service using Linux signals. To run the Rose kernel, 'rosex86' process should be fed with clock ticks. There are 2 clock ticks binaries in rose/utils/system_clk_100ms(100 ms ticks) and rose/utils/system_clk_10ms(10ms ticks). You can run either of them in a different terminal after executing 'rosex86'
+In the x86 simulator mode fake interruts are sent to the kernel interrupt management service using Linux signals. To run the Rose kernel, 'rosex86' process should be fed with clock ticks. There are 2 clock ticks binaries in rose/utils/system_clk_100ms(100 ms ticks) and rose/utils/system_clk_10ms(10ms ticks). Please copy the tick executable to rose/ folder and run in a different terminal after executing 'rosex86'
 
 ```
 cd rose
+cp utils/system_clk_100ms .
 ./system_clk_100ms
 ```
 ## Running the tests
