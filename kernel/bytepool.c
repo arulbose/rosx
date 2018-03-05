@@ -38,7 +38,7 @@ const int DeBruijnBitPosition[32] = {
         			 };
 #define MAX_BLOCK_SIZE 32
 #define MAX_BLOCK_FROM_POOL 4096 
-/* The below controls the mempool; Increase you pool as required; must add in power of 2 */
+/* The below controls the mempool; Increase the pool as required; must add in power of 2 */
 static struct pool_table pool_mem[] =  {  
 					{1, 		0,0,0,0,0,0},
 					{2, 		0,0,0,0,0,0},
