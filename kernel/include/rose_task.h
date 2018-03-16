@@ -25,12 +25,12 @@
  */
 struct __task_control_block
 {
-        char name[TASK_STR_LEN]; /* Task name */
+	void *preempt;           /* DO NOT change the 'preempt' order in the structure> used to Save EIP(current instruction pointer) during preempt */
+        char name[TASK_STR_LEN]; /* Task name; Use LEN multiples of 4 bytes to avoid un-aligned access */
         void *stack_start_ptr;   /* Start of stack for the task */
         void *curr_stack_ptr;    /* Current stack pointer for the task */
         void *ip;                /* Current instruction pointer/program counter */
         void *bp;                /* Stack frame pointer */
-	void *preempt;           /* Save EIP(current instruction pointer) during preempt */
         int stack_size;          /* Stack size for the task */
         int prio;                /* Current task priority value 0 has the hisghest priority */
         void (*func)(void);      /* Pointer to task handler */

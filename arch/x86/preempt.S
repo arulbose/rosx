@@ -25,7 +25,7 @@ __preempt_task:
 		#save the EIP where the task for preempted <start>
 		movl %eax, -8(%esp)   # save the eax on the stack
                 movl __curr_running_task, %eax # copy the current runing task to eax
-                movl 24(%eax), %eax # copy the __curr_running_task->preempt to eax which has the EIP of the preempted location
+                movl 0(%eax), %eax # copy the __curr_running_task->preempt to eax which has the EIP of the preempted location
                 push %eax # push the EIP to stack
                 movl -4(%esp), %eax # restore eax
 		#save the EIP where the task for preempted <end>
