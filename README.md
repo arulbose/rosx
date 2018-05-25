@@ -79,7 +79,7 @@ thats it. It builds a executable named `rosex86` which has the kernel, applicati
 
 To run follow the below steps
 
-## Terminal 1
+# Terminal 1
 ```
 cd rose/
 ./rosex86
@@ -92,7 +92,7 @@ In the x86 simulator mode fake interrupts are sent to the kernel interrupt manag
 
 Open Terminal 2 and copy the tick executable(system_clk_100ms) to rose/ folder and run system_clk_100ms from rose/ after executing 'rosex86'
 
-## Terminal 2
+# Terminal 2
 ```
 cd rose
 cp utils/system_clk_100ms .
