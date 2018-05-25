@@ -31,7 +31,7 @@ Below are the services supported by the kernel.
       Time sensitive memory allocation using fixed memory blocks.
       Application can dynamically request  and free memory block from 1 byte to 4096 bytes.
 ##### 9. Mempool
-      Used by kernel services to dynamically create kernel services structures to meet real time constraints(not avialble for applications)
+      Used by kernel services to dynamically create kernel services structures to meet real time constraints(not available for applications)
 ##### 10. Message queues
       Used for passing messages between threads
       Supports fixed size messages. Message sizes are 1, 2, 4, 8, and 16 32-bit words
@@ -77,22 +77,29 @@ make -f scripts/Makefile.x86
 ```
 thats it. It builds a executable named `rosex86` which has the kernel, applications and x86 simualtor port built-in.
 
-To run
+To run follow the below steps
 
+##Terminal 1
 ```
+cd rose/
 ./rosex86
 *************************************************************** 
 *********** ROSE Real Time operating system experiment v0_x ***** 
 ***************************************************************
 < The below are the application thread prints >
 ```
-In the x86 simulator mode fake interruts are sent to the kernel interrupt management service using Linux signals. To run the Rose kernel, 'rosex86' process should be fed with clock ticks. There are 2 clock tick binaries in rose/utils/system_clk_100ms(100 ms ticks) and rose/utils/system_clk_10ms(10ms ticks). Please copy the tick executable to rose/ folder and run in a different terminal after executing 'rosex86'
+In the x86 simulator mode fake interrupts are sent to the kernel interrupt management service using Linux signals. To run the Rose kernel, 'rosex86' process should be fed with clock ticks. There are 2 clock tick binaries in rose/utils/system_clk_100ms(100 ms ticks) and rose/utils/system_clk_10ms(10ms ticks). 
 
+Open Terminal 2 and copy the tick executable(system_clk_100ms) to rose/ folder and run system_clk_100ms from rose/ after executing 'rosex86'
+
+##Terminal 2
 ```
 cd rose
 cp utils/system_clk_100ms .
 ./system_clk_100ms
 ```
+Now you should see ROSE application prints on terminal 1
+
 ## Running the tests
 All application files should be in rose/apps folder. There is a reference application named main.c in rose/apps folder. The apps/rose_defines.h file has the kernel configuration for the application threads. You can write you own application files with a different kernel configuration. Make sure to add the application file names in to makefile scripts/Makefile.x86. The other test reference applications c files are present in rose/testapps.
 
