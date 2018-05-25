@@ -24,7 +24,7 @@
 #define __init_tcb__(tcb) 							\
 do {										\
    __asm__ volatile("pushl %%ebp\n\t"	    /* save caller  EBP */		\
-		"movl %%esp,%[curr_sp_o]\n\t" /* save current th esp */		\
+		"movl %%esp,%[curr_sp_o]\n\t" /* save esp to current_sp_o */	\
 		"movl %[tcb_sp],%%esp\n\t"  /* store task SP to ESP */          \
                 "movl %[tcb_sp],%%ebp\n\t"  /* store task SP to EBP */          \
                 "pushfl\n\t"                                               	\
