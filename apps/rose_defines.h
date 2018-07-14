@@ -46,6 +46,7 @@
 #define CONFIG_QUEUE_COUNT	10 /* Max count is 32 */ 
 /* Events */
 #define CONFIG_EVENTS
+#define CONFIG_SYS_EVENT_QUEUE_BLOCKS 8
 #define CONFIG_EVENT_COUNT	10 /* Max count is 32 */
 /* Timers */
 #define CONFIG_TIMERS

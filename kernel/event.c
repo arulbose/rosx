@@ -17,13 +17,15 @@
 
 #include <RoseRTOS.h>
 
+struct msg_queue event_recv_q;
+char event_recv_q_start[sizeof(struct msg_queue) * CONFIG_SYS_EVENT_QUEUE_BLOCKS];
+
 /* struct to pack the events in the event receive queue */
 struct event {
     void *p;
     unsigned int flag;
 };
 
-static struct queue *event_recv_q = NULL; /* queue to hold the events received */
 static int process_event(struct event_group *, unsigned int flag);
 
 /* Rose Event Group
@@ -129,14 +131,14 @@ void rose_event_thread()
 {
     struct event e; 
 
-    if(NULL == (event_recv_q = create_queue("event_q", sizeof(struct event), 8, Q_BLOCK|Q_CYCLIC_FULL))) {
+    if(OS_OK != create_queue(&event_recv_q, "event_q", sizeof(struct event), CONFIG_SYS_EVENT_QUEUE_BLOCKS, event_recv_q_start, Q_BLOCK|Q_CYCLIC_FULL)) {
 		pr_panic("create_queue failed in rose_event_thread\n");
     }
 	
     /* empty the queue when there is an event */
     while(1) {
 
-       read_from_queue(event_recv_q, (char *)&e, sizeof(struct event), OS_NO_WAIT);
+       read_from_queue(&event_recv_q, (char *)&e, sizeof(struct event), OS_NO_WAIT);
        process_event((struct event_group *)e.p, e.flag);		
     }
 
@@ -149,7 +151,7 @@ void notify_event(struct event_group *eg, unsigned int flag)
 
      e.p = eg;
      e.flag = flag;
-     write_to_queue(event_recv_q, (char *)&e, sizeof(struct event)); 
+     write_to_queue(&event_recv_q, (const char *)&e, sizeof(struct event), OS_WAIT_FOREVER); 
 
      return;
 }

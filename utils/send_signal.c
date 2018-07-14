@@ -24,10 +24,10 @@ void  main(void)
      int counter = 0;
       struct timespec tim, tim2;
      tim.tv_sec = 0;
-     tim.tv_nsec = 10000000L;
+     tim.tv_nsec = 100000000L;
 
      /* generates an IPC key */
-     MyKey   = ftok(".", 'c');
+     MyKey   = ftok("../", 'c');
      /* Allocates a System V shared memory segment */        
      ShmID   = shmget(MyKey, sizeof(struct shm_struct), 0666);
      /* attaches the System V shared memory segment identified by the ShmID */

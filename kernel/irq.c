@@ -66,25 +66,25 @@ int request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_fl
 	    if(!(irq_flags & IRQF_SHARED) || !(dev_id)) /* Dev_id cannot be empty in shared handlers */
 		return E_OS_UNAVAIL;
 
-		p = __irq_pool[irq_num].next;
-		while(p != NULL)
-		    p = p->next;
+	    p = __irq_pool[irq_num].next;
+	    while(p != NULL)
+                p = p->next;
 
-		if(NULL == (p = (struct irq *)__alloc_pool(SHIRQ_POOL)))
-		    return E_OS_UNAVAIL;
+	    if(NULL == (p = (struct irq *)__alloc_pool(SHIRQ_POOL)))
+                return E_OS_UNAVAIL;
  
-		p->irq_handler = irq_handler;
-		p->flags = irq_flags;
-		strncpy(p->devname, dev_name, 7);
-		p->dev_id = dev_id;
-		p->next = NULL;
+	    p->irq_handler = irq_handler;
+	    p->flags = irq_flags;
+	    strncpy(p->devname, dev_name, 7);
+	    p->dev_id = dev_id;
+	    p->next = NULL;
 	}else{
 	/* Init irq structure */
-	  __irq_pool[irq_num].irq_handler = irq_handler;
-          __irq_pool[irq_num].flags = irq_flags;
-	  strncpy(__irq_pool[irq_num].devname, dev_name, 7);
-	  __irq_pool[irq_num].dev_id = dev_id;
-	  __irq_pool[irq_num].next = NULL;
+	    __irq_pool[irq_num].irq_handler = irq_handler;
+            __irq_pool[irq_num].flags = irq_flags;
+	   strncpy(__irq_pool[irq_num].devname, dev_name, 7);
+	   __irq_pool[irq_num].dev_id = dev_id;
+	   __irq_pool[irq_num].next = NULL;
 
 	}
 

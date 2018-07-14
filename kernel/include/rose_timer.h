@@ -71,7 +71,7 @@ int msleep(unsigned int msecs);
 int ssleep(unsigned int secs);
 
 /* Handy inlines*/
-inline int MSECS_TO_TICKS(int m);
+//inline int MSECS_TO_TICKS(int m);
 /* Handy defines */
 #define TICKS_TO_MS(ticks) (((ticks) * (1000/CONFIG_HZ)))
 #define TICKS_TO_SECS(ticks) (TICKS_TO_MS(ticks) * 1000)

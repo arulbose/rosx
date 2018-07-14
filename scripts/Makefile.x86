@@ -4,7 +4,8 @@ LD = gcc
 AS = gcc
 MKDIR_P = mkdir -p
 
-CFLAGS = -I include -Wall -m32 -g -fvar-tracking -DCONFIG_X86_SIMULATOR -D__KERNEL__ -D__GNUC__=4 -I kernel/include -I apps
+#CFLAGS = -I include -Wall -m32 -g -fvar-tracking -DCONFIG_X86_SIMULATOR -D__KERNEL__ -D__GNUC__=4 -I kernel/include -I apps
+CFLAGS = -I include -Wall -m32 -g -fvar-tracking -DCONFIG_X86_SIMULATOR -D__KERNEL__ -I kernel/include -I apps
 LDFLAGS += -m32
 OBJDIR = out
 OUTDIR = out/apps out/kernel out/arch/x86 out/lib out/drivers/simulator

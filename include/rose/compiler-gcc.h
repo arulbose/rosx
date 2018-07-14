@@ -79,6 +79,8 @@
 #define __inline__	__inline__	notrace
 #define __inline	__inline	notrace
 #endif
+/*__always_inline is already defined in stddef.h*/
+#undef __always_inline
 #define __always_inline	inline __attribute__((always_inline))
 #define  noinline	__attribute__((noinline))
 

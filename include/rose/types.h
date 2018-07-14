@@ -34,6 +34,7 @@ typedef enum{
 	E_OS_ASSERT_FAIL = -5,
 	E_OS_ERR_NO_MEMORY = -6,
 	E_OS_ERR_OVERFLOW = -7,
+	E_OS_Q_DEL = -8,
 	E_OS_ERR_UNKNOWN,
 }OS_ERR_TYPE;
 

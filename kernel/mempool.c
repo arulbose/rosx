@@ -34,7 +34,7 @@ static unsigned int __timer_bits = ~0;
 #endif
 #if(CONFIG_QUEUE_COUNT > 0)
 /* struct queue pool */
-static struct queue __queue_pool[CONFIG_QUEUE_COUNT - 1];
+static struct msg_queue __queue_pool[CONFIG_QUEUE_COUNT - 1];
 static unsigned int __queue_bits = ~0;
 #endif
 

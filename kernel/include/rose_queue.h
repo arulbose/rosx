@@ -35,7 +35,7 @@
 #define Q_PRIO_NONE ~(Q_PRIO)
 
 /* Supports muliple producers and single consumer */
-struct queue {
+struct msg_queue {
         char name[Q_NAME_SIZE];
         char *start;
         char *head;
@@ -43,15 +43,16 @@ struct queue {
         unsigned int flag;
         int size_of_block; /* in bytes */
         int num_of_blocks;
-	TCB *task;
+	TCB *write_task; /* Task waiting to write */
+	TCB *read_task; /* Task waiting to read */
 };
 
 /* -------------- Application system calls ---------------- */
 #if(CONFIG_QUEUE_COUNT > 0)
-struct queue *create_queue(char *name, int size_of_block, int num_of_blocks, unsigned int flag); /* flag 0: Q_STOP_FULL, Q_PRIO_NONE*/
-void delete_queue(struct queue *p);
+int create_queue(struct msg_queue *mq, char *name, int size_of_block, int num_of_blocks, void *queue_start, unsigned int flag); /* flag 0: Q_STOP_FULL, Q_PRIO_NONE*/
+int delete_queue(struct msg_queue *mq);
 #endif
-int read_from_queue(struct queue *p, char *n, int size, int timeout);
-int write_to_queue(struct queue *p, char *n, int size);
+int read_from_queue(struct msg_queue *mq, char *msg_buffer, int size, int timeout);
+int write_to_queue(struct msg_queue *mq, const char *msg_buffer, int size, int timeout);
 
 #endif
