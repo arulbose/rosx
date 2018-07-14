@@ -34,25 +34,17 @@ static int process_event(struct event_group *, unsigned int flag);
 
 /* Create dynamic event create */
 
-#if(CONFIG_EVENT_COUNT > 0)
 /* Runtime creation of event group */
-struct event_group * create_event_group()
+int create_event_group(struct event_group *event)
 {
-	struct event_group *event = NULL;
-
 	unsigned int imask = enter_critical();
-
-        if(NULL == (event = __alloc_pool(EVENT_POOL))) {
-           pr_error( " create_event failed\n");
-           return NULL;
-        }
 
 	event->task = NULL;
 	event->next = NULL;
 
 	exit_critical(imask);
 
-	return event;
+	return OS_OK;
 }
 
 /* Runtime deletion of event group. Notify the task waiting for the events */
@@ -70,10 +62,8 @@ void delete_event_group(struct event_group *p)
             __add_to_ready_q(ready);
         }
 
-	__free_pool(p, EVENT_POOL);
         exit_critical(imask);
 }
-#endif
 
 /* Add events to the task */
 int set_event_flag(unsigned int flag)

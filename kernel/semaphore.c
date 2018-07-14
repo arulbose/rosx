@@ -20,31 +20,24 @@
 void __sem_handler(void *ptr);
 
 
-#if(CONFIG_SEMAPHORE_COUNT > 0)
 /* Runtime creation of semaphore */
-struct semaphore * create_semaphore(int val)
+int create_semaphore(struct semaphore *sem, int val)
 {
-    struct semaphore *sem = NULL;
     unsigned int imask;
 
     if(val <=0 ){
 		pr_error( "invalid semaphore init value\n");
-		return NULL;
+		return OS_ERR;
     }
 
     imask = enter_critical();
 
-    if(NULL == (sem = __alloc_pool(SEMAPHORE_POOL))) {
-        pr_error( "create_semaphore failed\n");
-	exit_critical(imask);
-        return NULL;
-    }
     sem->init_val = val; 
     sem->curr_val = val; 
     sem->task = NULL;
 
     exit_critical(imask);
-    return sem;
+    return OS_OK;
 }
 
 /* Runtime deletion of semaphore */
@@ -67,13 +60,10 @@ void delete_semaphore(struct semaphore *p)
             __add_to_ready_q(ready);
     }
 
-    __free_pool(p, SEMAPHORE_POOL);
-
     exit_critical(imask);
 
     return;
 }
-#endif
 
 /* increment sem value */
 int semaphore_post(struct semaphore *sem)

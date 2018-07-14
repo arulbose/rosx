@@ -202,36 +202,26 @@ int init_timer(struct timer_list *timer, void (*timer_handler)(void *), void *pr
 	return OS_OK;
 }
 
-#if(CONFIG_TIMER_COUNT > 0)
-struct timer_list *  create_timer(void (*timer_handler)(void *), void *priv, unsigned int ticks)
+int create_timer(struct timer_list *timer, void (*timer_handler)(void *), void *priv, unsigned int ticks)
 {
-	struct timer_list *timer;
-
 	if(ticks == 0){
 		pr_error( "create_timer: Check params\n");
-		return NULL;
+		return OS_ERR;
 	}	
 
-	if(NULL == (timer = __alloc_pool(TIMER_POOL))) {
-		pr_error("Create_timer: Timer pool FULL!\n");
-		return NULL;
-	}
-	
 	timer->priv = priv;
 	__add_timer(timer, timer_handler, ticks, __curr_running_task);			
-	return timer;
+	return OS_OK;
 }
 
 void delete_timer(struct timer_list *timer)
 {
 	if(timer->flag & __TIMER_ENABLED){
-		pr_error( "delete_timer: first stop the time to delete %s\n", timer->task->name);
+		pr_error( "delete_timer: first stop the timer to delete %s\n", timer->task->name);
 		return;
 	}
-	__free_pool(timer, TIMER_POOL); /* attemp to free only dynamic timers */
 }
 
-#endif
 /* mod timer will modifiy the delay;  and start the time r */
 void mod_timer(struct timer_list *p, unsigned int delay)
 {

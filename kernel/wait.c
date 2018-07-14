@@ -21,7 +21,7 @@
  * */
 
 static struct wait_queue *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
-static void __wait_timeout(void);
+static void __wait_timeout(struct timer_list *timer);
 static void __wait_handler(void *ptr);
 static void wake_task_in_the_queue(struct wait_queue **ride);
 
@@ -49,11 +49,9 @@ int __finish_wait()
 
 }
 
-static void __wait_timeout()
+static void __wait_timeout(struct timer_list *timer)
 {
-    struct timer_list *timer = NULL;
-
-    if (!(timer = create_timer(__wait_handler, __curr_running_task,  __curr_running_task->timeout))){
+    if ( OS_OK != create_timer(timer, __wait_handler, __curr_running_task,  __curr_running_task->timeout)){
         pr_panic("Timer creation failed\n");
     }
     __curr_running_task->timer = timer;
@@ -65,12 +63,11 @@ static void __wait_timeout()
 static void __wait_handler(void *ptr)
 {
     TCB *t = (TCB *)ptr;
-    delete_timer(t->timer);
     t->timeout = E_OS_TIMEOUT;
     t->timer = NULL;
 }
 
-int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
+int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout, struct timer_list *timer)
 {
     struct wait_queue *ride;
     TCB *t;
@@ -112,10 +109,10 @@ int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout)
             wq->prev = ride;
         }
    }
-    /* Wait timeout;Avoid starting the timer is already started */
+    /* Wait timeout; Avoid starting the timer if already started */
     if((timeout > 0) && (__curr_running_task->timeout == __TIMER_OFF)) {
         __curr_running_task->timeout = timeout;
-        __wait_timeout();
+        __wait_timeout(timer);
     }
 
     exit_critical(imask);

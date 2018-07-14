@@ -57,10 +57,8 @@ void __remove_from_timer_list(struct timer_list *p, struct timer_list **head);
 
 /* -------------- Application system calls ---------------- */
 int init_timer(struct timer_list *timer, void (*timer_handler)(void *), void *priv, unsigned int delay);
-#if(CONFIG_TIMER_COUNT > 0)
-struct timer_list * create_timer(void (*timer_handler)(void *), void *priv, unsigned int ticks);
+int create_timer(struct timer_list *, void (*timer_handler)(void *), void *priv, unsigned int ticks);
 void delete_timer(struct timer_list *p);
-#endif
 void start_timer(struct timer_list *p);
 void stop_timer(struct timer_list *p);
 void mod_timer(struct timer_list *p, unsigned int delay);

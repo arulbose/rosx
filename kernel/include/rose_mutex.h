@@ -49,10 +49,8 @@ __UNLOCKED
              .next = NULL,        \
            }
 
-#if(CONFIG_MUTEX_COUNT > 0)
-struct mutex * create_mutex(void);
+int create_mutex(struct mutex *m);
 void delete_mutex(struct mutex *p);
-#endif
 int mutex_unlock(struct mutex *p);
 int mutex_lock(struct mutex *p, int ticks); /* Ticks or Jiffies */
 

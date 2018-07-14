@@ -33,7 +33,6 @@
 #include <rose_mutex.h>
 #include <rose_init.h>
 #include <rose_bytepool.h>
-#include <rose_mempool.h>
 #include <rose_queue.h>
 #include <rose_timer.h>
 #include <rose_irq.h>

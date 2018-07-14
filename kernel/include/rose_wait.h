@@ -36,27 +36,28 @@ struct wait_queue{
 };
 
 int __finish_wait();
-int __add_to_wait_queue(struct wait_queue *wq, int, int);
+int __add_to_wait_queue(struct wait_queue *wq, int, int, struct timer_list *);
 
-#define wait_queue_timeout(wq, condition, timeout)                      \
-({                                                                      \
-        int __ret = 0;                                                  \
-        if (!(condition)){                                              \
-            __wait_queue_timeout(wq, condition, timeout, __ret);        \
-        }                                                               \
-        __ret;                                                          \
+#define wait_queue_timeout(wq, condition, timeout)                       \
+({                                                                       \
+        int __ret = 0;                                                   \
+        struct timer_list timer;                                         \
+        if (!(condition)){                                               \
+            __wait_queue_timeout(wq, condition, timeout, timer, __ret);  \
+        }                                                                \
+        __ret;                                                           \
 })
 
-#define __wait_queue_timeout(wq, condition, timeout, ret)               \
-do {                                                                    \
-        for(;;){                                                        \
-           __add_to_wait_queue(wq, TASK_INTERRUPTIBLE, timeout);        \
-           rose_sched();                                                \
-           if((condition) || (E_OS_TIMEOUT == ((wq)->timeout) )) {      \
-               break;                                                   \
-            }                                                           \
-          (ret) =  __finish_wait(wq);                                   \
-        }                                                               \
+#define __wait_queue_timeout(wq, condition, timeout, timer, ret)         \
+do {                                                                     \
+        for(;;){                                                         \
+           __add_to_wait_queue(wq, TASK_INTERRUPTIBLE, timeout, &timer); \
+           rose_sched();                                                 \
+           if((condition) || (E_OS_TIMEOUT == ((wq)->timeout) )) {       \
+               break;                                                    \
+            }                                                            \
+          (ret) =  __finish_wait(wq);                                    \
+        }                                                                \
 }while(0)
 
 #define wait_queue(wq, condition)                                       \
@@ -70,7 +71,7 @@ do {                                                                    \
 #define __wait_queue(wq, condition, ret)                                \
 do {                                                                    \
         for(;;){                                                        \
-           __add_to_wait_queue(wq, TASK_INTERRUPTIBLE, 0);              \
+           __add_to_wait_queue(wq, TASK_INTERRUPTIBLE, 0, 0);           \
            rose_sched();                                                \
            if(condition) {                                              \
                break;                                                   \
@@ -89,7 +90,7 @@ do {                                                                    \
 
 #define __wait_on(wq, ret)                                              \
 do {                                                                    \
-        __add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE, 0);               \
+        __add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE, 0, 0);            \
         rose_sched();                                                   \
        (ret) =  __finish_wait(wq);                                      \
 }while(0)
@@ -98,13 +99,14 @@ do {                                                                    \
 #define wait_on_timeout(wq, timeout)                                    \
 ({                                                                      \
         int __ret = 0;                                                  \
-         __wait_on_timeout(wq, timeout, __ret);                         \
+        struct timer_list timer;                                        \
+         __wait_on_timeout(wq, timeout, timer, __ret);                  \
         __ret;                                                          \
 })
 
-#define __wait_on_timeout(wq, timeout, ret)                             \
+#define __wait_on_timeout(wq, timeout, timer, ret)                      \
 do {                                                                    \
-       __add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE, timeout);          \
+       __add_to_wait_queue(wq, TASK_UNINTERRUPTIBLE, timeout, &timer);  \
        rose_sched();                                                    \
        (ret) =  __finish_wait(wq);                                      \
 }while(0)

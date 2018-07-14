@@ -48,10 +48,8 @@ struct msg_queue {
 };
 
 /* -------------- Application system calls ---------------- */
-#if(CONFIG_QUEUE_COUNT > 0)
 int create_queue(struct msg_queue *mq, char *name, int size_of_block, int num_of_blocks, void *queue_start, unsigned int flag); /* flag 0: Q_STOP_FULL, Q_PRIO_NONE*/
 int delete_queue(struct msg_queue *mq);
-#endif
 int read_from_queue(struct msg_queue *mq, char *msg_buffer, int size, int timeout);
 int write_to_queue(struct msg_queue *mq, const char *msg_buffer, int size, int timeout);
 

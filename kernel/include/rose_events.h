@@ -36,10 +36,9 @@ struct event_group{
 void rose_event_thread();
 
 /* -------------- Application system calls ---------------- */
-#if(CONFIG_EVENT_COUNT > 0)
-struct event_group * create_event_group(void);
+int create_event_group(struct event_group *p);
 void delete_event_group(struct event_group *p);
-#endif
+
 int set_event_flag(unsigned int flag);
 int clear_event_flag(unsigned int flag);
 int wait_event_group(struct event_group *, int flag);

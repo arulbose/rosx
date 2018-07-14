@@ -25,14 +25,14 @@ struct irq __irq_pool[CONFIG_IRQ_COUNT - 1];
 
 void __irq_handler(int irq_num)
 {
-    struct irq *p = NULL;
+    //struct irq *p = NULL;
 
     __raw_irq_counter ++;
 
     /* add code for mapping the Kernel irq line with the physical line */
     if( (__irq_pool[irq_num].irq_handler != NULL) || (__irq_pool[irq_num].next != NULL)) {
         __irq_pool[irq_num].irq_handler(irq_num, __irq_pool[irq_num].dev_id);
-
+    #if 0
         /* Invoke if any shared handlers */
         if(__irq_pool[irq_num].flags & IRQF_SHARED){
             p = __irq_pool[irq_num].next;
@@ -42,6 +42,7 @@ void __irq_handler(int irq_num)
 	        p = p->next;
 	    }
         }
+    #endif
     }
 }
 
@@ -54,7 +55,7 @@ void __irq_handler(int irq_num)
  */
 int request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_flags, char *dev_name, void *dev_id)
 {
-	struct irq *p =  NULL;
+	//struct irq *p =  NULL;
 
 	if(irq_num > CONFIG_IRQ_COUNT)
 		return OS_ERR;
@@ -66,6 +67,7 @@ int request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_fl
 	    if(!(irq_flags & IRQF_SHARED) || !(dev_id)) /* Dev_id cannot be empty in shared handlers */
 		return E_OS_UNAVAIL;
 
+    #if 0
 	    p = __irq_pool[irq_num].next;
 	    while(p != NULL)
                 p = p->next;
@@ -78,6 +80,7 @@ int request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_fl
 	    strncpy(p->devname, dev_name, 7);
 	    p->dev_id = dev_id;
 	    p->next = NULL;
+    #endif
 	}else{
 	/* Init irq structure */
 	    __irq_pool[irq_num].irq_handler = irq_handler;
@@ -97,14 +100,14 @@ int request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_fl
  */
 int free_irq(int irq_num, void *dev_id)
 {
-    struct irq *prev = NULL;
-    struct irq *curr = NULL;
+    //struct irq *prev = NULL;
+    //struct irq *curr = NULL;
 
     if(irq_num > CONFIG_IRQ_COUNT)
         return E_OS_UNAVAIL;
     /* Check if shared interrupts */
     if(__irq_pool[irq_num].flags & IRQF_SHARED) {
-		
+    #if 0		
 		if(__irq_pool[irq_num].dev_id == dev_id) {
 
 			__irq_pool[irq_num].irq_handler = NULL;
@@ -124,6 +127,7 @@ int free_irq(int irq_num, void *dev_id)
 		if(__irq_pool[irq_num].next == NULL) {
 		    __irq_pool[irq_num].flags = 0;
 		}
+    #endif
     } else {
 
 	__irq_pool[irq_num].irq_handler = NULL;

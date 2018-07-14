@@ -64,17 +64,17 @@ void task_2(void)
 
 void task_1(void)
 {
-    struct timer_list *timer = NULL;
+    struct timer_list timer;
     struct priv my_priv;   
  
     pr_info("Enter task_1\n");
-    if(NULL == (timer = create_timer(timer_callback, &my_priv, 5))) {
+    if(OS_OK != create_timer(&timer, timer_callback, &my_priv, 5)) {
 		pr_panic("task_1: create_timer failed");
     }
 	
-    my_priv.timer = timer;
+    my_priv.timer = &timer;
 
-    start_timer(timer); 
+    start_timer(&timer); 
     pr_info("Timer started\n");
    
     suspend_task(MYSELF); 

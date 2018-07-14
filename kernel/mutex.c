@@ -20,58 +20,47 @@
 static int __mutex_timeout(struct mutex *p, unsigned int timeout);
 void __mutex_handler(void *ptr);
 
-#if(CONFIG_MUTEX_COUNT > 0)
 /* Runtime creation of mutex */
-struct mutex * create_mutex()
+int create_mutex(struct mutex *m)
 {
-	struct mutex *mutex = NULL;
 
 	unsigned int imask = enter_critical();
 
-	if(NULL == (mutex = __alloc_pool(MUTEX_POOL))) {
-		pr_error( " create_mutex failed\n");
-		exit_critical(imask);
-		return NULL;
-	}		
-	
-	mutex->lock = __UNLOCKED;
-	mutex->owner = NULL;
-	mutex->next = NULL;
-	mutex->task = NULL;
+	m->lock = __UNLOCKED;
+	m->owner = NULL;
+	m->next = NULL;
+	m->task = NULL;
 
 	exit_critical(imask);
 
-	return mutex;	
+	return OS_OK;	
 }
 
 /* Runtime deletion of mutex */
-void delete_mutex(struct mutex *p)
+void delete_mutex(struct mutex *m)
 {
         TCB *ready;
 	unsigned int imask = enter_critical();
 
 	/* wake up all task waiting on the mutext q, let the task return proper error code */	
-	while(p->task){
-	    p->task->state = TASK_READY;
-	    p->task->mutex = NULL;
+	while(m->task){
+	    m->task->state = TASK_READY;
+	    m->task->mutex = NULL;
 	    /* Make sure if the task is waiting for the timeout on the mutex list */
-            if(p->task->timer) {
-                stop_timer(p->task->timer);
-                p->task->timer = NULL;
+            if(m->task->timer) {
+                stop_timer(m->task->timer);
+                m->task->timer = NULL;
             }
-            ready = p->task;
-	    p->task = p->task->next; /* move to the next task in the queue */
+            ready = m->task;
+	    m->task = m->task->next; /* move to the next task in the queue */
 	    __add_to_ready_q(ready);
 	}
 
-	p->owner = NULL;
-
-	__free_pool(p, MUTEX_POOL);
+	m->owner = NULL;
 
 	exit_critical(imask);
 }
 
-#endif
 /* unlock and wake up if any task pending 
  * supports priority inheritance
 */

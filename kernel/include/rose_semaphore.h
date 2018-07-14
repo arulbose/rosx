@@ -37,10 +37,8 @@ struct semaphore {
 }
 
 /* -------------- Application system calls ---------------- */
-#if(CONFIG_SEMAPHORE_COUNT > 0)
-struct semaphore * create_semaphore(int val);
+int create_semaphore(struct semaphore *, int val);
 void delete_semaphore(struct semaphore *sem);
-#endif
 int semaphore_post(struct semaphore *sem);
 int semaphore_wait(struct semaphore *sem, int timeout);
 

@@ -43,7 +43,6 @@
  *        Q_BLOCK - If the queue is empty readers wait on the read queue if Q is full writers wait on the write queue
  *        Q_NO_BLOCK - Threads are not allowed to be blocked on the queue.
  */
-#if(CONFIG_QUEUE_COUNT > 0)
 /* Max size of block is 16 32-bit words: more than that use a pointer */
 int create_queue(struct msg_queue *mq, char *name, int size_of_block, int num_of_blocks, void *queue_start, unsigned int flag)
 {
@@ -103,8 +102,6 @@ int delete_queue(struct msg_queue *mq)
 
 	exit_critical(imask);
 }
-
-#endif
 
 /** read_from_queue() - Read message from queue
  *  @mq: Message queue control block
