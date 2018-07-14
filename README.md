@@ -14,32 +14,30 @@ Below are the services supported by the kernel.
 ##### 3. Application kernel timers services
       Supports static or dynamic creation of timers. Dynamic management of timers.
 ##### 4. Mutex services
-      Supports static or dynamic creation of Mutex.
+      Supports any number of static or dynamic creation of Mutex.
       Supports Priority inheritance to avoid priority inversion.
       Supports Mutex timeout
 ##### 5. Counting semaphores
-      Supports static or dynamic creation of Semaphores.
+      Supports any number of static or dynamic creation of Semaphores.
 ##### 6. Event Groups
-      Supports static or dynamic creation of event groups
+      Supports any number of static or dynamic creation of event groups
       Inter-thread event notification and synchronization between group of threads.
       Participating threads can use 32 event flags at the same time.
 ##### 7. Wait Queues and Wake services
-      Supports static or dynamic creation of wait queues.
+      Supports any number of static or dynamic creation of wait queues.
       Threads can wait(sleep) on queues till a given condition is met or can wait till it is waked up by another thread.
       Waitqueue condition with timeout
 ##### 8. Memory bytepool
       Time sensitive memory allocation using fixed memory blocks.
       Application can dynamically request  and free memory block from 1 byte to 4096 bytes.
-##### 9. Mempool
-      Used by kernel services to dynamically create kernel services structures to meet real time constraints(not available for applications)
-##### 10. Message queues
+##### 9. Message queues
       Used for passing messages between threads
       Supports fixed size messages. Message sizes are 1, 2, 4, 8, and 16 32-bit words
       Support dynamic creation of message queues
-##### 11. Interrupt management service
+##### 10. Interrupt management service
       Dynamic request and free of interrupt. 
       Supports interrupt sharing
-##### 12. Device driver management
+##### 11. Device driver management
       Driver core support Linux like open/release/read/write/ioctl/poll api calls
       
 ## Getting Started
