@@ -1,6 +1,6 @@
-# Rose kernel configuration
+# RosX kernel configuration
 
-menu "Rose Kernel setup"
+menu "RosX Kernel setup"
 
 config STACK_ALLOC_DYNAMIC
 	bool
@@ -29,7 +29,7 @@ config MAX_TASK
 	prompt "maximum number of tasks"
 	default 32
 	help
-	Maximum tasks supposed to be created. RoseKernal does not limit it. It is limited by the resource available
+	Maximum tasks supposed to be created. RosX Kernal does not limit it. It is limited by the resource available
 
 config IRQ_COUNT
 	int

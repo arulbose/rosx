@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* Rosx RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ struct event {
 
 static int rx_process_event(struct event_group *, unsigned int flag);
 
-/* Rose Event Group
+/* Rosx Event Group
  * */
 /* A event group created can be shared with multiple thread for synchronization */
 

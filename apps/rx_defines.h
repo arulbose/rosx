@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ROSE_DEFINES_H__
-#define __ROSE_DEFINES_H__
+#ifndef __ROSX_DEFINES_H__
+#define __ROSX_DEFINES_H__
 
 #include <asm/interrupt.h>
 /* System stack config */
@@ -77,4 +77,4 @@
 #define PRINT_DEBUG
 #define PRINT_ERROR
 
-#endif /* __ROSE_DEFINES_H__ */
+#endif /* __ROSX_DEFINES_H__ */

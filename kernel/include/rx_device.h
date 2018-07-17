@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* Rosx RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,4 +64,4 @@ int rx_dev_ioctl(int fd, unsigned int cmd, void *arg);
 int rx_dev_poll(int desc_id, unsigned int events, int timeout);
 void rx_poll_wait (struct devfile *, struct wait_queue *, struct poll_table *);
 
-#endif /* __ROSE_DEVICE_H */
+#endif /* __ROSX_DEVICE_H */

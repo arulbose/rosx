@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* Rosx RT-Kernel
  * Copyright (C) 2018 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 
 #include <RosX.h>
 
-/* Rose Wait Q
+/* Rosx Wait Q
  * */
 
 static struct wait_queue *__rx_sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */

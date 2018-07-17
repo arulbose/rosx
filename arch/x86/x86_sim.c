@@ -94,7 +94,7 @@ int main()
     shm_ptr->pid = pid;
     init_signals();
 
-    /******** Port specific Rose RTOS initialization <start> ********/
+    /******** Port specific Rosx RTOS initialization <start> ********/
 
     #ifdef CONFIG_STACK_ALLOC_DYNAMIC
     __rx_stack_start_ptr = ((char *)malloc(CONFIG_SYSTEM_STACK_SIZE) + CONFIG_SYSTEM_STACK_SIZE);
@@ -113,9 +113,9 @@ int main()
     }
     #endif 
 
-    /******** Port specific Rose RTOS initialization <end> ********/
+    /******** Port specific Rosx RTOS initialization <end> ********/
 
-    /* Entry point of Rose RTOS  */
+    /* Entry point of Rosx RTOS  */
     __rx_kernel_enter();
     return 0;
 }

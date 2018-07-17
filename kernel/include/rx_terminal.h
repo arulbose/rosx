@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ROSE_TERMINAL_H__
-#define __ROSE_TERMINAL_H__
+#ifndef __ROSX_TERMINAL_H__
+#define __ROSX_TERMINAL_H__
 
 void rx_terminal_thread();
 

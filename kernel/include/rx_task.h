@@ -20,7 +20,7 @@
 #define RX_TASK_STR_LEN CONFIG_TASK_STR_LEN /* Fixed */
 /**************** OS  Task definitions  **********************************/
 /* RX_TASK-Task control block, expected to have all the details of the task
- * The number of tasks is limited only by the resource available; Rose kernel by itself
+ * The number of tasks is limited only by the resource available; Rosx kernel by itself
  * does not limit the number of tasks
  */
 struct __rx_task_control_block
