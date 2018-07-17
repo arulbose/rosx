@@ -9,8 +9,8 @@ Below are the services supported by the kernel.
       Preemptive             : Threads with lower priority are preempted in favour of higher priority threads
       Round robin scheduling : Same priority threads are atleast executed for the time slice given.
       Priority inheritance   : Implemented as part of mutex services to avoid priority inversion
-##### 2. Dynamic thread management
-      Threads can be created either during initialization or execution context of other threads. There is no limit to thread creation and is limited to only by the resources(memory) available.
+##### 2. Dynamic task management
+      Tasks can be created either during initialization or execution context of other tasks. There is no limit to number of task creation and is limited to only by the resources(memory) available. Dynamic and static stack allocation for tasks supported.
 ##### 3. Application kernel timers services
       Supports static or dynamic creation of timers. Dynamic management of timers.
 ##### 4. Mutex services
