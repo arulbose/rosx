@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ROSE_RTOS_H__
-#define __ROSE_RTOS_H__
+#ifndef __ROSX_RTOS_H__
+#define __ROSX_RTOS_H__
 
 /* port file which includes all the defines for the kernel hooks */
 #include <asm/osport.h>
@@ -93,4 +93,4 @@
 			}
 #endif /*CONFIG_PRINT_BUFFER*/
 
-#endif /* __ROSE_RTOS_H__ */
+#endif /* __ROSX_RTOS_H__ */
