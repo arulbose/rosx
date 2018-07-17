@@ -22,7 +22,7 @@
 void rx_terminal_thread()
 {
     pr_info("*************************************************************** \n");
-    pr_info("*********** ROSE Real Time operating system experiment %s ***** \n", CONFIG_RELEASE_VERSION);
+    pr_info("*********** ROSX Real Time operating system experiment %s ***** \n", CONFIG_RELEASE_VERSION);
     pr_info("*************************************************************** \n");
 
     while(1) {
