@@ -19,6 +19,7 @@ Below are the services supported by the kernel.
       Supports Mutex timeout
 ##### 5. Counting semaphores
       Supports any number of static or dynamic creation of Semaphores.
+      Supports sempahore timeout 
 ##### 6. Event Groups
       Supports any number of static or dynamic creation of event groups
       Inter-thread event notification and synchronization between group of threads.
