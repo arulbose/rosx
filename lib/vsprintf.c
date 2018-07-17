@@ -14,9 +14,9 @@
 #include <common.h>
 #include <charset.h>
 #include <stdarg.h>
-#include <rose/types.h>
-#include <rose/string.h>
-#include <rose/ctype.h>
+#include <rosx/types.h>
+#include <rosx/string.h>
+#include <rosx/ctype.h>
 #include <div64.h>
 
 #define noinline __attribute__((noinline))

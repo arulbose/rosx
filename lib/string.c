@@ -15,9 +15,9 @@
  *    reentrant and should be faster). Use only strsep() in new code, please.
  */
 
-#include <rose/types.h>
-#include <rose/string.h>
-#include <rose/ctype.h>
+#include <rosx/types.h>
+#include <rosx/string.h>
+#include <rosx/ctype.h>
 
 char * ___strtok;
 

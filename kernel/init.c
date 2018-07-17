@@ -15,45 +15,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
-static TCB timer0_tcb;
-static TCB event0_tcb;
-static TCB logger0_tcb;
-static TCB terminal0_tcb;
+static RX_TASK rx_timer0_tcb;
+static RX_TASK rx_event0_tcb;
+static RX_TASK rx_logger0_tcb;
+static RX_TASK rx_terminal0_tcb;
 
 /* App entry point */
-extern void application_init(void);
+extern void rx_application_init(void);
 
 /* First OS call made after platform initialization 
 *  All OS specific initialization done here 
 */
-void __kernel_enter()
+void __rx_kernel_enter()
 {
-    /* mempool init */
-    bytepool_init();
     /* stack init */
-    __curr_stack_ptr = __stack_start_ptr; 
+    __rx_curr_stack_ptr = __rx_stack_start_ptr; 
     /* init task(just a place holder needed for the first context switch ) */
-    strcpy(__init_task.name, "init"); 
-    __curr_running_task = &__init_task;
-    __curr_num_task = 0;
+    strcpy(__rx_init_task.name, "init"); 
+    __rx_curr_running_task = &__rx_init_task;
+    __rx_curr_num_task = 0;
 
     /* driver initialization */
-    driver_init();
+    rx_driver_init();
 
     /* create all system threads */
-    create_task(&timer0_tcb,"timer0", 0, 0, 8192, rose_timer_thread, TASK_READY, 0); /* system timer thread */
-    create_task(&event0_tcb,"event0", 0, 0, 8192, rose_event_thread, TASK_READY, 0); /* system event thread */
+    rx_create_task(&rx_timer0_tcb,"timer0", 0, 0, 8192, rx_timer_thread, RX_TASK_READY, 0); /* system timer thread */
+    rx_create_task(&rx_event0_tcb,"event0", 0, 0, 8192, rx_event_thread, RX_TASK_READY, 0); /* system event thread */
             
     /* Logger init */
-    __printk_buffer_head = __printk_buffer_tail = __printk_buffer_start_ptr;
-    create_task(&logger0_tcb,"logger0", (LEAST_PRIO - 1), 0, 8192, rose_logger_thread, TASK_READY, 0); /* system logger thread */
+    __rx_printk_buffer_head = __rx_printk_buffer_tail = __rx_printk_buffer_start_ptr;
+    rx_create_task(&rx_logger0_tcb,"logger0", (RX_TASK_LEAST_PRIO - 1), 0, 8192, rx_logger_thread, RX_TASK_READY, 0); /* system logger thread */
 
     /* terminal */
-    create_task(&terminal0_tcb,"term0", (LEAST_PRIO - 2), 0, 8192, rose_terminal_thread, TASK_READY, 0); /* terminal emulator thread */
+    rx_create_task(&rx_terminal0_tcb,"term0", (RX_TASK_LEAST_PRIO - 2), 0, 8192, rx_terminal_thread, RX_TASK_READY, 0); /* terminal emulator thread */
     
-    application_init();	
+    rx_application_init();	
     /* NO RETURN */
 }
 

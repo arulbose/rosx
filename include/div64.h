@@ -20,8 +20,8 @@
  *       beware of side effects!
  */
 
-#include <rose/types.h>
-#include <rose/compiler.h>
+#include <rosx/types.h>
+#include <rosx/compiler.h>
 
 #if BITS_PER_LONG == 64
 
@@ -35,7 +35,7 @@
 
 #elif BITS_PER_LONG == 32
 
-#include <rose/log2.h>
+#include <rosx/log2.h>
 
 /*
  * If the divisor happens to be constant, we determine the appropriate

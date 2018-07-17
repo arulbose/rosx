@@ -1,7 +1,7 @@
 #ifndef _LINUX_STRING_H_
 #define _LINUX_STRING_H_
 
-#include <rose/types.h>	/* for size_t */
+#include <rosx/types.h>	/* for size_t */
 
 #ifdef __cplusplus
 extern "C" {

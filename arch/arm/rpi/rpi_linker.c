@@ -39,5 +39,5 @@ SECTIONS
    . = ALIGN(4);
 
    /* Move the stack pointer to top of the given ram  */
-   __stack_start_ptr = ORIGIN(ram) + LENGTH(ram); 
+   __rx_stack_start_ptr = ORIGIN(ram) + LENGTH(ram); 
 }

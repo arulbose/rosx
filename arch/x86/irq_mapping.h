@@ -18,7 +18,7 @@
 #ifndef __IRQ_MAPPING_H__
 #define __IRQ_MAPPING_H__
 
-#define TIMER0_INT	0
+#define RX_TIMER0_INT	0
 
 
 

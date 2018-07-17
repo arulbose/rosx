@@ -3,17 +3,17 @@
  * Test kernel timer
  */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
 void idle_task(void);
 void task_1(void);
 void task_2(void);
 void task_3(void);
 
-static TCB idle_tcb;
-static TCB task_1_tcb;
-static TCB task_2_tcb;
-static TCB task_3_tcb;
+static RX_TASK idle_tcb;
+static RX_TASK task_1_tcb;
+static RX_TASK task_2_tcb;
+static RX_TASK task_3_tcb;
 
 struct priv {
         struct timer_list *timer;
@@ -26,7 +26,7 @@ void timer_callback(void *priv)
 	struct priv *my_priv = priv;
 
 	pr_info("received timer call-back\n");
-	mod_timer(my_priv->timer, 6);
+	rx_mod_timer(my_priv->timer, 6);
 }
 
 int system_irq(int irq_num, void *a);
@@ -35,11 +35,11 @@ int system_irq(int irq_num, void *a);
 void application_init(void)
 {
     /* Create all application task  */
-    create_task(&idle_tcb,"idle", LEAST_PRIO, 0, 8192, idle_task, TASK_READY, 0);	
-    create_task(&task_1_tcb,"task1", 1, 0, 8192, task_1, TASK_READY, 0);	
-    create_task(&task_2_tcb,"task2", 2, 0, 8192, task_2, TASK_READY, 0);	
-    create_task(&task_3_tcb,"task3", 3, 0, 8192, task_3, TASK_READY, 0);	
-    rose_sched();
+    rx_create_task(&idle_tcb,"idle", RX_TASK_LEAST_PRIO, 0, 8192, idle_task, RX_TASK_READY, 0);	
+    rx_create_task(&task_1_tcb,"task1", 1, 0, 8192, task_1, RX_TASK_READY, 0);	
+    rx_create_task(&task_2_tcb,"task2", 2, 0, 8192, task_2, RX_TASK_READY, 0);	
+    rx_create_task(&task_3_tcb,"task3", 3, 0, 8192, task_3, RX_TASK_READY, 0);	
+    rx_sched();
 }
 
 void task_3(void)
@@ -47,7 +47,7 @@ void task_3(void)
     int count = 0;
     pr_info("Enter task_3\n");
     while(1) {
-        ssleep(3);
+        rx_ssleep(3);
         count ++;
         pr_info("task3 %d\n", count);
     }
@@ -58,7 +58,7 @@ void task_2(void)
     int count = 0;
     pr_info("Enter task_2\n");
     while(1) {
-        ssleep(9);
+        rx_ssleep(9);
         count ++;
         pr_info("task2 %d\n", count);
     }
@@ -70,16 +70,16 @@ void task_1(void)
     struct priv my_priv;   
  
     pr_info("Enter task_1\n");
-    if(NULL == (timer = create_timer(timer_callback, &my_priv, 5))) {
-		pr_panic("task_1: create_timer failed");
+    if(NULL == (timer = rx_create_timer(timer_callback, &my_priv, 5))) {
+		pr_panic("task_1: rx_create_timer failed");
     }
 	
     my_priv.timer = timer;
 
-    start_timer(timer); 
+    rx_start_timer(timer); 
     pr_info("Timer started\n");
    
-    suspend_task(MYSELF); 
+    rx_suspend_task(MYSELF); 
     while(1) {
 			
 		

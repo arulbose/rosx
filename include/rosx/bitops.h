@@ -1,7 +1,7 @@
 #ifndef _LINUX_BITOPS_H
 #define _LINUX_BITOPS_H
 
-#include <rose/compiler.h>
+#include <rosx/compiler.h>
 #include <asm/types.h>
 #include <asm-generic/bitsperlong.h>
 

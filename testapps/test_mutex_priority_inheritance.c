@@ -1,7 +1,7 @@
 
 /* An example mutex timeout */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
 /* An example application - Mutex with priority inheritance to avoid priority inversion */
 
@@ -10,10 +10,10 @@ void task_1(void);
 void task_2(void);
 void task_3(void);
 
-static TCB idle_tcb;
-static TCB task_1_tcb;
-static TCB task_2_tcb;
-static TCB task_3_tcb;
+static RX_TASK idle_tcb;
+static RX_TASK task_1_tcb;
+static RX_TASK task_2_tcb;
+static RX_TASK task_3_tcb;
 
 struct priv {
        int num;
@@ -26,55 +26,55 @@ DEFINE_MUTEX(m);
 void application_init(void)
 {
     /* Create all application task  */
-    create_task(&idle_tcb,"idle", LEAST_PRIO, 0, 8192, idle_task, TASK_READY, 0);	
-    create_task(&task_1_tcb,"task1", 3, 0, 8192, task_1, TASK_READY, 0);	
-    create_task(&task_2_tcb,"task2", 5, 0, 8192, task_2, TASK_READY, 0);	
-    create_task(&task_3_tcb,"task3", 1, 0, 8192, task_3, TASK_READY, 0);
+    rx_create_task(&idle_tcb,"idle", RX_TASK_LEAST_PRIO, 0, 8192, idle_task, RX_TASK_READY, 0);	
+    rx_create_task(&task_1_tcb,"task1", 3, 0, 8192, task_1, RX_TASK_READY, 0);	
+    rx_create_task(&task_2_tcb,"task2", 5, 0, 8192, task_2, RX_TASK_READY, 0);	
+    rx_create_task(&task_3_tcb,"task3", 1, 0, 8192, task_3, RX_TASK_READY, 0);
     
-    rose_sched();
+    rx_sched();
 }
 
 void task_3(void)
 {
 	while(1) {
 			
-		ssleep(5);
-		mutex_lock(&m, OS_WAIT_FOREVER);
-                __early_printk("Mutex taken by task 3 \n");
-		mutex_unlock(&m);
-                __early_printk("Mutex unlock task 3 \n");
-                suspend_task(&task_1_tcb);
-		suspend_task(MYSELF);
+		rx_ssleep(5);
+		rx_mutex_lock(&m, OS_WAIT_FOREVER);
+                __rx_early_printk("Mutex taken by task 3 \n");
+		rx_mutex_unlock(&m);
+                __rx_early_printk("Mutex unlock task 3 \n");
+                rx_suspend_task(&task_1_tcb);
+		rx_suspend_task(MYSELF);
 	}
 
 }
 
 void task_2(void)
 {
-	__early_printk("entering task_2\n");
+	__rx_early_printk("entering task_2\n");
 
 	while(1) {
 #if 1
-		if(OS_OK != mutex_lock(&m, OS_WAIT_FOREVER)) {
-			__early_printk("Failed to get Mutex task 2 \n");
-			suspend_task(MYSELF);
+		if(OS_OK != rx_mutex_lock(&m, OS_WAIT_FOREVER)) {
+			__rx_early_printk("Failed to get Mutex task 2 \n");
+			rx_suspend_task(MYSELF);
 		} else {
-			__early_printk("got the mutex task 2\n");
+			__rx_early_printk("got the mutex task 2\n");
 
 		}
-                ssleep(9);
-		mutex_unlock(&m);
+                rx_ssleep(9);
+		rx_mutex_unlock(&m);
 #endif
-                __early_printk("Mutex unlock task 2 \n");
-		suspend_task(MYSELF);
+                __rx_early_printk("Mutex unlock task 2 \n");
+		rx_suspend_task(MYSELF);
 	}
 }
 
 void task_1(void)
 {
-	__early_printk("entering task_1\n");
-        ssleep(7);
-	__early_printk("task_1 coming out of sleep\n");
+	__rx_early_printk("entering task_1\n");
+        rx_ssleep(7);
+	__rx_early_printk("task_1 coming out of sleep\n");
 	while(1) 
 	{
        
@@ -88,7 +88,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-            //__early_printk("I ");
+            //__rx_early_printk("I ");
 	    c = a + b;
         }
 }

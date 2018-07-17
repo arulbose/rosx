@@ -10,7 +10,7 @@
 #ifdef __KERNEL__
 
 #ifdef __GNUC__
-#include <rose/compiler-gcc.h>
+#include <rosx/compiler-gcc.h>
 #endif
 
 #if defined(CC_USING_HOTPATCH) && !defined(__CHECKER__)

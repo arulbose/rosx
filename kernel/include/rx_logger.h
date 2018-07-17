@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,10 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __INIT_H__
-#define __INIT_H__
+#ifndef __LOGGER_H__
+#define __LOGGER_H__
 
-/* OS entry */
-void __kernel_enter(void);
+#include <RosX.h>
 
-#endif 
+void __rx_printk_to_buffer(const char *fmt, ...);
+void rx_logger_thread(void);
+
+#ifdef CONFIG_PRINT_BUFFER
+char *__rx_printk_buffer_head;
+char *__rx_printk_buffer_tail;
+char *__rx_printk_buffer_start_ptr;
+#endif
+
+#endif /* __LOGGER_H__ */

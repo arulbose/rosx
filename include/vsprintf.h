@@ -9,7 +9,7 @@
 #define __VSPRINTF_H
 
 #include <stdarg.h>
-#include <rose/types.h>
+#include <rosx/types.h>
 
 ulong simple_strtoul(const char *cp, char **endp, unsigned int base);
 

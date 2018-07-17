@@ -1,17 +1,17 @@
 
 /* An example Semaphore application */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
 void idle_task(void);
 void task_1(void);
 void task_2(void);
 void task_3(void);
 
-static TCB idle_tcb;
-static TCB task_1_tcb;
-static TCB task_2_tcb;
-static TCB task_3_tcb;
+static RX_TASK idle_tcb;
+static RX_TASK task_1_tcb;
+static RX_TASK task_2_tcb;
+static RX_TASK task_3_tcb;
 
 struct priv {
        int num;
@@ -24,12 +24,12 @@ DEFINE_SEMAPHORE(s, 1);
 void application_init(void)
 {
     /* Create all application task  */
-    create_task(&idle_tcb,"idle", LEAST_PRIO, 0, 8192, idle_task, TASK_READY, 0);	
-    create_task(&task_1_tcb,"task1", 3, 0, 8192, task_1, TASK_READY, 0);	
-    create_task(&task_2_tcb,"task2", 2, 0, 8192, task_2, TASK_READY, 0);	
-    create_task(&task_3_tcb,"task3", 1, 0, 8192, task_3, TASK_READY, 0);
+    rx_create_task(&idle_tcb,"idle", RX_TASK_LEAST_PRIO, 0, 8192, idle_task, TASK_READY, 0);	
+    rx_create_task(&task_1_tcb,"task1", 3, 0, 8192, task_1, RX_TASK_READY, 0);	
+    rx_create_task(&task_2_tcb,"task2", 2, 0, 8192, task_2, RX_TASK_READY, 0);	
+    rx_create_task(&task_3_tcb,"task3", 1, 0, 8192, task_3, RX_TASK_READY, 0);
     
-    rose_sched();
+    rx_sched();
 }
 
 void task_3(void)
@@ -39,10 +39,10 @@ void task_3(void)
 	        	
                 semaphore_wait(&s, OS_WAIT_FOREVER);
                 pr_info("Task 3 Acquired semaphore\n");
-                ssleep(6);
+                rx_ssleep(6);
                 semaphore_post(&s);
                 pr_info("Task 3 Released semaphore\n");
-		suspend_task(MYSELF);
+		rx_suspend_task(MYSELF);
 	}
 }
 
@@ -52,10 +52,10 @@ void task_2(void)
 	while(1) {
                 semaphore_wait(&s, OS_WAIT_FOREVER);
                 pr_info("Task 2 Acquired semaphore\n");
-                ssleep(3);
+                rx_ssleep(3);
                 semaphore_post(&s);
                 pr_info("Task 2 Released semaphore\n");
-		suspend_task(MYSELF);
+		rx_suspend_task(MYSELF);
 	}
 }
 
@@ -65,10 +65,10 @@ void task_1(void)
 	while(1) {
                 semaphore_wait(&s, OS_WAIT_FOREVER);
                 pr_info("Task 1 Acquired semaphore\n");
-                ssleep(1);
+                rx_ssleep(1);
                 semaphore_post(&s);
                 pr_info("Task 1 Released semaphore\n");
-		suspend_task(MYSELF);
+		rx_suspend_task(MYSELF);
 	}
 }
 

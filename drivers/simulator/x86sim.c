@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
 int x86_simulator_init();
 struct device_ops fops;
 
 int x86_simulator_init()
 {
-    if ( 0 == register_driver("simx86", &fops)) {
-        __early_printk("simx86 Driver registered\n");
+    if ( 0 == rx_register_driver("simx86", &fops)) {
+        __rx_early_printk("simx86 Driver registered\n");
     }else{
-        __early_printk("simx86 Driver registeration failed\n");
+        __rx_early_printk("simx86 Driver registeration failed\n");
     }
 
     return 0;

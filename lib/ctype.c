@@ -27,7 +27,7 @@
  *  Copyright (C) 1991, 1992  Linus Torvalds
  */
 
-#include <rose/ctype.h>
+#include <rosx/ctype.h>
 
 const unsigned char _ctype[] = {
 _C,_C,_C,_C,_C,_C,_C,_C,			/* 0-7 */

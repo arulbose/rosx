@@ -9,7 +9,7 @@
 #ifndef __CHARSET_H_
 #define __CHARSET_H_
 
-#include <rose/types.h>
+#include <rosx/types.h>
 
 #define MAX_UTF8_PER_UTF16 3
 

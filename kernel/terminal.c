@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
 /* Opens a terminal emulator */
 
-void rose_terminal_thread()
+void rx_terminal_thread()
 {
     pr_info("*************************************************************** \n");
     pr_info("*********** ROSE Real Time operating system experiment %s ***** \n", CONFIG_RELEASE_VERSION);
@@ -27,7 +27,7 @@ void rose_terminal_thread()
 
     while(1) {
               #ifdef CONFIG_X86_SIMULATOR
-	      suspend_task(MYSELF);
+	      rx_suspend_task(MYSELF);
               #else
               /* Add waitqueue for real serial ports */
               #endif

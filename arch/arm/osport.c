@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "osport.h"
-#include <RoseRTOS.h>
+#include <RosX.h>
 
 /* <TUNE CODE> */
-void exit_critical (unsigned int key)
+void rx_exit_critical (unsigned int key)
 {
     if(__context || !(__critical))
 	return; /* If in IRQ context return doing nothing */
@@ -28,7 +28,7 @@ void exit_critical (unsigned int key)
 }
 
 /* Interrupts are simulated by using signals in UNIX */
-unsigned int enter_critical (void)
+unsigned int rx_enter_critical (void)
 {
     if(__context || __critical) /* if already in IRQ or in critical than do nothing */
 	return 0;

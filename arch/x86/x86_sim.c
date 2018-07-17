@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* RoseRTOS x86 simulator */
+/* RosX x86 simulator */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>
@@ -38,19 +38,19 @@ struct shm_struct *shm_ptr;
 /* to handle simulated interrupts; acts as the main interrupt entry point  */
 void sig_handler(int signum)
 {
-    TCB *tcb = __curr_running_task;
+    RX_TASK *tcb = __rx_curr_running_task;
     
     __context = __IRQ; 
 
     if (signum == SIGUSR1)
     {
-        __irq_handler(shm_ptr->num); /* RTOS IRQ hook; IRQ number */
+        __rx_irq_handler(shm_ptr->num); /* RTOS IRQ hook; IRQ number */
     }
 #ifdef CONFIG_KERNEL_PREEMPT
 	/* check for re-sched and alter the stack to switch to higher priority task */
-    if(__need_resched) {
-	__need_resched = 0; /* to avoid recursion of preempt code */
-	tcb->state = TASK_READY;
+    if(__rx_need_resched) {
+	__rx_need_resched = 0; /* to avoid recursion of preempt code */
+	tcb->state = RX_TASK_READY;
     	__preempt__(tcb);
     }
 #endif
@@ -66,7 +66,7 @@ void init_signals()
     act.sa_handler = sig_handler;
  
     if (sigaction(SIGUSR1, &act, 0)) {
- 	__early_printk("sigaction error");
+ 	__rx_early_printk("sigaction error");
 	exit(1);
     }
  
@@ -82,12 +82,12 @@ int main()
     mem_key   = ftok(".", 'c');
     /* Allocates a System V shared memory segment */
     if( -1 == (shm_id   = shmget(mem_key, sizeof(struct shm_struct), IPC_CREAT | 0666))) {
-	__early_printk("Shget failed \n");
+	__rx_early_printk("Shget failed \n");
 	exit(1);
     }
     /* attaches the System V shared memory segment identified by the shm_id */
     if((void *)-1 == (shm_ptr  = (struct shm_struct *) shmat(shm_id, NULL, 0))) {
-	__early_printk("Shmat failed\n");
+	__rx_early_printk("Shmat failed\n");
           exit(1);
     }
 
@@ -97,31 +97,26 @@ int main()
     /******** Port specific Rose RTOS initialization <start> ********/
 
     #ifdef CONFIG_STACK_ALLOC_DYNAMIC
-    __stack_start_ptr = ((char *)malloc(CONFIG_SYSTEM_STACK_SIZE) + CONFIG_SYSTEM_STACK_SIZE);
-    if(!__stack_start_ptr) {
-  	__early_printk("System stack allocation failed\n");
+    __rx_stack_start_ptr = ((char *)malloc(CONFIG_SYSTEM_STACK_SIZE) + CONFIG_SYSTEM_STACK_SIZE);
+    if(!__rx_stack_start_ptr) {
+  	__rx_early_printk("System stack allocation failed\n");
  	exit(1);
     }
-    __early_printk("__stack_start_ptr = %p\n", __stack_start_ptr);
+    __rx_early_printk("__rx_stack_start_ptr = %p\n", __rx_stack_start_ptr);
     #endif
 
     #ifdef CONFIG_PRINT_BUFFER
-    __printk_buffer_start_ptr = (char *)malloc(CONFIG_PRINT_BUFFER_SIZE);
-    if(!__printk_buffer_start_ptr) {
-  	__early_printk("System print buffer allocation failed\n");
+    __rx_printk_buffer_start_ptr = (char *)malloc(CONFIG_PRINT_BUFFER_SIZE);
+    if(!__rx_printk_buffer_start_ptr) {
+  	__rx_early_printk("System print buffer allocation failed\n");
  	exit(1);
     }
     #endif 
 
-    __bytepool_start = (unsigned char *)malloc(CONFIG_BYTEPOOL_SIZE);
-    if(!__bytepool_start) {
-	__early_printk("System bytepool allocation failed\n");
-	exit(1);
-    }
     /******** Port specific Rose RTOS initialization <end> ********/
 
     /* Entry point of Rose RTOS  */
-    __kernel_enter();
+    __rx_kernel_enter();
     return 0;
 }
 

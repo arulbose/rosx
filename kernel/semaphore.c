@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
-void __sem_handler(void *ptr);
+void __rx_sem_handler(void *ptr);
 
 
 /* Runtime creation of semaphore */
-int create_semaphore(struct semaphore *sem, int val)
+int rx_create_semaphore(struct semaphore *sem, int val)
 {
     unsigned int imask;
 
@@ -30,71 +30,71 @@ int create_semaphore(struct semaphore *sem, int val)
 		return OS_ERR;
     }
 
-    imask = enter_critical();
+    imask = rx_enter_critical();
 
     sem->init_val = val; 
     sem->curr_val = val; 
     sem->task = NULL;
 
-    exit_critical(imask);
+    rx_exit_critical(imask);
     return OS_OK;
 }
 
 /* Runtime deletion of semaphore */
-void delete_semaphore(struct semaphore *p)
+void rx_delete_semaphore(struct semaphore *p)
 {
-    TCB *ready;
-    unsigned int imask = enter_critical();
+    RX_TASK *ready;
+    unsigned int imask = rx_enter_critical();
 
     /* wake up all task waiting on the sem q, let the task return proper error code */
     while(p->task){
-       p->task->state = TASK_READY;
+       p->task->state = RX_TASK_READY;
        p->task->sem = NULL;
        /* Make sure if the task is waiting for the timeout on the semaphore list */
        if(p->task->timer) {
-           __remove_from_timer_list(p->task->timer, &__active_timer_head);
+           __rx_remove_from_timer_list(p->task->timer, &__rx_active_timer_head);
            p->task->timer = NULL;
        }
             ready = p->task;
             p->task = p->task->next; /* move to the next task in the queue */
-            __add_to_ready_q(ready);
+            __rx_add_to_ready_q(ready);
     }
 
-    exit_critical(imask);
+    rx_exit_critical(imask);
 
     return;
 }
 
 /* increment sem value */
-int semaphore_post(struct semaphore *sem)
+int rx_semaphore_post(struct semaphore *sem)
 {
-	TCB *t;
+	RX_TASK *t;
 
-	unsigned int imask = enter_critical();
+	unsigned int imask = rx_enter_critical();
 	/* Wake up the task sleeping in the it's queue */
 	if(sem->task) {
 		t = sem->task;
 		sem->task = sem->task->next; /* move the next task in the sem wait queue */
-		t->state = TASK_READY;
+		t->state = RX_TASK_READY;
 		t->sem = NULL;
-		__add_to_ready_q(t);
+		__rx_add_to_ready_q(t);
 		sem->curr_val ++; /* inc the count as one task is woke up from the wait queue */
 	}
 
-	exit_critical(imask);
+	rx_exit_critical(imask);
 	
 	return OS_OK;
 }
 
 /* Running in timer contex */
-void __sem_handler(void *ptr)
+void __rx_sem_handler(void *ptr)
 {
-    TCB *lead;
-    TCB *follow;
-    TCB *task = (TCB *)ptr;
+    RX_TASK *lead;
+    RX_TASK *follow;
+    RX_TASK *task = (RX_TASK *)ptr;
     struct semaphore *sem = task->sem;
 
-    __early_printk("timer handler start %s\n", task->name);
+    __rx_early_printk("timer handler start %s\n", task->name);
     if(task->sem == NULL) {
         /* Already acquired the semaphore and clean-up done in the sem_post() */
         return;
@@ -117,28 +117,28 @@ void __sem_handler(void *ptr)
     task->timer = NULL;
     task->timeout = E_OS_TIMEOUT;
     /* Set the task as runnable */
-    task->state = TASK_READY;
-    __add_to_ready_q(task);
+    task->state = RX_TASK_READY;
+    __rx_add_to_ready_q(task);
 
     /* remove the task from sem wait queue<finish> */
     task->sem = NULL;
-    __early_printk("timer handler end %s\n", task->name);
+    __rx_early_printk("timer handler end %s\n", task->name);
 }
 
 /* Task waiting on semaphore with timeout will self suspend and or waked
  *  up either by timer handler or by semaphore post function 
  */
-static int __sem_timeout(struct semaphore *p, int timeout)
+static int __rx_sem_timeout(struct semaphore *p, int timeout)
 {
     struct timer_list timer;
 
-    init_timer(&timer, __sem_handler, __curr_running_task, timeout);
-    start_timer(&timer);
-    __curr_running_task->timeout = __TIMER_ON;
-    __curr_running_task->timer = &timer;
-    suspend_task(MYSELF);
+    rx_init_timer(&timer, __rx_sem_handler, __rx_curr_running_task, timeout);
+    rx_start_timer(&timer);
+    __rx_curr_running_task->timeout = __RX_TIMER_ON;
+    __rx_curr_running_task->timer = &timer;
+    rx_suspend_task(MYSELF);
 
-   if(E_OS_TIMEOUT == __curr_running_task->timeout) {
+   if(E_OS_TIMEOUT == __rx_curr_running_task->timeout) {
         return E_OS_TIMEOUT;
     }else{
         return OS_OK; /* Already task has acquired the sem; clean-up done by the sem_post() */
@@ -148,49 +148,49 @@ static int __sem_timeout(struct semaphore *p, int timeout)
 /* Decrement semaphore value and if less than 0 
  *  add the task in wait queue  
  */
-int semaphore_wait(struct semaphore *sem, int timeout)
+int rx_semaphore_wait(struct semaphore *sem, int timeout)
 {
-    TCB *ride;
+    RX_TASK *ride;
 	
-    unsigned int imask = enter_critical();
+    unsigned int imask = rx_enter_critical();
     /* decrement the semaphore; the value in negative specify 
            number of task waiting on the semaphore queue */
     sem->curr_val --;
     if(sem->curr_val >= 0) {
-       exit_critical(imask);
+       rx_exit_critical(imask);
        return OS_OK; /* return immediately for all positive values */
     }
 
     if(timeout == OS_NO_WAIT) {
         sem->curr_val ++; /* if not ready to wait */
-        exit_critical(imask);
+        rx_exit_critical(imask);
         return E_OS_UNAVAIL;
     }
     /* Remove the task from the ready queue */
-     __curr_running_task->state = TASK_SUSPEND;
-     __curr_running_task->sem = sem;
-     __curr_running_task->timeout = __TIMER_OFF;
-     __remove_from_ready_q(__curr_running_task);
-     __curr_running_task->next = NULL;
+     __rx_curr_running_task->state = RX_TASK_SUSPEND;
+     __rx_curr_running_task->sem = sem;
+     __rx_curr_running_task->timeout = __RX_TIMER_OFF;
+     __rx_remove_from_ready_q(__rx_curr_running_task);
+     __rx_curr_running_task->next = NULL;
 
     /* Add the task to the sem sleep queue */	
     if(!(sem->task)) {
-       sem->task = __curr_running_task;
+       sem->task = __rx_curr_running_task;
     }else{
         ride = sem->task;
 	    while(ride->next){
 	        ride = ride->next;
             }
-	    ride->next = __curr_running_task;
+	    ride->next = __rx_curr_running_task;
     }
     /* Check if there is a timeout for semaphore <start> */
     if(timeout > 0) {
-        exit_critical(imask);
-        return __sem_timeout(sem, timeout);
+        rx_exit_critical(imask);
+        return __rx_sem_timeout(sem, timeout);
     }
 
-    exit_critical(imask);
-    rose_sched();
+    rx_exit_critical(imask);
+    rx_sched();
 
     if(!sem){
 	return E_OS_UNAVAIL; /* semaphore is deleted and ask waken-up */

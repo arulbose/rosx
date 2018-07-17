@@ -14,7 +14,6 @@ OBJS_GCC = apps/main.o \
        kernel/sched.o \
        kernel/task.o \
        kernel/queue.o \
-       kernel/bytepool.o \
        kernel/event.o \
        kernel/irq.o \
        kernel/init.o \

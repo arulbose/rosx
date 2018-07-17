@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <rose/string.h>
+#include <rosx/string.h>
 
 #if !defined(__WIN32__) && !defined(__MINGW32__)
 # include <sys/mman.h>
@@ -128,8 +128,8 @@ typedef unsigned int uint;
 typedef unsigned long int uintptr_t;
 #endif
 
-#include <rose/string.h>
-#include <rose/types.h>
+#include <rosx/string.h>
+#include <rosx/types.h>
 #include <asm/byteorder.h>
 
 #if __SIZEOF_LONG__ == 8

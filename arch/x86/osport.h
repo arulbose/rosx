@@ -21,7 +21,7 @@
 
 #define _ASMLANGUAGE
 
-#define __init_tcb__(tcb) 							\
+#define __rx_init_tcb__(tcb) 							\
 do {										\
    __asm__ volatile("pushl %%ebp\n\t"	    /* save caller  EBP */		\
 		"movl %%esp,%[curr_sp_o]\n\t" /* save esp to current_sp_o */	\
@@ -45,7 +45,7 @@ do {										\
 do {                                                                            \
         __asm__ volatile("movl 68(%%ebp), %%ebx\n\t" /* copy the ebp+68 to ebx to get the EIP location of the thread when interrupted from the stack(kernel signal code stores the interrupted eip ptr at ebp+68(fix it to be more reliable ??)) */        \
                          "movl %%ebx, %[tcb_p]\n\t"  /* mov @ebx(actual EIP pointer) to tcb->preempt  */                                                \
-                         "movl $__preempt_task, 68(%%ebp)\n\t"  /* mov preempt_task to the prev EIP pointer to redirect to preempt function call  */                                            \
+                         "movl $__rx_preempt_task, 68(%%ebp)\n\t"  /* mov preempt_task to the prev EIP pointer to redirect to preempt function call  */                                            \
                          :[tcb_p] "=m" (tcb->preempt)                            \
                          :                                                       \
                          :"ebx"                 /* Clobbered */                  \

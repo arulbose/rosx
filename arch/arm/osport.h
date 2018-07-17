@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,8 +38,8 @@ do {                                                                            
 }while(0)
 
 /* OS port hooks */
-unsigned int enter_critical (void);
-void exit_critical (unsigned int);
+unsigned int rx_enter_critical (void);
+void rx_exit_critical (unsigned int);
 
 #define  __printk(...)  {}
 

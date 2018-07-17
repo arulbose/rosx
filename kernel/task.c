@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
 /** create_task() - Create new task
  *  @tcb:		Task Control Block
@@ -27,37 +27,37 @@
  *  task_state:		Task state when created
  *  time_slice:		The time in ticks the process should run in case of task competing with same priority
  */
-int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_size, void (*func)(void), int task_state, int time_slice)
+int rx_create_task(RX_TASK *tcb, char *task_name, int prio, void *stack_ptr, int stack_size, void (*func)(void), int task_state, int time_slice)
 {
-	TCB *tmp;
+	RX_TASK *tmp;
 	unsigned int imask;
 
-	if(strlen(task_name) > TASK_STR_LEN){
+	if(strlen(task_name) > RX_TASK_STR_LEN){
 		pr_error( "%s %s\n", "Task name overflow", task_name);
 		return OS_ERR;
 	}
 
-	imask = enter_critical();
+	imask = rx_enter_critical();
 
 	#ifdef CONFIG_STACK_ALLOC_DYNAMIC
 	/* if stack_ptr is NULL go for dynamic stack allocation */
 	if(!stack_ptr) {
 
-  		if(((char *)__stack_start_ptr - CONFIG_SYSTEM_STACK_SIZE) > ((char *)__curr_stack_ptr - stack_size)){
+  		if(((char *)__rx_stack_start_ptr - CONFIG_SYSTEM_STACK_SIZE) > ((char *)__rx_curr_stack_ptr - stack_size)){
 	        	pr_panic( "%s %s\n", "Stack size overflow\n", task_name);
-			exit_critical(imask);
+			rx_exit_critical(imask);
 			return OS_ERR;
 		}
-		stack_ptr = __curr_stack_ptr;
-		__curr_stack_ptr = ((char *)__curr_stack_ptr - (stack_size + 4));
+		stack_ptr = __rx_curr_stack_ptr;
+		__rx_curr_stack_ptr = ((char *)__rx_curr_stack_ptr - (stack_size + 4));
 	}
  	#endif
 
 	strcpy((char *)tcb->name, task_name);	
 	tcb->curr_stack_ptr = stack_ptr;
 	tcb->stack_start_ptr = stack_ptr;
-        if (prio > LEAST_PRIO)
-            prio = LEAST_PRIO; /* Fix it to the LEAST_PRIO */
+        if (prio > RX_TASK_LEAST_PRIO)
+            prio = RX_TASK_LEAST_PRIO; /* Fix it to the RX_TASK_LEAST_PRIO */
 
 	tcb->prio = prio;
 #ifdef CONFIG_PRIO_INHERITANCE
@@ -66,7 +66,7 @@ int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_
 	tcb->stack_size = stack_size;
 	tcb->func = func;
 	tcb->state = task_state;
-        tcb->timeout = __TIMER_OFF;
+        tcb->timeout = __RX_TIMER_OFF;
 #ifdef CONFIG_TIME_SLICE
 	tcb->time_slice = time_slice;
 	tcb->ticks = time_slice;
@@ -74,54 +74,54 @@ int create_task(TCB *tcb, char *task_name, int prio, void *stack_ptr, int stack_
 #endif
 	tcb->list = NULL;
 	/* port specific initialiation <start>*/
-	__init_tcb__(tcb);	
+	__rx_init_tcb__(tcb);	
 	/* port specific initialiation <end>*/
 	tcb->ip =  tcb->func;
 
-	if(task_state == TASK_READY)
-		__add_to_ready_q(tcb);
+	if(task_state == RX_TASK_READY)
+		__rx_add_to_ready_q(tcb);
 
 	/* add the task to the global list of tasks */
-	if(!__task_list_head){
-                __task_list_head = tcb;
+	if(!__rx_task_list_head){
+                __rx_task_list_head = tcb;
         }else{
-                tmp = __task_list_head;
+                tmp = __rx_task_list_head;
                 while(tmp->list)
                         tmp = tmp->list;
 
                 tmp->list = tcb;
         }
 
-	__curr_num_task ++;
+	__rx_curr_num_task ++;
 
-	exit_critical(imask);
+	rx_exit_critical(imask);
 	
 	return OS_OK;
 }
 
 /* Sort based on task priority while adding to the ready list */
-int __add_to_ready_q(TCB * new)
+int __rx_add_to_ready_q(RX_TASK * new)
 {
-	TCB *start = NULL;	
-	TCB *prev = NULL;	
+	RX_TASK *start = NULL;	
+	RX_TASK *prev = NULL;	
 	unsigned int imask;
 	int prio = new->prio;
 
-	if(!(new->state == TASK_READY || new->state == TASK_RUNNING) ){
-	    pr_error( "__add_to_ready_q: task is not in ready state %s, %d\n", new->name, new->state);
+	if(!(new->state == RX_TASK_READY || new->state == RX_TASK_RUNNING) ){
+	    pr_error( "__rx_add_to_ready_q: task is not in ready state %s, %d\n", new->name, new->state);
 	    return OS_ERR;
 	}
 
 	new->next = NULL;
 
-	imask = enter_critical();
-	if(!__task_ready_head){ 
-	    __task_ready_head = new;
-	    exit_critical(imask);
+	imask = rx_enter_critical();
+	if(!__rx_task_ready_head){ 
+	    __rx_task_ready_head = new;
+	    rx_exit_critical(imask);
 	    return OS_OK;
 	}
 	
-	start = __task_ready_head;
+	start = __rx_task_ready_head;
 
 	while(start) {	
 		
@@ -143,9 +143,9 @@ int __add_to_ready_q(TCB * new)
 				}
 			}else{
 				new->next = start;
-				if(start == __task_ready_head){
+				if(start == __rx_task_ready_head){
 				    /* In case head prio is less */
-			            __task_ready_head = new;	
+			            __rx_task_ready_head = new;	
 				    goto done;	
 				}else{
 				    /* In case prio is less in the middle */
@@ -162,40 +162,40 @@ int __add_to_ready_q(TCB * new)
 	prev->next = new; 
 
 done:
-     if(__curr_running_task != __task_ready_head){
-           __need_resched = 1; /* Used for pre-emptive re-scheduling */
+     if(__rx_curr_running_task != __rx_task_ready_head){
+           __rx_need_resched = 1; /* Used for pre-emptive re-scheduling */
      }
-        exit_critical(imask);
+        rx_exit_critical(imask);
 	return OS_OK;
 }
 
 /* remove from ready runqueue  */
-int __remove_from_ready_q(TCB * rmv)
+int __rx_remove_from_ready_q(RX_TASK * rmv)
 {
-	TCB *start = NULL;	
-	TCB *prev = NULL;	
+	RX_TASK *start = NULL;	
+	RX_TASK *prev = NULL;	
 	unsigned int imask;
 
-	imask = enter_critical();
+	imask = rx_enter_critical();
 
- 	start = __task_ready_head;
+ 	start = __rx_task_ready_head;
 
         while(start != NULL) {
 
                 /* Always head will have the high priority task */
                 if(start == rmv ) {
 
-                        if(start == __task_ready_head){
+                        if(start == __rx_task_ready_head){
                                 /* In case head is the task */
-                                __task_ready_head = start->next;
+                                __rx_task_ready_head = start->next;
 				rmv->next = NULL;
-				exit_critical(imask);
+				rx_exit_critical(imask);
 				return OS_OK;
                         }else{
                                 /* In case task is in the middle */
                                 prev->next = start->next;
 				rmv->next = NULL;
-				exit_critical(imask);
+				rx_exit_critical(imask);
 				return OS_OK;
                         }
 		}
@@ -205,68 +205,68 @@ int __remove_from_ready_q(TCB * rmv)
                 /* In case task is at the end */
                 prev->next = NULL;
 		rmv->next = NULL;
-		exit_critical(imask);
+		rx_exit_critical(imask);
 		return OS_OK;
 }
 
 
 /* Task cannot abort itself but can be done by other threads 
  * Aborted tasked cannot be resumed */
-int abort_task(TCB *tcb)
+int rx_abort_task(RX_TASK *tcb)
 {
-	if(tcb == __curr_running_task)
+	if(tcb == __rx_curr_running_task)
 		return OS_ERR; /* A task cannot abort itself */
 
 	/* releive all the resource that the task curently holds*/
-	if(tcb->state == TASK_READY) {
-		 __remove_from_ready_q(tcb);
+	if(tcb->state == RX_TASK_READY) {
+		 __rx_remove_from_ready_q(tcb);
 	}
 	/* TODO Remove form any waitqueues/return resources  and then change the state to task_abort */
-	tcb->state = TASK_ABORT;
+	tcb->state = RX_TASK_ABORT;
 
 	return OS_OK;
 }
 
 /* Only self complete allowed; Always call this function to gracefully close the task 
  * App has to make sure it returns all the resources before calling task_complete */
-int complete_task(TCB *tcb)
+int rx_complete_task(RX_TASK *tcb)
 {
-	if(tcb != __curr_running_task)
+	if(tcb != __rx_curr_running_task)
 		return OS_ERR;
 
-	__remove_from_ready_q(tcb);
-	tcb->state = TASK_COMPLETE;
-	rose_sched();
+	__rx_remove_from_ready_q(tcb);
+	tcb->state = RX_TASK_COMPLETE;
+	rx_sched();
 	return OS_OK;
 }
 
 /* Set task priority at runtime */
-int set_task_prio(TCB *tcb, int prio)
+int rx_set_task_prio(RX_TASK *tcb, int prio)
 {
-	if((prio == tcb->prio)|| tcb->prio == TASK_COMPLETE || tcb->prio == TASK_ABORT)
+	if((prio == tcb->prio)|| tcb->prio == RX_TASK_COMPLETE || tcb->prio == RX_TASK_ABORT)
 		return 0; /* Nothing to do */
 
 	tcb->prio = prio;
-	if(tcb->state == TASK_READY) {
-		__remove_from_ready_q(tcb);
-		__add_to_ready_q(tcb);
+	if(tcb->state == RX_TASK_READY) {
+		__rx_remove_from_ready_q(tcb);
+		__rx_add_to_ready_q(tcb);
 	}
 	return OS_OK;
 }
 
 /* Task should be either in ABORT or COMPLETE state before calling this function  */
-int delete_task(TCB *tcb)
+int rx_delete_task(RX_TASK *tcb)
 {
-	TCB *tmp;
+	RX_TASK *tmp;
 
-	if((tcb->state == TASK_SUSPEND) || (tcb->state == TASK_READY))
+	if((tcb->state == RX_TASK_SUSPEND) || (tcb->state == RX_TASK_READY))
 		return OS_ERR;
 
 	/* remove from the global task list */
-	if(tcb == __task_list_head){
-                        __task_list_head = tcb->list;
+	if(tcb == __rx_task_list_head){
+                        __rx_task_list_head = tcb->list;
         } else {
-                        tmp = __task_list_head;
+                        tmp = __rx_task_list_head;
                         while(tmp->list) {
                                 if(tmp->list == tcb)
                                         break;
@@ -279,30 +279,30 @@ int delete_task(TCB *tcb)
 }
 
 /* Task can be suspended by own or by other task. It has to be resumed by calling task_resume */
-int suspend_task(TCB *tcb)
+int rx_suspend_task(RX_TASK *tcb)
 {
 	if(!tcb) {
 
-	    __remove_from_ready_q(__curr_running_task);
-            __curr_running_task->state = TASK_SUSPEND;
-            rose_sched();
+	    __rx_remove_from_ready_q(__rx_curr_running_task);
+            __rx_curr_running_task->state = RX_TASK_SUSPEND;
+            rx_sched();
 
 	}else{
-		if(tcb->state == TASK_READY) {
-		   __remove_from_ready_q(tcb);
-                   tcb->state = TASK_SUSPEND;
+		if(tcb->state == RX_TASK_READY) {
+		   __rx_remove_from_ready_q(tcb);
+                   tcb->state = RX_TASK_SUSPEND;
 		}
 	}
 	return OS_OK;
 }
 
-int resume_task(TCB *tcb)
+int rx_resume_task(RX_TASK *tcb)
 {
-	if(tcb->state != TASK_SUSPEND)
+	if(tcb->state != RX_TASK_SUSPEND)
 		return OS_ERR;
 
-	tcb->state = TASK_READY;
-	__add_to_ready_q(tcb);
+	tcb->state = RX_TASK_READY;
+	__rx_add_to_ready_q(tcb);
 
 	return OS_OK;
 }

@@ -15,89 +15,89 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
 /* Rose Wait Q
  * */
 
-static struct wait_queue *__sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
-static void __wait_timeout(struct timer_list *timer);
-static void __wait_handler(void *ptr);
-static void wake_task_in_the_queue(struct wait_queue **ride);
+static struct wait_queue *__rx_sys_wait_list = NULL; /* Pointer to the list of tasks waiting on the wait queue */
+static void __rx_wait_timeout(struct timer_list *timer);
+static void __rx_wait_handler(void *ptr);
+static void rx_wake_task_in_the_queue(struct wait_queue **ride);
 
-int __finish_wait()
+int __rx_finish_wait()
 {
     int ret = 0;
 
-    unsigned int imask = enter_critical();
+    unsigned int imask = rx_enter_critical();
     /* Find the current task */
 
-    if(__curr_running_task->timer != NULL) {
+    if(__rx_curr_running_task->timer != NULL) {
         /* Stop the timer and remove the timer from the list */
-        __remove_from_timer_list(__curr_running_task->timer, &__active_timer_head);
-        __curr_running_task->timer = NULL;    
+        __rx_remove_from_timer_list(__rx_curr_running_task->timer, &__rx_active_timer_head);
+        __rx_curr_running_task->timer = NULL;    
     }
-    if(__curr_running_task->timeout == E_OS_TIMEOUT) {
+    if(__rx_curr_running_task->timeout == E_OS_TIMEOUT) {
         ret = E_OS_TIMEOUT;
     }
-    __curr_running_task->timeout = __TIMER_OFF;
-    __curr_running_task->wq = NULL;
+    __rx_curr_running_task->timeout = __RX_TIMER_OFF;
+    __rx_curr_running_task->wq = NULL;
 
-    exit_critical(imask);
+    rx_exit_critical(imask);
 
     return ret;
 
 }
 
-static void __wait_timeout(struct timer_list *timer)
+static void __rx_wait_timeout(struct timer_list *timer)
 {
-    if ( OS_OK != create_timer(timer, __wait_handler, __curr_running_task,  __curr_running_task->timeout)){
+    if ( OS_OK != rx_create_timer(timer, __rx_wait_handler, __rx_curr_running_task,  __rx_curr_running_task->timeout)){
         pr_panic("Timer creation failed\n");
     }
-    __curr_running_task->timer = timer;
-    start_timer(timer);
-    __curr_running_task->timeout = __TIMER_ON;
+    __rx_curr_running_task->timer = timer;
+    rx_start_timer(timer);
+    __rx_curr_running_task->timeout = __RX_TIMER_ON;
 }
 
 /* Timer context */
-static void __wait_handler(void *ptr)
+static void __rx_wait_handler(void *ptr)
 {
-    TCB *t = (TCB *)ptr;
+    RX_TASK *t = (RX_TASK *)ptr;
     t->timeout = E_OS_TIMEOUT;
     t->timer = NULL;
 }
 
-int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout, struct timer_list *timer)
+int __rx_add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout, struct timer_list *timer)
 {
     struct wait_queue *ride;
-    TCB *t;
+    RX_TASK *t;
 
-    unsigned int imask = enter_critical();
+    unsigned int imask = rx_enter_critical();
 
    /* Put the current task to sleep in its waitqueue */    
-    __curr_running_task->state = task_state;
-    __curr_running_task->wq = wq;
-    __remove_from_ready_q(__curr_running_task);
-    __curr_running_task->next = NULL;
+    __rx_curr_running_task->state = task_state;
+    __rx_curr_running_task->wq = wq;
+    __rx_remove_from_ready_q(__rx_curr_running_task);
+    __rx_curr_running_task->next = NULL;
  
     /* Add the tasks in its wait_queue */ 
     if(!(wq->task)) {
-        wq->task = __curr_running_task;
+        wq->task = __rx_curr_running_task;
     }else{
         t = wq->task;
         while(t->next){
             t = t->next;
         }
-        t->next = __curr_running_task;
+        t->next = __rx_curr_running_task;
     }
     /* Check if the waitqueue is already in the list */
         /* Now add the waitqueue to the sys wait queue */    
-    if(!(__sys_wait_list)) {
+    if(!(__rx_sys_wait_list)) {
             /* Empty; add the first node */
-            __sys_wait_list = wq;
+            __rx_sys_wait_list = wq;
     }else{
         /* add wait queue to the tail of sytem wait list */
-        ride = __sys_wait_list;
+        ride = __rx_sys_wait_list;
         while(ride->next){
             if(ride == wq){
                 break; /* wq is already in the list */
@@ -110,37 +110,37 @@ int __add_to_wait_queue(struct wait_queue *wq, int task_state, int timeout, stru
         }
    }
     /* Wait timeout; Avoid starting the timer if already started */
-    if((timeout > 0) && (__curr_running_task->timeout == __TIMER_OFF)) {
-        __curr_running_task->timeout = timeout;
-        __wait_timeout(timer);
+    if((timeout > 0) && (__rx_curr_running_task->timeout == __RX_TIMER_OFF)) {
+        __rx_curr_running_task->timeout = timeout;
+        __rx_wait_timeout(timer);
     }
 
-    exit_critical(imask);
+    rx_exit_critical(imask);
 
     return 0;
 }
 
 /* Wakeup all the task waiting on the wait queue */
-int wakeup(struct wait_queue *wq)
+int rx_wakeup(struct wait_queue *wq)
 {
-    TCB *ready;
+    RX_TASK *ready;
   
-    unsigned int imask = enter_critical();
+    unsigned int imask = rx_enter_critical();
     
-    TCB *t = wq->task;
+    RX_TASK *t = wq->task;
     
     while(t) {
-        t->state = TASK_READY; 
+        t->state = RX_TASK_READY; 
         ready = t;  
         t = t->next;
-        __add_to_ready_q(ready);
+        __rx_add_to_ready_q(ready);
     }    
     wq->task = NULL;
     /* Remove the queue from the sys queue list */
-    if(wq == __sys_wait_list) {
-         __sys_wait_list = wq->next;
-         if(__sys_wait_list) {
-              __sys_wait_list->prev = NULL;
+    if(wq == __rx_sys_wait_list) {
+         __rx_sys_wait_list = wq->next;
+         if(__rx_sys_wait_list) {
+              __rx_sys_wait_list->prev = NULL;
          }
     }else{
          /* Remove the task from the waitqueue */
@@ -149,39 +149,39 @@ int wakeup(struct wait_queue *wq)
          wq->prev = wq->next = NULL;     
     }
 
-    exit_critical(imask);
+    rx_exit_critical(imask);
 
     return 0;
 }
 
 /* Wake all the task in this queue */
-static void wake_task_in_the_queue(struct wait_queue **ride)
+static void rx_wake_task_in_the_queue(struct wait_queue **ride)
 {
-    TCB *tn;
-    TCB *tp;
-    TCB *ready;
+    RX_TASK *tn;
+    RX_TASK *tp;
+    RX_TASK *ready;
     tn = tp = (*ride)->task;
     
     while(tn){
-        if((tn->state == TASK_INTERRUPTIBLE) || \
+        if((tn->state == RX_TASK_INTERRUPTIBLE) || \
            (tn->timeout == E_OS_TIMEOUT) ) {
-            /* Wake up task with state TASK_INTERRUPTIBLE or E_OS_TIMEOUT */
-            tn->state = TASK_READY;
+            /* Wake up task with state RX_TASK_INTERRUPTIBLE or E_OS_TIMEOUT */
+            tn->state = RX_TASK_READY;
             ready = tn;
             if(tn == (*ride)->task){
                 /* Move the head of the queue */
                 tn = tn->next;
                 (*ride)->task = tn;
                 tp = tn;
-                __add_to_ready_q(ready);
+                __rx_add_to_ready_q(ready);
            }else{
                /* Remove the task if in between the task chain */
                tn = tn->next;
                tp->next = tn;
-               __add_to_ready_q(ready);
+               __rx_add_to_ready_q(ready);
            }
                     
-       }else { /* !TASK_INTERRUPTIBLE && !E_OS_TIMEOUT */
+       }else { /* !RX_TASK_INTERRUPTIBLE && !E_OS_TIMEOUT */
                     tp = tn;
                     tn = tn->next;
              }
@@ -189,36 +189,36 @@ static void wake_task_in_the_queue(struct wait_queue **ride)
 
 }
 
-/* Runs in the context of rose_event_thread()
+/* Runs in the context of rosx_event_thread()
  * Wake all the tasks in a queue list; Will be called from event_group thread */
 
-void __rose_wake()
+void __rx_wake()
 {
     struct wait_queue *ride;
     struct wait_queue *wq;
 
-    if(!__sys_wait_list)
+    if(!__rx_sys_wait_list)
         return;
     
-    ride = __sys_wait_list;
+    ride = __rx_sys_wait_list;
     /* Walk through each queue in the queue list and wake up all the task
-     * if TASK_INTERRUPTIBLE or E_OS_TIMEOUT
+     * if RX_TASK_INTERRUPTIBLE or E_OS_TIMEOUT
      */
     while(ride)
     {
-        if(ride == __sys_wait_list) {
-            wake_task_in_the_queue(&ride);  
+        if(ride == __rx_sys_wait_list) {
+            rx_wake_task_in_the_queue(&ride);  
             if(ride->task == NULL) {
                  wq = ride;
                 /* If the task list is empty for the queue the move the head to the next one  */
-                __sys_wait_list = ride->next;
+                __rx_sys_wait_list = ride->next;
                  wq->prev = wq->next = NULL;
-                if(__sys_wait_list){
-                    __sys_wait_list->prev = NULL;
+                if(__rx_sys_wait_list){
+                    __rx_sys_wait_list->prev = NULL;
                 }
             }
-        }else{ /* !(ride == __sys_wait_list) */
-             wake_task_in_the_queue(&ride);  
+        }else{ /* !(ride == __rx_sys_wait_list) */
+             rx_wake_task_in_the_queue(&ride);  
              if(ride->task == NULL) {
                  wq = ride;
                  /* Remove the task from the waitqueue */ 

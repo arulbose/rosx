@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,12 @@
 #define _ASMLANGUAGE
 
 	.text
-	.global __preempt_task
+	.global __rx_preempt_task
 
-__preempt_task:
+__rx_preempt_task:
 		#save the EIP where the task for preempted <start>
 		movl %eax, -8(%esp)   # save the eax on the stack
-                movl __curr_running_task, %eax # copy the current runing task to eax
+                movl __rx_curr_running_task, %eax # copy the current runing task to eax
                 movl 0(%eax), %eax # copy the __curr_running_task->preempt to eax which has the EIP of the preempted location
                 push %eax # push the EIP to stack
                 movl -4(%esp), %eax # restore eax
@@ -39,7 +39,7 @@ __preempt_task:
 		pushl %edi
 		pushfl
 
-		call rose_sched # C funtion in sched.c
+		call rx_sched # C funtion in sched.c
 		
 		# Restore context
 		popfl

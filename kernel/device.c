@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
-#include <rose/errno.h>
+#include <RosX.h>
+#include <rosx/errno.h>
 
 extern int x86_simulator_init();
 
@@ -29,7 +29,7 @@ static struct device device_table[] = {
 
 /* Driver core APIs used by application */
 
-int dev_open(const char *filename, int flags)
+int rx_dev_open(const char *filename, int flags)
 {
     int device_table_id;
     int desc_id;
@@ -67,7 +67,7 @@ int dev_open(const char *filename, int flags)
 }
 
 /* Device close */
-int dev_close(int desc_id)
+int rx_dev_close(int desc_id)
 {
     int ret;
     if(desc[desc_id].dev != NULL) {
@@ -84,7 +84,7 @@ int dev_close(int desc_id)
     return -ENODEV;
 }
 
-int dev_read(int desc_id, void *dest, size_t size)
+int rx_dev_read(int desc_id, void *dest, size_t size)
 {
     int ret;
     if(desc[desc_id].dev != NULL) {
@@ -95,7 +95,7 @@ int dev_read(int desc_id, void *dest, size_t size)
     return -ENODEV;
 }
 
-int dev_write(int desc_id, const void *src, size_t size)
+int rx_dev_write(int desc_id, const void *src, size_t size)
 {
     int ret;
     if(desc[desc_id].dev != NULL) {
@@ -106,7 +106,7 @@ int dev_write(int desc_id, const void *src, size_t size)
     return -ENODEV;
 }
 
-int dev_ioctl(int desc_id, unsigned int cmd, void *arg)
+int rx_dev_ioctl(int desc_id, unsigned int cmd, void *arg)
 {
     int ret;
     if(desc[desc_id].dev != NULL) {
@@ -117,13 +117,13 @@ int dev_ioctl(int desc_id, unsigned int cmd, void *arg)
     return -ENODEV;
 }
 
-void poll_wait (struct devfile *d, struct wait_queue *wq, struct poll_table *p)
+void rx_poll_wait (struct devfile *d, struct wait_queue *wq, struct poll_table *p)
 {
     /* Timeout support will be added later */
-    wait_on(wq);
+    rx_wait_on(wq);
 }
 
-int dev_poll(int desc_id, unsigned int events, int timeout)
+int rx_dev_poll(int desc_id, unsigned int events, int timeout)
 {
     int ret;
     struct poll_table poll;
@@ -137,7 +137,7 @@ int dev_poll(int desc_id, unsigned int events, int timeout)
     return -ENODEV;
 }
 
-int register_driver(char *name, struct device_ops *ops)
+int rx_register_driver(char *name, struct device_ops *ops)
 {
     int device_table_id;
 
@@ -146,7 +146,7 @@ int register_driver(char *name, struct device_ops *ops)
         if(0 == strcmp(name, device_table[device_table_id].name))
         { /* Device found */
            if(device_table[device_table_id].device_ops != NULL) {
-               __early_printk("Registeration failed %s\n", name );
+               __rx_early_printk("Registeration failed %s\n", name );
                return ENODEV;
            }
            device_table[device_table_id].device_ops = ops; 
@@ -156,7 +156,7 @@ int register_driver(char *name, struct device_ops *ops)
     return -ENODEV;
 }
 
-void driver_init()
+void rx_driver_init()
 {
     x86_simulator_init();
 }

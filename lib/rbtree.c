@@ -20,7 +20,7 @@
   linux/lib/rbtree.c
 */
 
-#include <rose/rbtree.h>
+#include <rosx/rbtree.h>
 
 static void __rb_rotate_left(struct rb_node *node, struct rb_root *root)
 {

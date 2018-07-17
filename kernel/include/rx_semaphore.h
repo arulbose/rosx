@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,16 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __BYTEPOOL_H__
-#define __BYTEPOOL_H__
+#ifndef __SEMAPHORE_H__
+#define __SEMAPHORE_H__
 
-/* Internal funtions */
-unsigned char *__bytepool_start; /* Address must be 32 bit aligned */
-void bytepool_init();
+struct semaphore {
+
+    int init_val;
+    int curr_val;
+    RX_TASK *task; /* task waiting on the semaphore */
+    struct semaphore *next;
+};
+
+#define DEFINE_SEMAPHORE(s,v) \
+    struct semaphore (s) = __SEMAPHORE_INIT(v)
+
+#define __SEMAPHORE_INIT(v)        \
+{          .init_val = (v),        \
+            .curr_val = (v),       \
+            .task = NULL,          \
+            .next = NULL,          \
+}
 
 /* -------------- Application system calls ---------------- */
-void *salloc(int size); /* Simple time sensitive allocation from the bytepool; size is number of bytes */
-void sfree(void *);
+int rx_create_semaphore(struct semaphore *, int val);
+void rx_delete_semaphore(struct semaphore *sem);
+int rx_semaphore_post(struct semaphore *sem);
+int rx_semaphore_wait(struct semaphore *sem, int timeout);
 
 #endif
-

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ROSE_DEVICE_H
-#define __ROSE_DEVICE_H
+#ifndef __ROSX_DEVICE_H
+#define __ROSX_DEVICE_H
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
 struct device;
 struct devfile;
@@ -52,16 +52,16 @@ struct poll_table {
     int timeout;
 };
 
-int register_driver(char *, struct device_ops *);
-void driver_init(void);
+int rx_register_driver(char *, struct device_ops *);
+void rx_driver_init(void);
 
 /* Driver core APIs used by application */
-int dev_open(const char *filename, int flags);
-int dev_close(int fd);
-int dev_read(int fd, void *dest, size_t);
-int dev_write(int fd, const void *src, size_t);
-int dev_ioctl(int fd, unsigned int cmd, void *arg);
-int dev_poll(int desc_id, unsigned int events, int timeout);
-void poll_wait (struct devfile *, struct wait_queue *, struct poll_table *);
+int rx_dev_open(const char *filename, int flags);
+int rx_dev_close(int fd);
+int rx_dev_read(int fd, void *dest, size_t);
+int rx_dev_write(int fd, const void *src, size_t);
+int rx_dev_ioctl(int fd, unsigned int cmd, void *arg);
+int rx_dev_poll(int desc_id, unsigned int events, int timeout);
+void rx_poll_wait (struct devfile *, struct wait_queue *, struct poll_table *);
 
 #endif /* __ROSE_DEVICE_H */

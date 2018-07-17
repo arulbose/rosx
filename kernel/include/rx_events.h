@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,11 +20,11 @@
 
 /********************** Events **********************/
 struct event_group{
-        TCB *task; /* task waiting for the event */
+        RX_TASK *task; /* task waiting for the event */
         struct event_group *next;
 };
 
-#define DEFINE_EVENTGROUP(event)    \
+#define RX_DEFINE_EVENTGROUP(event)    \
       struct event_group (event) = __EVENTGROUP_INIT(event)
 
 #define __EVENTGROUP_INIT(event)    \
@@ -33,15 +33,15 @@ struct event_group{
              .next = NULL        \
            }
 
-void rose_event_thread();
+void rx_event_thread();
 
 /* -------------- Application system calls ---------------- */
-int create_event_group(struct event_group *p);
-void delete_event_group(struct event_group *p);
+int rx_create_event_group(struct event_group *p);
+void rx_delete_event_group(struct event_group *p);
 
-int set_event_flag(unsigned int flag);
-int clear_event_flag(unsigned int flag);
-int wait_event_group(struct event_group *, int flag);
-void notify_event(struct event_group *, unsigned int flag);
+int rx_set_event_flag(unsigned int flag);
+int rx_clear_event_flag(unsigned int flag);
+int rx_wait_event_group(struct event_group *, int flag);
+void rx_notify_event(struct event_group *, unsigned int flag);
 
 #endif /* __EVENTS_H__*/

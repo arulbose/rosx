@@ -17,8 +17,8 @@
  * or by defining a preprocessor macro in arch/include/asm/div64.h.
  */
 
-#include <rose/kernel.h>
-#include <rose/math64.h>
+#include <rosx/kernel.h>
+#include <rosx/math64.h>
 
 
 #define EXPORT_SYMBOL(x)

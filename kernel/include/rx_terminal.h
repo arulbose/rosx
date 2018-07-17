@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __SCHED_H__
-#define __SCHED_H__
+#ifndef __ROSE_TERMINAL_H__
+#define __ROSE_TERMINAL_H__
 
-volatile int __need_resched;
-
-/* -------------- Application system calls ---------------- */
-void rose_sched(void);
+void rx_terminal_thread();
 
 #endif

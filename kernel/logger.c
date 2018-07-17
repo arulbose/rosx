@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 #include <stdarg.h>
 
-static int print_buffer_ready = 0;
+static int rx_print_buffer_ready = 0;
 
 /* Store the print output in the buffer; Take care of buffer overflow and truncate and complain if the a single print exceeds the maximum capacity of the buffer
 */
-void __printk_to_buffer(const char *fmt, ...)
+void __rx_printk_to_buffer(const char *fmt, ...)
 {
     va_list arg;
     int size;
@@ -36,44 +36,44 @@ void __printk_to_buffer(const char *fmt, ...)
  	pr_error("Invalid print request; exceeeds print buffer capacity Requested: %d Available: %d\n" , (size + 1), CONFIG_PRINT_BUFFER_SIZE );
         return;
      }
-    imask = enter_critical();
+    imask = rx_enter_critical();
 
-    if((__printk_buffer_head + (size + 1)) > (__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE)){
+    if((__rx_printk_buffer_head + (size + 1)) > (__rx_printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE)){
         /* Size cannot fit move the head to start of the buffer and also set to skipped mem to NULL */ 
-        memset(__printk_buffer_head, '\0', ((__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE) - __printk_buffer_head));
-        __printk_buffer_head = __printk_buffer_start_ptr;
+        memset(__rx_printk_buffer_head, '\0', ((__rx_printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE) - __rx_printk_buffer_head));
+        __rx_printk_buffer_head = __rx_printk_buffer_start_ptr;
      } 
 
     /* All good */
-    vsprintf(__printk_buffer_head, fmt, arg);
-    __printk_buffer_head = __printk_buffer_head + (size + 1);
+    vsprintf(__rx_printk_buffer_head, fmt, arg);
+    __rx_printk_buffer_head = __rx_printk_buffer_head + (size + 1);
 
-    exit_critical(imask);
+    rx_exit_critical(imask);
 
     va_end (arg);
 }
 
-void rose_logger_thread()
+void rx_logger_thread()
 {
     int dd;
-    DEFINE_WAITQUEUE(w);
+    RX_DEFINE_WAITQUEUE(w);
 
-    print_buffer_ready = 1;
-    __early_printk("rose_logger_thread ready\n");
+    rx_print_buffer_ready = 1;
+    __rx_early_printk("rosx_logger_thread ready\n");
 
-    if (0 < (dd = dev_open(CONFIG_SERIAL, 0))) {
-       __early_printk("Failed to open serial device\n");
+    if (0 < (dd = rx_dev_open(CONFIG_SERIAL, 0))) {
+       __rx_early_printk("Failed to open serial device\n");
        while(1); 
     }
 
     while(1) {
-        if(0 == wait_queue(&w, (__printk_buffer_head != __printk_buffer_tail))) {
-           dev_write(dd, __printk_buffer_tail, 1);
-           if((__printk_buffer_tail + 1) > (__printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE) ) {
+        if(0 == rx_wait_queue(&w, (__rx_printk_buffer_head != __rx_printk_buffer_tail))) {
+           rx_dev_write(dd, __rx_printk_buffer_tail, 1);
+           if((__rx_printk_buffer_tail + 1) > (__rx_printk_buffer_start_ptr + CONFIG_PRINT_BUFFER_SIZE) ) {
               /* Buffer roll over */
-               __printk_buffer_tail = __printk_buffer_start_ptr;
+               __rx_printk_buffer_tail = __rx_printk_buffer_start_ptr;
            }else{
-               __printk_buffer_tail = __printk_buffer_tail + 1;
+               __rx_printk_buffer_tail = __rx_printk_buffer_tail + 1;
            }
 
 	}

@@ -15,27 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
-struct irq __irq_pool[CONFIG_IRQ_COUNT - 1];
+struct irq __rx_irq_pool[CONFIG_IRQ_COUNT - 1];
 
 /** __irq_handler(): Called by port interrupt code
  *  @irq_num:        Interrupt number as received from the interrupt controllers
  */
 
-void __irq_handler(int irq_num)
+void __rx_irq_handler(int irq_num)
 {
     //struct irq *p = NULL;
 
-    __raw_irq_counter ++;
+    __rx_raw_irq_counter ++;
 
     /* add code for mapping the Kernel irq line with the physical line */
-    if( (__irq_pool[irq_num].irq_handler != NULL) || (__irq_pool[irq_num].next != NULL)) {
-        __irq_pool[irq_num].irq_handler(irq_num, __irq_pool[irq_num].dev_id);
+    if( (__rx_irq_pool[irq_num].irq_handler != NULL) || (__rx_irq_pool[irq_num].next != NULL)) {
+        __rx_irq_pool[irq_num].irq_handler(irq_num, __rx_irq_pool[irq_num].dev_id);
     #if 0
         /* Invoke if any shared handlers */
-        if(__irq_pool[irq_num].flags & IRQF_SHARED){
-            p = __irq_pool[irq_num].next;
+        if(__rx_irq_pool[irq_num].flags & RX_IRQF_SHARED){
+            p = __rx_irq_pool[irq_num].next;
 	    /* go through all the shared irq handler */
 	    while(p != NULL){
 	        p->irq_handler(irq_num, p->dev_id);
@@ -53,7 +53,7 @@ void __irq_handler(int irq_num)
  *  @dev_name:      Name of the driver using the interrupt 
  *  @dev_id:        Unique pointer to pass to interrupt handlers, used as a signature for shared interrupt handlers
  */
-int request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_flags, char *dev_name, void *dev_id)
+int rx_request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_flags, char *dev_name, void *dev_id)
 {
 	//struct irq *p =  NULL;
 
@@ -62,17 +62,17 @@ int request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_fl
 	/* add code for mapping RT irq line with physical irq line */
 
 	/* check if irq is already allocated if not check if the request is for shared irq */
-	 if(__irq_pool[irq_num].irq_handler != NULL || __irq_pool[irq_num].next != NULL) {
+	 if(__rx_irq_pool[irq_num].irq_handler != NULL || __rx_irq_pool[irq_num].next != NULL) {
 	    /* Only shared handler can have more than one irq handler */
-	    if(!(irq_flags & IRQF_SHARED) || !(dev_id)) /* Dev_id cannot be empty in shared handlers */
+	    if(!(irq_flags & RX_IRQF_SHARED) || !(dev_id)) /* Dev_id cannot be empty in shared handlers */
 		return E_OS_UNAVAIL;
 
     #if 0
-	    p = __irq_pool[irq_num].next;
+	    p = __rx_irq_pool[irq_num].next;
 	    while(p != NULL)
                 p = p->next;
 
-	    if(NULL == (p = (struct irq *)__alloc_pool(SHIRQ_POOL)))
+	    if(NULL == (p = (struct irq *)__rx_alloc_pool(RX_SHIRQ_POOL)))
                 return E_OS_UNAVAIL;
  
 	    p->irq_handler = irq_handler;
@@ -83,11 +83,11 @@ int request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_fl
     #endif
 	}else{
 	/* Init irq structure */
-	    __irq_pool[irq_num].irq_handler = irq_handler;
-            __irq_pool[irq_num].flags = irq_flags;
-	   strncpy(__irq_pool[irq_num].devname, dev_name, 7);
-	   __irq_pool[irq_num].dev_id = dev_id;
-	   __irq_pool[irq_num].next = NULL;
+	    __rx_irq_pool[irq_num].irq_handler = irq_handler;
+            __rx_irq_pool[irq_num].flags = irq_flags;
+	   strncpy(__rx_irq_pool[irq_num].devname, dev_name, 7);
+	   __rx_irq_pool[irq_num].dev_id = dev_id;
+	   __rx_irq_pool[irq_num].next = NULL;
 
 	}
 
@@ -98,7 +98,7 @@ int request_irq(int irq_num, int (*irq_handler)(int, void*), unsigned int irq_fl
  *  @irq_num:    Interrupt number from interrupt controller
  *  @dev_id:     Unique pointer used as a signature to free shared interrupt handlers
  */
-int free_irq(int irq_num, void *dev_id)
+int rx_free_irq(int irq_num, void *dev_id)
 {
     //struct irq *prev = NULL;
     //struct irq *curr = NULL;
@@ -106,31 +106,31 @@ int free_irq(int irq_num, void *dev_id)
     if(irq_num > CONFIG_IRQ_COUNT)
         return E_OS_UNAVAIL;
     /* Check if shared interrupts */
-    if(__irq_pool[irq_num].flags & IRQF_SHARED) {
+    if(__rx_irq_pool[irq_num].flags & RX_IRQF_SHARED) {
     #if 0		
-		if(__irq_pool[irq_num].dev_id == dev_id) {
+		if(__rx_irq_pool[irq_num].dev_id == dev_id) {
 
-			__irq_pool[irq_num].irq_handler = NULL;
+			__rx_irq_pool[irq_num].irq_handler = NULL;
 		}else{
-		    prev = curr = __irq_pool[irq_num].next;
+		    prev = curr = __rx_irq_pool[irq_num].next;
                     while(curr != NULL) {
 			if(curr->dev_id == dev_id) {
 				curr->irq_handler = NULL;
 				prev->next = curr->next;
-				__free_pool(curr, SHIRQ_POOL);
+				__rx_free_pool(curr, RX_SHIRQ_POOL);
 				break;	
 			}
                         curr = curr->next;
 		    }
 		}
 		/* do when all sh_irq are freed */
-		if(__irq_pool[irq_num].next == NULL) {
-		    __irq_pool[irq_num].flags = 0;
+		if(__rx_irq_pool[irq_num].next == NULL) {
+		    __rx_irq_pool[irq_num].flags = 0;
 		}
     #endif
     } else {
 
-	__irq_pool[irq_num].irq_handler = NULL;
+	__rx_irq_pool[irq_num].irq_handler = NULL;
     }
 	return OS_OK;
 }

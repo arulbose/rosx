@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,20 +18,20 @@
 #ifndef __IRQ_H__
 #define __IRQ_H__
 /* IRQ */
-#define IRQF_TRIGGER_EDGED     (1 << 0)
-#define IRQF_TRIGGER_LEVEL     ~IRQF_TRIGGER_EDGED
+#define RX_IRQF_TRIGGER_EDGED     (1 << 0)
+#define RX_IRQF_TRIGGER_LEVEL     ~RX_IRQF_TRIGGER_EDGED
 
-#define IRQF_TRIGGER_RISING     (1 << 1)
-#define IRQF_TRIGGER_FALLING    ~IRQF_TRIGGER_RISING
+#define RX_IRQF_TRIGGER_RISING     (1 << 1)
+#define RX_IRQF_TRIGGER_FALLING    ~RX_IRQF_TRIGGER_RISING
 
-#define IRQF_TRIGGER_HIGH       (1 << 1)
-#define IRQF_TRIGGER_LOW        ~IRQF_TRIGGER_HIGH
+#define RX_IRQF_TRIGGER_HIGH       (1 << 1)
+#define RX_IRQF_TRIGGER_LOW        ~RX_IRQF_TRIGGER_HIGH
 
-#define IRQF_SHARED             (1 << 2)
+#define RX_IRQF_SHARED             (1 << 2)
 
-#define IRQ_HANDLED 0
+#define RX_IRQ_HANDLED 0
 
-volatile unsigned int __raw_irq_counter; /* global irq counter */
+volatile unsigned int __rx_raw_irq_counter; /* global irq counter */
 
 struct irq{
         char devname[8];
@@ -42,13 +42,13 @@ struct irq{
 };
 
 /* Kernel entry point interrupt handler */
-void __irq_handler(int irq_num);
-#define enable_irq(x)  __enable_irq(x)
-#define disable_irq(x)  __disable_irq(x)
-#define enter_critical(x)  __disable_irq_global(x)
-#define exit_critical(x) __restore_irq_global(x)
+void __rx_irq_handler(int irq_num);
+#define rx_enable_irq(x)  __enable_irq(x)
+#define rx_disable_irq(x)  __disable_irq(x)
+#define rx_enter_critical(x)  __disable_irq_global(x)
+#define rx_exit_critical(x) __restore_irq_global(x)
 
 /* -------------- Application system calls ---------------- */
-int request_irq(int irq_num, int (*irq_handler)(int, void *), unsigned int irq_flags, char *dev_name, void *dev_id);
-int free_irq(int irq_num, void *p);
+int rx_request_irq(int irq_num, int (*irq_handler)(int, void *), unsigned int irq_flags, char *dev_name, void *dev_id);
+int rx_free_irq(int irq_num, void *p);
 #endif

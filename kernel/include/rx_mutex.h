@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,30 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __MUTEX_H__
-#define __MUTEX_H__
+#ifndef __RX_MUTEX_H__
+#define __RX_MUTEX_H__
 
 
 /******* MUTEX *******************/
 struct mutex{
 
         int lock;
-	TCB *owner; /* task which currently owns the mutex lock */
-        TCB *task; /* list of task waiting for the mutex lock */
+	RX_TASK *owner; /* task which currently owns the mutex lock */
+        RX_TASK *task; /* list of task waiting for the mutex lock */
 	struct mutex *next;
 };
 
 enum{
-__LOCKED,
-__UNLOCKED
-}_MUTEX_LOCK;
+__RX_MUTEX_LOCKED,
+__RX_MUTEX_UNLOCKED
+}_RX_MUTEX_LOCK;
 
-#define WAIT_LOCK 1
-#define NO_WAIT_LOCK 2
+#define RX_MUTEX_WAIT_LOCK 1
+#define RX_MUTEX_NO_WAIT_LOCK 2
 
 /* -------------- Application system calls ---------------- */
 
-#define DEFINE_MUTEX(m)    \
+#define RX_DEFINE_MUTEX(m)    \
       struct mutex (m) = __MUTEX_INIT(m)
 
 #define __MUTEX_INIT(m)           \
@@ -49,9 +49,9 @@ __UNLOCKED
              .next = NULL,        \
            }
 
-int create_mutex(struct mutex *m);
-void delete_mutex(struct mutex *p);
-int mutex_unlock(struct mutex *p);
-int mutex_lock(struct mutex *p, int ticks); /* Ticks or Jiffies */
+int rx_create_mutex(struct mutex *m);
+void rx_delete_mutex(struct mutex *p);
+int rx_mutex_unlock(struct mutex *p);
+int rx_mutex_lock(struct mutex *p, int ticks); /* Ticks or Jiffies */
 
 #endif

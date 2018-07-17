@@ -9,8 +9,8 @@
 #ifndef _LINUX_LOG2_H
 #define _LINUX_LOG2_H
 
-#include <rose/types.h>
-#include <rose/bitops.h>
+#include <rosx/types.h>
+#include <rosx/bitops.h>
 
 /*
  * deal with unrepresentable constant logarithms

@@ -1,7 +1,7 @@
 #ifndef _LINUX_STDDEF_H
 #define _LINUX_STDDEF_H
 
-#include <rose/compiler.h>
+#include <rosx/compiler.h>
 
 #undef NULL
 #if defined(__cplusplus)

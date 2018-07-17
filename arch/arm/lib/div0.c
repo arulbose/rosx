@@ -22,7 +22,7 @@
  */
 
 /* Replacement (=dummy) for GNU/Linux division-by zero handler */
-#include <RoseRTOS.h>
+#include <RosX.h>
 void __div0 (void)
 {
     pr_panic("### ERROR ### Please RESET the board ###\n");

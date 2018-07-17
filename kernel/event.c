@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <RoseRTOS.h>
+#include <RosX.h>
 
-struct msg_queue event_recv_q;
-char event_recv_q_start[sizeof(struct msg_queue) * CONFIG_SYS_EVENT_QUEUE_BLOCKS];
+struct msg_queue rx_event_recv_q;
+char rx_event_recv_q_start[sizeof(struct msg_queue) * CONFIG_SYS_EVENT_QUEUE_BLOCKS];
 
 /* struct to pack the events in the event receive queue */
 struct event {
@@ -26,7 +26,7 @@ struct event {
     unsigned int flag;
 };
 
-static int process_event(struct event_group *, unsigned int flag);
+static int rx_process_event(struct event_group *, unsigned int flag);
 
 /* Rose Event Group
  * */
@@ -35,47 +35,47 @@ static int process_event(struct event_group *, unsigned int flag);
 /* Create dynamic event create */
 
 /* Runtime creation of event group */
-int create_event_group(struct event_group *event)
+int rx_create_event_group(struct event_group *event)
 {
-	unsigned int imask = enter_critical();
+	unsigned int imask = rx_enter_critical();
 
 	event->task = NULL;
 	event->next = NULL;
 
-	exit_critical(imask);
+	rx_exit_critical(imask);
 
 	return OS_OK;
 }
 
 /* Runtime deletion of event group. Notify the task waiting for the events */
-void delete_event_group(struct event_group *p)
+void rx_delete_event_group(struct event_group *p)
 {
-        TCB *ready;
-	unsigned int imask = enter_critical();
+        RX_TASK *ready;
+	unsigned int imask = rx_enter_critical();
 
         /* wake up all task waiting on the event q, let the task return proper error code */
         while(p->task){
-            p->task->state = TASK_READY;
+            p->task->state = RX_TASK_READY;
             p->task->event = NULL;
             ready = p->task;
             p->task = p->task->next; /* move to the next task in the queue */
-            __add_to_ready_q(ready);
+            __rx_add_to_ready_q(ready);
         }
 
-        exit_critical(imask);
+        rx_exit_critical(imask);
 }
 
 /* Add events to the task */
-int set_event_flag(unsigned int flag)
+int rx_set_event_flag(unsigned int flag)
 {
-	__curr_running_task->event_flag |= flag;
+	__rx_curr_running_task->event_flag |= flag;
 	return OS_OK; 
 }
 
-int clear_event_flag(unsigned int flag)
+int rx_clear_event_flag(unsigned int flag)
 {
-	__curr_running_task->event_flag &= ~flag;
-	__curr_running_task->event_recv &= ~flag;
+	__rx_curr_running_task->event_flag &= ~flag;
+	__rx_curr_running_task->event_recv &= ~flag;
 
 	return OS_OK;
 }
@@ -83,84 +83,84 @@ int clear_event_flag(unsigned int flag)
 /* Task removed from ready queue and added in wait queue; task will be waked-up by notify_event(). 
  * In case of event occured when the task is not waiting on the event queue, event will miss;
  */
-int wait_event_group(struct event_group *p, int flag)
+int rx_wait_event_group(struct event_group *p, int flag)
 {
-	TCB *tmp;
+	RX_TASK *tmp;
 
-	unsigned int imask = enter_critical();
+	unsigned int imask = rx_enter_critical();
 
-	__curr_running_task->event_flag |= flag;
+	__rx_curr_running_task->event_flag |= flag;
 	/* Add the task to the event queue */
 	/* add to the event group list */
 
-	__curr_running_task->state = TASK_SUSPEND;
-	__curr_running_task->event = p;
-	__remove_from_ready_q(__curr_running_task);
-	__curr_running_task->next = NULL;
+	__rx_curr_running_task->state = RX_TASK_SUSPEND;
+	__rx_curr_running_task->event = p;
+	__rx_remove_from_ready_q(__rx_curr_running_task);
+	__rx_curr_running_task->next = NULL;
 
 	  if(!(p->task)) {
-                p->task = __curr_running_task;
+                p->task = __rx_curr_running_task;
 
             }else{
                 tmp = p->task;
                 while(tmp)
                     tmp = tmp->next;
 
-                tmp = __curr_running_task;
+                tmp = __rx_curr_running_task;
             }
 	
-	exit_critical(imask);
+	rx_exit_critical(imask);
 
-	rose_sched();	
+	rx_sched();	
 
-	return __curr_running_task->event_recv;
+	return __rx_curr_running_task->event_recv;
 }
 
 /* Event thread which process all system events; thread part of system threads with prio 0 */
-void rose_event_thread()
+void rx_event_thread()
 {
     struct event e; 
 
-    if(OS_OK != create_queue(&event_recv_q, "event_q", sizeof(struct event), CONFIG_SYS_EVENT_QUEUE_BLOCKS, event_recv_q_start, Q_BLOCK|Q_CYCLIC_FULL)) {
-		pr_panic("create_queue failed in rose_event_thread\n");
+    if(OS_OK != rx_create_queue(&rx_event_recv_q, "event_q", sizeof(struct event), CONFIG_SYS_EVENT_QUEUE_BLOCKS, rx_event_recv_q_start, RX_Q_BLOCK|RX_Q_CYCLIC_FULL)) {
+		pr_panic("create_queue failed in rosx_event_thread\n");
     }
 	
     /* empty the queue when there is an event */
     while(1) {
 
-       read_from_queue(&event_recv_q, (char *)&e, sizeof(struct event), OS_NO_WAIT);
-       process_event((struct event_group *)e.p, e.flag);		
+       rx_read_from_queue(&rx_event_recv_q, (char *)&e, sizeof(struct event), OS_NO_WAIT);
+       rx_process_event((struct event_group *)e.p, e.flag);		
     }
 
 }
 
 /* Write to event queue to be processed later; called also from interrupt */
-void notify_event(struct event_group *eg, unsigned int flag)
+void rx_notify_event(struct event_group *eg, unsigned int flag)
 {
      struct event e;
 
      e.p = eg;
      e.flag = flag;
-     write_to_queue(&event_recv_q, (const char *)&e, sizeof(struct event), OS_WAIT_FOREVER); 
+     rx_write_to_queue(&rx_event_recv_q, (const char *)&e, sizeof(struct event), OS_WAIT_FOREVER); 
 
      return;
 }
 
 /* Wake up all task waiting for a particular event/s  */
-static int process_event(struct event_group *head, unsigned int flag)
+static int rx_process_event(struct event_group *head, unsigned int flag)
 {
-	TCB *start = NULL;
-	TCB *prev = NULL;
+	RX_TASK *start = NULL;
+	RX_TASK *prev = NULL;
 
 
-	unsigned int imask = enter_critical();
+	unsigned int imask = rx_enter_critical();
 	
         /* Wake thread sleeping on the wait queues */
-        __rose_wake();
+        __rx_wake();
 
 	if(head == NULL) {
 		pr_error( "In notify_event: no event_group to notify\n");
-		exit_critical(imask);
+		rx_exit_critical(imask);
 		return OS_ERR;
 	}
 
@@ -169,20 +169,20 @@ static int process_event(struct event_group *head, unsigned int flag)
 		
 		if((start->event_flag & flag) != 0) {
 			 start->event_recv = flag;
-			 start->state = TASK_READY;
+			 start->state = RX_TASK_READY;
 			 start->event = NULL;
 			 start->next = NULL;
 			/* Remove from the event group list */
 			  if(start == head->task){
                                 head->task = start->next;
-				__add_to_ready_q(start);
+				__rx_add_to_ready_q(start);
 					if(head->task == NULL)
 						break; /* no more node to parse */
 				prev = head->task;
 				start = head->task->next;
                           }else{
 				prev->next = start->next;
-				__add_to_ready_q(start);
+				__rx_add_to_ready_q(start);
 				start = prev->next;
                           }
 
@@ -192,6 +192,6 @@ static int process_event(struct event_group *head, unsigned int flag)
 		}
 
 	 }
-	exit_critical(imask);
+	rx_exit_critical(imask);
 	return OS_OK;
 }

@@ -1,4 +1,4 @@
-/* Rose RT-Kernel
+/* RosX RT-Kernel
  * Copyright (C) 2016 Arul Bose<bose.arul@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,7 +44,7 @@ do {										\
 	      "popl %%ebp\n\t"           	/* restore EBP   */     	\
               "popfl\n\t"                  	/* restore flags */     	\
               "pushl %[next_ip]\n\t"     	/* restore EIP   */     	\
-	      "jmp __switch_to\n\t"	        /* call the C function */	\
+	      "jmp __rx_switch_to\n\t"	        /* call the C function */	\
 	      "1:\t"								\
 										\
   		/* output parameters */         		                \

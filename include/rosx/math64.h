@@ -2,8 +2,8 @@
 #define _LINUX_MATH64_H
 
 #include <div64.h>
-#include <rose/bitops.h>
-#include <rose/types.h>
+#include <rosx/bitops.h>
+#include <rosx/types.h>
 
 #if BITS_PER_LONG == 64
 
