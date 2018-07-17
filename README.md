@@ -1,11 +1,11 @@
 # RosX - Real Time Operating System Experiment
 
 ## Introduction
-  I have tried to write a RTOS based on my experience and understanding on OS concepts. I just started for fun and also to keep myself busy. As the title says it is an 'experiment' Rose might not be even close to any of the successful RTOS out there. Nevertheless I have tried to make the kernel simple to understand as well added kernel services of what any decent RTOS should have. The development is on-going and would appreciate your contribution to ROSE. Please do mail me if you would like to collabrate in this project. Email: bose.arul@gmail.com
+  I have tried to write a RTOS based on my experience and understanding on OS concepts. I just started for fun and also to keep myself busy. I have tried to make the kernel simple to understand as well added kernel services of what any decent RTOS should have. The development is on-going and would appreciate your contribution to RosX. Please do mail me if you would like to collabrate in this project. Email: bose.arul@gmail.com
 
 Below are the services supported by the kernel.
 
-##### 1. Rose Scheduler
+##### 1. RosX Scheduler
       Preemptive             : Threads with lower priority are preempted in favour of higher priority threads
       Round robin scheduling : Same priority threads are atleast executed for the time slice given.
       Priority inheritance   : Implemented as part of mutex services to avoid priority inversion
@@ -38,10 +38,10 @@ Below are the services supported by the kernel.
       Driver core support Linux like open/release/read/write/ioctl/poll api calls
       
 ## Getting Started
-Currently the kernel is not ported to any hardware. There are some porting code in the source for ARM Raspberry pi but not complete. I have ported the kernel to work on a 32-bit x86 simulator which runs on a x86 or x86_64 bit machine. The x86 simulator runs the Rose kernel threads as if running on a actual bare metal hardware(where the RosX scheduler handles the application threads). As the priority is to stabilize the kernel the x86 simulator environment gives greater flexibility in debugging kernel using gdb.
+Currently the kernel is not ported to any hardware. There are some porting code in the source for ARM Raspberry pi but not complete. I have ported the kernel to work on a 32-bit x86 simulator which runs on a x86 or x86_64 bit machine. The x86 simulator runs the RosX kernel threads as if running on a actual bare metal hardware(where the RosX scheduler handles the application threads). As the priority is to stabilize the kernel the x86 simulator environment gives greater flexibility in debugging kernel using gdb.
 
 ### Prerequisites for running the RosX kernel in the x86 simulator mode
-Any Ubuntu, Debain, Fedora or any other Linux flavor should be able to build the kernel. I personally use Debain machine. If you are running on x86_64 please install libc 32-bit. Below are the library dependencies for the RosX kernel to be built. `RosXx86` is the Rose kernel binary which has the application threads as well the x86 simulator.
+Any Ubuntu, Debain, Fedora or any other Linux flavor should be able to build the kernel. I personally use Debain machine. If you are running on x86_64 please install libc 32-bit. Below are the library dependencies for the RosX kernel to be built. `RosXx86` is the RosX kernel binary which has the application threads as well the x86 simulator.
 ```
 # apt-get install libc6-i386
 # apt-get install libc6-dev-i386
@@ -51,8 +51,8 @@ Any Ubuntu, Debain, Fedora or any other Linux flavor should be able to build the
 ```
 apps/          - The actual application using the kernel APIs
 arch/          - Arch specific code
-kernel/        - Rose kernel files
-kernel/include - Rose kernel include files
+kernel/        - RosX kernel files
+kernel/include - RosX kernel include files
 drivers/       - All device drivers
 include/       - Common include files
 lib/           - Common C library routines
@@ -77,11 +77,11 @@ To run follow the below steps
 cd rosx/
 ./rosx86
 *************************************************************** 
-*********** ROSE Real Time operating system experiment v0_x ***** 
+*********** ROSX Real Time operating system experiment v0_x ***** 
 ***************************************************************
 < The below are the application thread prints >
 ```
-In the x86 simulator mode fake interrupts are sent to the kernel interrupt management service using Linux signals. To run the Rose kernel, 'rosx86' process should be fed with clock ticks. There are 2 clock tick binaries in rosx/utils/system_clk_100ms(100 ms ticks) and rosx/utils/system_clk_10ms(10ms ticks). 
+In the x86 simulator mode fake interrupts are sent to the kernel interrupt management service using Linux signals. To run the RosX kernel, 'rosx86' process should be fed with clock ticks. There are 2 clock tick binaries in rosx/utils/system_clk_100ms(100 ms ticks) and rosx/utils/system_clk_10ms(10ms ticks). 
 
 Now open Terminal 2 and run the below
 
@@ -90,7 +90,7 @@ Now open Terminal 2 and run the below
 cd rosx/utils
 ./system_clk_100ms
 ```
-Now you should see ROSE application prints on terminal 1
+Now you should see ROSX application prints on terminal 1
 
 ## Running the tests
 All application files should be in rosx/apps folder. There is a reference application named main.c in rosx/apps folder. The apps/rosx_defines.h file has the kernel configuration for the application threads. You can write you own application files with a different kernel configuration. Make sure to add the application file names in to makefile scripts/Makefile.x86. The other test reference applications c files are present in rosx/testapps.
