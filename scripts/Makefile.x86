@@ -40,9 +40,9 @@ OBJS_AS = arch/x86/preempt.o
 OBJECTS_GCC = $(patsubst %,$(OBJDIR)/%,$(OBJS_GCC))
 OBJECTS_AS = $(patsubst %,$(OBJDIR)/%,$(OBJS_AS))
 
-.PHONY: directories rosex86 clean
+.PHONY: directories rosx86 clean
 
-all: directories rosex86
+all: directories rosx86
 
 directories: $(OUTDIR)
 
@@ -56,7 +56,7 @@ $(OBJDIR)/%.o: %.c
 $(OBJDIR)/%.o: %.S
 	$(AS) -c -o $@ $< $(CFLAGS)
 
-rosex86: $(OBJECTS_GCC) $(OBJECTS_AS)
+rosx86: $(OBJECTS_GCC) $(OBJECTS_AS)
 	$(LD) -o $@ $^ $(LDFLAGS)
          
 clean:
