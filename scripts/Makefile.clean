@@ -1,15 +1,15 @@
 clean:
-	rm -f rose.bin
-	rm -f rose.hex
-	rm -f rose.elf
-	rm -f rose.list
-	rm -f rose.img
-	rm -f rose.bc
-	rm -f rose.lds
+	rm -f rosx.bin
+	rm -f rosx.hex
+	rm -f rosx.elf
+	rm -f rosx.list
+	rm -f rosx.img
+	rm -f rosx.bc
+	rm -f rosx.lds
 	rm -f include/asm
 	rm -rf out
-	rm -f rosex86
-	rm -f librose.a
+	rm -f rosx86
+	rm -f librosx.a
 	rm -rf validate
 	rm -f validate.tar.gz
 

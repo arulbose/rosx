@@ -5,8 +5,8 @@ AS = gcc
 
 CFLAGS = -I port/x86 -Wall -m32 -g -fvar-tracking -DCONFIG_X86_SIMULATOR -I kernel/include -I apps
 
-rose: 
-	$(CC) -o $@ apps/main.c -L. -lrose $(CFLAGS)
+rosx: 
+	$(CC) -o $@ apps/main.c -L. -lrosx $(CFLAGS)
          
 clean:
-	@rm -f rose
+	@rm -f rosx

@@ -11,19 +11,19 @@ OBJDIR = out
 OUTDIR = out/apps out/kernel out/arch/x86 out/lib out/drivers/simulator
 
 OBJS_GCC = apps/main.o \
-       kernel/sched.o \
-       kernel/task.o \
-       kernel/queue.o \
-       kernel/event.o \
-       kernel/irq.o \
-       kernel/init.o \
-       kernel/mutex.o \
-       kernel/timer.o \
-       kernel/semaphore.o \
-       kernel/logger.o \
-       kernel/terminal.o \
-       kernel/device.o \
-       kernel/wait.o \
+       kernel/rx_sched.o \
+       kernel/rx_task.o \
+       kernel/rx_queue.o \
+       kernel/rx_event.o \
+       kernel/rx_irq.o \
+       kernel/rx_init.o \
+       kernel/rx_mutex.o \
+       kernel/rx_timer.o \
+       kernel/rx_semaphore.o \
+       kernel/rx_logger.o \
+       kernel/rx_terminal.o \
+       kernel/rx_device.o \
+       kernel/rx_wait.o \
        drivers/simulator/x86sim.o \
        lib/vsprintf.o \
        lib/strto.o \
