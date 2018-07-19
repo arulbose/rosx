@@ -50,7 +50,8 @@ struct __rx_task_control_block
 	struct mutex *mutex;     /* Pointer task mutex */
 	struct event_group *event; /* Pointer to task event group */
         struct wait_queue *wq;     /* Pointer to task wait event */
-	struct msg_queue *mq;          /* pointer to a message queue */
+	struct msg_queue *mq;      /* pointer to a message queue */
+	struct block_pool *bpool;     /* Pointer to block pool */
 	struct __rx_task_control_block *next; /* pointer to the next task kcontrol block */
 	struct __rx_task_control_block *list; /* used to add in the global list of task */
 	int err; /* Used to store the error code */

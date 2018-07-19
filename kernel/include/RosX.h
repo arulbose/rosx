@@ -41,6 +41,7 @@
 #include <rx_terminal.h>
 #include <rx_device.h>
 #include <rx_wait.h>
+#include <rx_blockpool.h>
 
 #ifdef CONFIG_PRINT_BUFFER
 /* Log controls in defines.h */

@@ -193,7 +193,7 @@ static int __rx_mutex_timeout(struct mutex *p, unsigned int timeout)
 /* Task sleep if lock not available; add to timer list if time out is greater than 0 */
 int rx_mutex_lock(struct mutex *p, int timeout)
 {
-	RX_TASK *t1;
+	RX_TASK *t;
 
 	unsigned int imask = rx_enter_critical();
 
@@ -219,12 +219,12 @@ int rx_mutex_lock(struct mutex *p, int timeout)
 	if(!(p->task)) {
 	   p->task = __rx_curr_running_task;
 	}else{
-	   t1 = p->task;
+	   t = p->task;
 	   /* Add the new task to the end of the queue */
-	   while(t1->next)
-		t1 = t1->next;
+	   while(t->next)
+		t = t->next;
 
-	    t1->next = __rx_curr_running_task;
+	    t->next = __rx_curr_running_task;
 	}
 
 	/* Avoid priority inversion by changing the prio to the task which has the max priority waiting in the mutex wait queue */
