@@ -37,22 +37,22 @@ int rx_create_block_pool(struct block_pool *pool_data, char *name, unsigned int 
         pr_error("rx_create_block_pool: Invalid params\n");
         return OS_ERR; 
     }
-    
+   
+    strcpy((char *)pool_data->name, name); 
     pool_data->start_of_pool = start_of_pool;
     pool_data->pool_size = pool_size;
     pool_data->block_size = block_size;
-    pool_data->available = (pool_size/block_size + sizeof(struct block_chain));
+    pool_data->available = (pool_size/(block_size + sizeof(struct block_chain)));
     pool_data->free_blocks = NULL;
 	
 	
     for(i = 0; i < pool_data->available; i ++)
     {
-        temp->next = NULL;	
         temp = ((struct block_chain *)start_of_pool + (i * (block_size + sizeof(struct block_chain))));
-	
         temp->block = temp + sizeof(struct block_chain);	
         if(pool_data->free_blocks == NULL) {
 	    pool_data->free_blocks = temp;
+	    temp->next = NULL;
         }else{
 			
             /* Add the blocks at the head of free blocks */
