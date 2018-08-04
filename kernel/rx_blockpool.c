@@ -49,14 +49,14 @@ int rx_create_block_pool(struct block_pool *pool_data, char *name, unsigned int 
     for(i = 0; i < pool_data->available; i ++)
     {
         temp = ((struct block_chain *)start_of_pool + (i * (block_size + sizeof(struct block_chain))));
-        temp->block = temp + sizeof(struct block_chain);	
+        temp->block = (char *)temp + sizeof(struct block_chain);
         if(pool_data->free_blocks == NULL) {
 	    pool_data->free_blocks = temp;
 	    temp->next = NULL;
         }else{
 			
             /* Add the blocks at the head of free blocks */
-            temp->next = pool_data->free_blocks->next;
+            temp->next = pool_data->free_blocks;
             pool_data->free_blocks = temp;
 	}
     }
@@ -114,8 +114,10 @@ int rx_allocate_block(struct block_pool *pool_data, void **block_ptr, int flags)
 	 /* Assign a block */
 	    temp = pool_data->free_blocks;
             pool_data->free_blocks = pool_data->free_blocks->next;
-            temp->next = NULL;
-            *block_ptr = temp->block;	    
+	    /* Pool data pointer is stored for releasing the block */
+            temp->next = (struct block_chain *)pool_data;
+            *block_ptr = temp->block;	   
+	    pool_data->available--; 
 	}
 
         rx_exit_critical(imask);
@@ -125,19 +127,26 @@ int rx_allocate_block(struct block_pool *pool_data, void **block_ptr, int flags)
 int rx_release_block(void *block_ptr)
 {
 	RX_TASK *t;
-        struct block_chain *start_of_block = (struct block_chain *)block_ptr - sizeof(struct block_chain);
-	struct block_pool *pool_data = NULL; /* <TODO> Use container_of to get the pool_data ptr */
+        struct block_chain *start_of_block = (struct block_chain *)((char *)block_ptr - sizeof(struct block_chain));
+	struct block_pool *pool_data = (struct block_pool *)start_of_block->next; 
 	unsigned int imask = rx_enter_critical();
+
+	if(pool_data->magic != 0x55555555){
+	    pr_error("Invalid block pool\n");
+		return OS_ERR;
+	}
 
         /* add it back to free block list */	
         if(pool_data->free_blocks == NULL) {
 	    pool_data->free_blocks = start_of_block;
+	    start_of_block->next = NULL;
         }else{
 			
             /* Add the blocks at the head of free blocks */
-            start_of_block->next = pool_data->free_blocks->next;
+            start_of_block->next = pool_data->free_blocks;
 	    pool_data->free_blocks = start_of_block;
 	 }
+	pool_data->available++;
         /* Wake up task waiting on the block sleep queue */
 	if(pool_data->task != NULL) {
             t = pool_data->task;

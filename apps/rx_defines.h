@@ -26,7 +26,7 @@
 /* Print buffer */
 #define CONFIG_PRINT_BUFFER 
 #ifdef CONFIG_PRINT_BUFFER
-#define CONFIG_PRINT_BUFFER_SIZE 1024
+#define CONFIG_PRINT_BUFFER_SIZE 4096
 #endif /* CONFIG_PRINT_BUFFER */
 
 /* Kernel config */
