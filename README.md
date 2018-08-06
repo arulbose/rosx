@@ -32,10 +32,14 @@ Below are the services supported by the kernel.
       Used for passing messages between threads
       Supports fixed size messages. Message sizes are 1, 2, 4, 8, and 16 32-bit words
       Support dynamic creation of message queues
-##### 9. Interrupt management service
+##### 9. Block pools
+      User can create multiple pools of fixed-sized memory blocks.
+      Blocks are allocated and freed in a fast and deterministic manner.
+      RosX does not place any restriction on the number of blocks in a pool 
+##### 10. Interrupt management service
       Dynamic request and free of interrupt. 
       Supports interrupt sharing
-##### 10. Device driver management
+##### 11. Device driver management
       Driver core support Linux like open/release/read/write/ioctl/poll api calls
       
 ## Getting Started
