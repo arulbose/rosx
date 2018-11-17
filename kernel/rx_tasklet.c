@@ -15,35 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __X86_SIM_H__ 
-#define __X86_SIM_H__
+#include <RosX.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <rosx/string.h>
-#include <signal.h>
-#include "irq_mapping.h"
+/* Under construction */
 
-#define  __printk(...) 	\
-			{ \
-			printf(__VA_ARGS__); \
-			fflush(stdout); \
-			}
+int rx_create_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned long data);
+void rx_delete_tasklet(struct tasklet *);
+void rx_enable_tasklet(struct tasklet *);
+void rx_disable_tasklet(struct tasklet *);
+void rx_schedule_tasklet(struct tasklet *);
 
-
-#define  __early_printk(...) 	\
-			{ \
-			printf(__VA_ARGS__); \
-			fflush(stdout); \
-			}
-
-sigset_t mask;
-sigset_t orig_mask;
-struct sigaction act;
-volatile int __context; /* user:0/IRQ:1 to be used by the port critical section code to bypass if already in IRQ context */
-volatile int __critical;
-
-#define __IRQ 1
-#define __USER 0
-
-#endif 
+void rx_bh_thread()
+{
+    while(1) {
+        rx_suspend_task(MYSELF);
+    }
+    
+}

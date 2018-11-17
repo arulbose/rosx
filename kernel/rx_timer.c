@@ -22,7 +22,7 @@ RX_DEFINE_EVENTGROUP(__rx_timer_events);
 int __rx_timer_tick_irq_handler(int irq, void *a)
 {
 	/* Wake up timer thread and return */
-	//pr_info("timer interrupt received\n");
+	//pr_dbg("timer interrupt received\n");
 	jiffies ++;
 	rx_notify_event(&__rx_timer_events, RX_TIMER_EVENT_IRQ_EVENT);
 
@@ -58,7 +58,7 @@ void rx_timer_thread()
         unsigned int tick = 0;
 
         /* put the timer thread in the ready queue; system thread priority */
-	pr_info( "In rosx_timer_thread\n");
+	pr_dbg( "In rosx_timer_thread\n");
 
 	/* request timer interrupt */
 	if(OS_OK != rx_request_irq(RX_TIMER0_INT, &__rx_timer_tick_irq_handler, 0, "timer_irq", 0)) {
@@ -67,7 +67,7 @@ void rx_timer_thread()
 	/* Parse the timer list and wake up expired timers */
 	while(1) {
 		event_flag = rx_wait_event_group(&__rx_timer_events, RX_TIMER_EVENT_IRQ_EVENT); 
-		//pr_info("jiffies %u\n", jiffies);
+		//pr_dbg("jiffies %u\n", jiffies);
 	
 		imask = rx_enter_critical();	
 		if ((event_flag & RX_TIMER_EVENT_IRQ_EVENT) == RX_TIMER_EVENT_IRQ_EVENT){
@@ -236,7 +236,7 @@ void rx_mod_timer(struct timer_list *p, unsigned int delay)
 	}
 	/* modify the value and start the timer */
 	if(p->delay == 0) {
-		pr_info( "rx_mod_timer: check params\n");
+		pr_dbg( "rx_mod_timer: check params\n");
 		return;
 	}
         p->delay = (delay * (1000/CONFIG_HZ)); /* convert to ticks */

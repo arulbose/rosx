@@ -39,10 +39,9 @@ int rx_create_task(RX_TASK *tcb, char *task_name, int prio, void *stack_ptr, int
 
 	imask = rx_enter_critical();
 
-	#ifdef CONFIG_STACK_ALLOC_DYNAMIC
 	/* if stack_ptr is NULL go for dynamic stack allocation */
 	if(!stack_ptr) {
-
+	#ifdef CONFIG_STACK_ALLOC_DYNAMIC
   		if(((char *)__rx_stack_start_ptr - CONFIG_SYSTEM_STACK_SIZE) > ((char *)__rx_curr_stack_ptr - stack_size)){
 	        	pr_panic( "%s %s\n", "Stack size overflow\n", task_name);
 			rx_exit_critical(imask);
@@ -50,9 +49,14 @@ int rx_create_task(RX_TASK *tcb, char *task_name, int prio, void *stack_ptr, int
 		}
 		stack_ptr = __rx_curr_stack_ptr;
 		__rx_curr_stack_ptr = ((char *)__rx_curr_stack_ptr - (stack_size + 4));
-	}
- 	#endif
+ 	#elif
+	       pr_panic( "%s %s\n", "Null system stack; Enable dynamic stack\n", task_name);
 
+        #endif
+	}else{
+            /* Point the stack pointer to the top of stack */
+            stack_ptr = (char *)stack_ptr + stack_size;
+        }
 	strcpy((char *)tcb->name, task_name);	
 	tcb->curr_stack_ptr = stack_ptr;
 	tcb->stack_start_ptr = stack_ptr;

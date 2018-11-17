@@ -28,7 +28,6 @@
 /* rosx rtos internal */
 #include <rx_version.h>
 #include <rx_defines.h>
-#include <rx_logger.h>
 #include <rx_task.h>
 #include <rx_mutex.h>
 #include <rx_init.h>
@@ -42,22 +41,24 @@
 #include <rx_device.h>
 #include <rx_wait.h>
 #include <rx_blockpool.h>
+#include <rx_tasklet.h>
 
 #ifdef CONFIG_PRINT_BUFFER
+#include <rx_logger.h>
 /* Log controls in defines.h */
-#ifdef PRINT_INFO
+#ifdef CONFIG_PRINT_INFO
 #define pr_info(fmt, args ...)    __rx_printk_to_buffer(fmt, ## args)
 #else
 #define pr_info(...)    
 #endif
 
-#ifdef PRINT_DEBUG
+#ifdef CONFIG_PRINT_DEBUG
 #define pr_dbg(fmt, args ...)     __rx_printk_to_buffer(fmt, ## args)
 #else
 #define pr_dbg(...)     
 #endif
     
-#ifdef PRINT_ERROR
+#ifdef CONFIG_PRINT_ERROR
 #define pr_error(fmt, args ...)   __rx_printk_to_buffer(fmt, ## args)
 #else
 #define pr_error(...)   
@@ -70,19 +71,19 @@
 #else /* CONFIG_PRINT_BUFFER */
 
 /* Log controls in defines.h */
-#ifdef PRINT_INFO
+#ifdef CONFIG_PRINT_INFO
 #define pr_info(...)	__printk(__VA_ARGS__)
 #else
 #define pr_info(...)	
 #endif
 
-#ifdef PRINT_DEBUG
+#ifdef CONFIG_PRINT_DEBUG
 #define pr_dbg(...)	__printk(__VA_ARGS__)
 #else
 #define pr_dbg(...)	
 #endif
 
-#ifdef PRINT_ERROR
+#ifdef CONFIG_PRINT_ERROR
 #define pr_error(...) 	__printk(__VA_ARGS__)
 #else
 #define pr_error(...) 	
@@ -93,5 +94,11 @@
 			while(1); \
 			}
 #endif /*CONFIG_PRINT_BUFFER*/
+
+#ifdef CONFIG_EARLY_PRINTK
+#define rx_early_printk(...)  __early_printk(__VA_ARGS__)
+#else
+#define rx_early_printk(...)  
+#endif
 
 #endif /* __ROSX_RTOS_H__ */

@@ -38,10 +38,10 @@ void task_3(void)
 			
 		rx_mutex_lock(&m, OS_WAIT_FOREVER);
 		MY_PRIV.num  = 13;
-		pr_info("Acquired mutex task_3\n");
+		pr_dbg("Acquired mutex task_3\n");
 		rx_ssleep(3);
 		rx_mutex_unlock(&m);
-		pr_info("Release mutex task_3\n");
+		pr_dbg("Release mutex task_3\n");
 		rx_suspend_task(MYSELF);
 	}
 
@@ -49,26 +49,26 @@ void task_3(void)
 
 void task_2(void)
 {
-	pr_info("entering task_2\n");
+	pr_dbg("entering task_2\n");
 	while(1) {
 		rx_mutex_lock(&m, OS_WAIT_FOREVER);
-		pr_info("Acquired mutex task_2\n");
+		pr_dbg("Acquired mutex task_2\n");
 		MY_PRIV.num  = 12;
 		rx_mutex_unlock(&m);
-		pr_info("Release mutex task_2\n");
+		pr_dbg("Release mutex task_2\n");
 		rx_suspend_task(MYSELF);
 	}
 }
 
 void task_1(void)
 {
-	pr_info("entering task_1\n");
+	pr_dbg("entering task_1\n");
 	while(1) {
 		rx_mutex_lock(&m, OS_WAIT_FOREVER);
-		pr_info("Acquired mutex task_1\n");
+		pr_dbg("Acquired mutex task_1\n");
 		MY_PRIV.num  = 11;
 		rx_mutex_unlock(&m);
-		pr_info("Release mutex task_1\n");
+		pr_dbg("Release mutex task_1\n");
 		rx_suspend_task(MYSELF);
 	}
 }
@@ -80,7 +80,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-            //pr_info("I ");
+            //pr_dbg("I ");
 	    c = a + b;
         }
 }

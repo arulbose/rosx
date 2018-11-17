@@ -66,7 +66,7 @@ void init_signals()
     act.sa_handler = sig_handler;
  
     if (sigaction(SIGUSR1, &act, 0)) {
- 	__rx_early_printk("sigaction error");
+ 	rx_early_printk("sigaction error");
 	exit(1);
     }
  
@@ -82,12 +82,12 @@ int main()
     mem_key   = ftok(".", 'c');
     /* Allocates a System V shared memory segment */
     if( -1 == (shm_id   = shmget(mem_key, sizeof(struct shm_struct), IPC_CREAT | 0666))) {
-	__rx_early_printk("Shget failed \n");
+	rx_early_printk("Shget failed \n");
 	exit(1);
     }
     /* attaches the System V shared memory segment identified by the shm_id */
     if((void *)-1 == (shm_ptr  = (struct shm_struct *) shmat(shm_id, NULL, 0))) {
-	__rx_early_printk("Shmat failed\n");
+	rx_early_printk("Shmat failed\n");
           exit(1);
     }
 
@@ -99,16 +99,16 @@ int main()
     #ifdef CONFIG_STACK_ALLOC_DYNAMIC
     __rx_stack_start_ptr = ((char *)malloc(CONFIG_SYSTEM_STACK_SIZE) + CONFIG_SYSTEM_STACK_SIZE);
     if(!__rx_stack_start_ptr) {
-  	__rx_early_printk("System stack allocation failed\n");
+  	rx_early_printk("System stack allocation failed\n");
  	exit(1);
     }
-    __rx_early_printk("__rx_stack_start_ptr = %p\n", __rx_stack_start_ptr);
+    rx_early_printk("__rx_stack_start_ptr = %p\n", __rx_stack_start_ptr);
     #endif
 
     #ifdef CONFIG_PRINT_BUFFER
     __rx_printk_buffer_start_ptr = (char *)malloc(CONFIG_PRINT_BUFFER_SIZE);
     if(!__rx_printk_buffer_start_ptr) {
-  	__rx_early_printk("System print buffer allocation failed\n");
+  	rx_early_printk("System print buffer allocation failed\n");
  	exit(1);
     }
     #endif 

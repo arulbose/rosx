@@ -94,7 +94,7 @@ void __rx_sem_handler(void *ptr)
     RX_TASK *task = (RX_TASK *)ptr;
     struct semaphore *sem = task->sem;
 
-    __rx_early_printk("timer handler start %s\n", task->name);
+    rx_early_printk("timer handler start %s\n", task->name);
     if(task->sem == NULL) {
         /* Already acquired the semaphore and clean-up done in the sem_post() */
         return;
@@ -122,7 +122,7 @@ void __rx_sem_handler(void *ptr)
 
     /* remove the task from sem wait queue<finish> */
     task->sem = NULL;
-    __rx_early_printk("timer handler end %s\n", task->name);
+    rx_early_printk("timer handler end %s\n", task->name);
 }
 
 /* Task waiting on semaphore with timeout will self suspend and or waked

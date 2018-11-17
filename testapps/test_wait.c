@@ -36,10 +36,10 @@ void application_init(void)
 
 void task_3(void)
 {
-	pr_info("entering task_3\n");
+	pr_dbg("entering task_3\n");
 	while(1) {
             wait_queue(&wq, (gvalue == 1));
-            pr_info("Task_3 Value change detected\n");
+            pr_dbg("Task_3 Value change detected\n");
             rx_suspend_task(MYSELF);
 	}
 
@@ -47,17 +47,17 @@ void task_3(void)
 
 void task_2(void)
 {
-	pr_info("entering task_2\n");
+	pr_dbg("entering task_2\n");
 	while(1) {
                 wait_queue(&wq, (gvalue == 1));
-                pr_info("Task_2 Value change detected\n");
+                pr_dbg("Task_2 Value change detected\n");
 		rx_suspend_task(MYSELF);
 	}
 }
 
 void task_1(void)
 {
-	pr_info("entering task_1\n");
+	pr_dbg("entering task_1\n");
 	while(1) {
                 gvalue = 1;
 		rx_suspend_task(MYSELF);
@@ -71,7 +71,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-            //pr_info("I ");
+            //pr_dbg("I ");
 	    c = a + b;
         }
 }

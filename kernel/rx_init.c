@@ -19,8 +19,19 @@
 
 static RX_TASK rx_timer0_tcb;
 static RX_TASK rx_event0_tcb;
+#ifdef CONFIG_PRINT_BUFFER
 static RX_TASK rx_logger0_tcb;
+#endif
 static RX_TASK rx_terminal0_tcb;
+static RX_TASK rx_bh0_tcb;
+
+static char sys_timer_stack_ptr[CONFIG_SYS_TIMER_STACK_SIZE];
+static char sys_event_stack_ptr[CONFIG_SYS_EVENT_STACK_SIZE];
+static char sys_bh_stack_ptr[CONFIG_SYS_BH_STACK_SIZE];
+static char sys_terminal_stack_ptr[CONFIG_SYS_TERMINAL_STACK_SIZE];
+#ifdef CONFIG_PRINT_BUFFER
+static unsigned char sys_logger_stack_ptr[CONFIG_SYS_LOGGER_STACK_SIZE];
+#endif
 
 /* App entry point */
 extern void rx_application_init(void);
@@ -41,15 +52,18 @@ void __rx_kernel_enter()
     rx_driver_init();
 
     /* create all system threads */
-    rx_create_task(&rx_timer0_tcb,"timer0", 0, 0, 8192, rx_timer_thread, RX_TASK_READY, 0); /* system timer thread */
-    rx_create_task(&rx_event0_tcb,"event0", 0, 0, 8192, rx_event_thread, RX_TASK_READY, 0); /* system event thread */
+    rx_create_task(&rx_timer0_tcb,"timer0", RX_TASK_HIGH_PRIO, &sys_timer_stack_ptr, CONFIG_SYS_TIMER_STACK_SIZE, rx_timer_thread, RX_TASK_READY, 0); /* system timer thread */
+    rx_create_task(&rx_event0_tcb,"event0", RX_TASK_HIGH_PRIO, &sys_event_stack_ptr, CONFIG_SYS_EVENT_STACK_SIZE, rx_event_thread, RX_TASK_READY, 0); /* system event thread */
+    rx_create_task(&rx_bh0_tcb,"bh0", RX_TASK_HIGH_PRIO, &sys_bh_stack_ptr, CONFIG_SYS_BH_STACK_SIZE, rx_bh_thread, RX_TASK_READY, 0); /* bottom half thread */
             
+#ifdef CONFIG_PRINT_BUFFER
     /* Logger init */
     __rx_printk_buffer_head = __rx_printk_buffer_tail = __rx_printk_buffer_start_ptr;
-    rx_create_task(&rx_logger0_tcb,"logger0", (RX_TASK_LEAST_PRIO - 1), 0, 8192, rx_logger_thread, RX_TASK_READY, 0); /* system logger thread */
+    rx_create_task(&rx_logger0_tcb,"logger0", (RX_TASK_LEAST_PRIO - 1), &sys_logger_stack_ptr, CONFIG_SYS_LOGGER_STACK_SIZE, rx_logger_thread, RX_TASK_READY, 0); /* system logger thread */
+#endif
 
     /* terminal */
-    rx_create_task(&rx_terminal0_tcb,"term0", (RX_TASK_LEAST_PRIO - 2), 0, 8192, rx_terminal_thread, RX_TASK_READY, 0); /* terminal emulator thread */
+    rx_create_task(&rx_terminal0_tcb,"term0", (RX_TASK_LEAST_PRIO - 2), &sys_terminal_stack_ptr, CONFIG_SYS_TERMINAL_STACK_SIZE, rx_terminal_thread, RX_TASK_READY, 0); /* terminal emulator thread */
     
     rx_application_init();	
     /* NO RETURN */

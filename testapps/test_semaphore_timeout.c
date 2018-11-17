@@ -34,14 +34,14 @@ void application_init(void)
 
 void task_3(void)
 {
-    pr_info("Entering task_3\n");
+    pr_dbg("Entering task_3\n");
 	while(1) {
 	        	
                 semaphore_wait(&s, OS_WAIT_FOREVER);
-                pr_info("Task 3 Acquired semaphore\n");
+                pr_dbg("Task 3 Acquired semaphore\n");
                 rx_ssleep(15);
                 semaphore_post(&s);
-                pr_info("Task 3 Released semaphore\n");
+                pr_dbg("Task 3 Released semaphore\n");
 		rx_suspend_task(MYSELF);
 	}
 }
@@ -49,13 +49,13 @@ void task_3(void)
 void task_2(void)
 {
 	while(1) {
-	pr_info("entering task_2\n");
+	pr_dbg("entering task_2\n");
                 if (E_OS_TIMEOUT == semaphore_wait(&s, SECS_TO_TICKS(10))) {
-                    pr_info("Task 2 semaphore timeout\n");
+                    pr_dbg("Task 2 semaphore timeout\n");
                 }else{
-                    pr_info("Task 2 Acquired semaphore\n");
+                    pr_dbg("Task 2 Acquired semaphore\n");
                     semaphore_post(&s);
-                    pr_info("Task 2 Released semaphore\n");
+                    pr_dbg("Task 2 Released semaphore\n");
                 }
 		rx_suspend_task(MYSELF);
 	}
@@ -64,14 +64,14 @@ void task_2(void)
 void task_1(void)
 {
 	while(1) {
-	pr_info("entering task_1\n");
+	pr_dbg("entering task_1\n");
                 if (E_OS_TIMEOUT == semaphore_wait(&s, SECS_TO_TICKS(11))){
-                    pr_info("Task 1 semaphore timeout\n");
+                    pr_dbg("Task 1 semaphore timeout\n");
                 }else{
-                    pr_info("Task 1 Acquired semaphore\n");
+                    pr_dbg("Task 1 Acquired semaphore\n");
                     rx_ssleep(1);
                     semaphore_post(&s);
-                    pr_info("Task 1 Released semaphore\n");
+                    pr_dbg("Task 1 Released semaphore\n");
                 }
 		rx_suspend_task(MYSELF);
 	}
@@ -84,7 +84,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-            //pr_info("I ");
+            //pr_dbg("I ");
 	    c = a + b;
         }
 }

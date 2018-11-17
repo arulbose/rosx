@@ -25,6 +25,7 @@ OBJS_GCC = apps/main.o \
        kernel/rx_device.o \
        kernel/rx_wait.o \
        kernel/rx_blockpool.o \
+       kernel/rx_tasklet.o \
        drivers/simulator/x86sim.o \
        lib/vsprintf.o \
        lib/strto.o \

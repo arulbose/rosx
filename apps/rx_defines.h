@@ -23,8 +23,15 @@
 #define CONFIG_STACK_ALLOC_DYNAMIC
 #define CONFIG_SYSTEM_STACK_SIZE (8192 * 10)
 
+/* Static stack allocation */
+#define CONFIG_SYS_TIMER_STACK_SIZE 8192
+#define CONFIG_SYS_EVENT_STACK_SIZE 8192
+#define CONFIG_SYS_BH_STACK_SIZE 8192
+#define CONFIG_SYS_LOGGER_STACK_SIZE 8192
+#define CONFIG_SYS_TERMINAL_STACK_SIZE 8192
+
 /* Print buffer */
-#define CONFIG_PRINT_BUFFER 
+#define CONFIG_PRINT_BUFFER
 #ifdef CONFIG_PRINT_BUFFER
 #define CONFIG_PRINT_BUFFER_SIZE 4096
 #endif /* CONFIG_PRINT_BUFFER */
@@ -73,8 +80,10 @@
 #define CONFIG_SERIAL "simx86"
 /******************************Kernel services config <end> */
 /* log control */
-#define PRINT_INFO
-#define PRINT_DEBUG
-#define PRINT_ERROR
+//#define CONFIG_EARLY_PRINTK
+#define CONFIG_PRINT_INFO
+//#define CONFIG_PRINT_DEBUG
+#define CONFIG_PRINT_ERROR
+
 
 #endif /* __ROSX_DEFINES_H__ */

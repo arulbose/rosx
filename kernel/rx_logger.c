@@ -18,6 +18,7 @@
 #include <RosX.h>
 #include <stdarg.h>
 
+#ifdef CONFIG_PRINT_BUFFER
 static int rx_print_buffer_ready = 0;
 
 /* Store the print output in the buffer; Take care of buffer overflow and truncate and complain if the a single print exceeds the maximum capacity of the buffer
@@ -59,10 +60,10 @@ void rx_logger_thread()
     RX_DEFINE_WAITQUEUE(w);
 
     rx_print_buffer_ready = 1;
-    __rx_early_printk("rosx_logger_thread ready\n");
+    rx_early_printk("rosx_logger_thread ready\n");
 
     if (0 < (dd = rx_dev_open(CONFIG_SERIAL, 0))) {
-       __rx_early_printk("Failed to open serial device\n");
+       rx_early_printk("Failed to open serial device\n");
        while(1); 
     }
 
@@ -79,3 +80,5 @@ void rx_logger_thread()
 	}
     }
 }
+
+#endif

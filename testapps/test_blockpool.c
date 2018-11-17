@@ -21,14 +21,14 @@ void rx_application_init(void)
 
 void print_pool(struct block_pool *p)
 {
-    pr_info("Name of the pool - %s\n", p->name);
-    pr_info("Magic number - 0x%x\n", p->magic);
-    pr_info("start_of_pool 0x%x\n", p->start_of_pool);
-    pr_info("pool size %d\n", p->pool_size);
-    pr_info("block size %d\n", p->block_size);
-    pr_info("Available %d\n", p->available);
-    pr_info("free_blocks ptr 0x%x\n", p->free_blocks);
-    pr_info("\n");
+    pr_dbg("Name of the pool - %s\n", p->name);
+    pr_dbg("Magic number - 0x%x\n", p->magic);
+    pr_dbg("start_of_pool 0x%x\n", p->start_of_pool);
+    pr_dbg("pool size %d\n", p->pool_size);
+    pr_dbg("block size %d\n", p->block_size);
+    pr_dbg("Available %d\n", p->available);
+    pr_dbg("free_blocks ptr 0x%x\n", p->free_blocks);
+    pr_dbg("\n");
 }
 
 void task_1(void)
@@ -37,14 +37,14 @@ void task_1(void)
     int count = 0;
     char *ptr_to_block[10];
     char *t;
-    pr_info("Enter task_1\n");
+    pr_dbg("Enter task_1\n");
 
     /* Create pool */
     rx_create_block_pool(&pool_data, "mypool", 64, pool, 500);
     print_pool(&pool_data);
 
     /* Allocate pool */
-    pr_info("----- Allocate pool ---- \n");
+    pr_dbg("----- Allocate pool ---- \n");
     while(OS_OK == rx_allocate_block(&pool_data, (void*) (&ptr_to_block[count]), OS_NO_WAIT))
     {
          t = *(ptr_to_block + count);
@@ -57,7 +57,7 @@ void task_1(void)
     }
 
     count --;
-    pr_info("----- Free pool ---- \n");
+    pr_dbg("----- Free pool ---- \n");
     /* Free pool */
     while(count >= 0) {
 
@@ -80,7 +80,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-            //pr_info("I ");
+            //pr_dbg("I ");
 	    c = a + b;
         }
 }

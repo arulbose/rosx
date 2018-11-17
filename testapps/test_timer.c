@@ -25,7 +25,7 @@ void timer_callback(void *priv)
 {
 	struct priv *my_priv = priv;
 
-	pr_info("received timer call-back\n");
+	pr_dbg("received timer call-back\n");
 	rx_mod_timer(my_priv->timer, 6);
 }
 
@@ -45,22 +45,22 @@ void application_init(void)
 void task_3(void)
 {
     int count = 0;
-    pr_info("Enter task_3\n");
+    pr_dbg("Enter task_3\n");
     while(1) {
         rx_ssleep(3);
         count ++;
-        pr_info("task3 %d\n", count);
+        pr_dbg("task3 %d\n", count);
     }
 }
 
 void task_2(void)
 {
     int count = 0;
-    pr_info("Enter task_2\n");
+    pr_dbg("Enter task_2\n");
     while(1) {
         rx_ssleep(9);
         count ++;
-        pr_info("task2 %d\n", count);
+        pr_dbg("task2 %d\n", count);
     }
 }
 
@@ -69,7 +69,7 @@ void task_1(void)
     struct timer_list *timer = NULL;
     struct priv my_priv;   
  
-    pr_info("Enter task_1\n");
+    pr_dbg("Enter task_1\n");
     if(NULL == (timer = rx_create_timer(timer_callback, &my_priv, 5))) {
 		pr_panic("task_1: rx_create_timer failed");
     }
@@ -77,7 +77,7 @@ void task_1(void)
     my_priv.timer = timer;
 
     rx_start_timer(timer); 
-    pr_info("Timer started\n");
+    pr_dbg("Timer started\n");
    
     rx_suspend_task(MYSELF); 
     while(1) {
@@ -93,7 +93,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-            //pr_info("I ");
+            //pr_dbg("I ");
 	    c = a + b;
         }
 }

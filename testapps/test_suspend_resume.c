@@ -47,7 +47,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-                pr_info("I%d%d ", __raw_irq_counter, sys_irq);
+                pr_dbg("I%d%d ", __raw_irq_counter, sys_irq);
 		c = a + b;
                 rx_sched();
         }
@@ -59,10 +59,10 @@ void task1(void)
 	int a = 1000;
 	int b = 1000;
 	int c = 0;
-	pr_info("Entering task1\n");
+	pr_dbg("Entering task1\n");
 	rx_suspend_task(MYSELF);
 	while(1) {
-		//pr_info(" T1%d ", __raw_irq_counter);
+		//pr_dbg(" T1%d ", __raw_irq_counter);
 		resume_task(&task2_tcb);
 		c = a + b;
 		while(c--);
@@ -75,9 +75,9 @@ void task2(void)
 	int a = 1000;
 	int b = 2000;
 	int c = 0;
-	pr_info("Entering task2\n");
+	pr_dbg("Entering task2\n");
  while(1) {
-		//pr_info(" T2%d ", __raw_irq_counter);
+		//pr_dbg(" T2%d ", __raw_irq_counter);
                 resume_task(&task1_tcb);
 		c = a + b;
 		while(c--);

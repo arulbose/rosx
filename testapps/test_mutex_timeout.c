@@ -39,10 +39,10 @@ void task_3(void)
 	while(1) {
 			
 		rx_mutex_lock(&m, OS_WAIT_FOREVER);
-                pr_info("Mutex lock task 3 \n");
+                pr_dbg("Mutex lock task 3 \n");
 		rx_ssleep(12);
 		rx_mutex_unlock(&m);
-                pr_info("Mutex unlock task 3 \n");
+                pr_dbg("Mutex unlock task 3 \n");
 		rx_suspend_task(MYSELF);
 	}
 
@@ -50,15 +50,15 @@ void task_3(void)
 
 void task_2(void)
 {
-	pr_info("entering task_2\n");
+	pr_dbg("entering task_2\n");
 
 	while(1) {
 #if 1
 		if(OS_OK != rx_mutex_lock(&m, SECS_TO_TICKS(7) )) {
-			pr_info("Mutex timedout task 2 \n");
+			pr_dbg("Mutex timedout task 2 \n");
 			rx_suspend_task(MYSELF);
 		} else {
-			pr_info("got the mutex task 2\n");
+			pr_dbg("got the mutex task 2\n");
 
 		}
 		rx_mutex_unlock(&m);
@@ -69,15 +69,15 @@ void task_2(void)
 
 void task_1(void)
 {
-	pr_info("entering task_1\n");
+	pr_dbg("entering task_1\n");
 	while(1) 
 	{
 		#if 1
 		if(OS_OK != rx_mutex_lock(&m, SECS_TO_TICKS(10))) {
-                        pr_info("Mutex timedout task 1 \n");
+                        pr_dbg("Mutex timedout task 1 \n");
 				rx_suspend_task(MYSELF);
                 } else {
-                        pr_info("got the mutex task 1\n");
+                        pr_dbg("got the mutex task 1\n");
 
                 }
 		rx_mutex_unlock(&m);
@@ -93,7 +93,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-            //pr_info("I ");
+            //pr_dbg("I ");
 	    c = a + b;
         }
 }

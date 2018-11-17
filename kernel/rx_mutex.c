@@ -208,7 +208,7 @@ int rx_mutex_lock(struct mutex *p, int timeout)
 	    rx_exit_critical(imask);
 	    return E_OS_UNAVAIL;
 	}
-	pr_info("entering rx_mutex_lock %s\n", __rx_curr_running_task->name);
+	pr_dbg("entering rx_mutex_lock %s\n", __rx_curr_running_task->name);
 	/* Put the task to sleep in the mutex wait list */
 	__rx_curr_running_task->state = RX_TASK_SUSPEND;
 	__rx_curr_running_task->mutex = p;

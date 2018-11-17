@@ -146,7 +146,7 @@ int rx_register_driver(char *name, struct device_ops *ops)
         if(0 == strcmp(name, device_table[device_table_id].name))
         { /* Device found */
            if(device_table[device_table_id].device_ops != NULL) {
-               __rx_early_printk("Registeration failed %s\n", name );
+               rx_early_printk("Registeration failed %s\n", name );
                return ENODEV;
            }
            device_table[device_table_id].device_ops = ops; 

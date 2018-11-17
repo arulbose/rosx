@@ -33,7 +33,7 @@ void task_3(void)
 			while(a --);
 
 			a = DELAY;
-			pr_info("3 ");		
+			pr_dbg("3 ");		
 	}
 
 }
@@ -41,24 +41,24 @@ void task_3(void)
 void task_2(void)
 {
 	int a = DELAY;
-	pr_info("entering task_2\n");
+	pr_dbg("entering task_2\n");
 	while(1) {
         		while(a --);
 
                         a = DELAY;
-                        pr_info("2 ");
+                        pr_dbg("2 ");
 	}
 }
 
 void task_1(void)
 {
 	int a = DELAY;
-	pr_info("entering task_1\n");
+	pr_dbg("entering task_1\n");
 	while(1) {
                        while(a --);
 
                         a = DELAY;
-                        pr_info("1 ");
+                        pr_dbg("1 ");
 	}
 }
 
@@ -69,7 +69,7 @@ void idle_task(void)
 	int c = 0;
 
         while(1) {
-            //pr_info("I ");
+            //pr_dbg("I ");
 	    c = a + b;
         }
 }

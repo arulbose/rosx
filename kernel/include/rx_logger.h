@@ -18,15 +18,17 @@
 #ifndef __LOGGER_H__
 #define __LOGGER_H__
 
+#ifdef CONFIG_PRINT_BUFFER
+
 #include <RosX.h>
 
 void __rx_printk_to_buffer(const char *fmt, ...);
 void rx_logger_thread(void);
 
-#ifdef CONFIG_PRINT_BUFFER
 char *__rx_printk_buffer_head;
 char *__rx_printk_buffer_tail;
 char *__rx_printk_buffer_start_ptr;
+
 #endif
 
 #endif /* __LOGGER_H__ */

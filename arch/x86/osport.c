@@ -23,7 +23,7 @@ void __restore_irq_global(unsigned int key)
 		return; /* If in IRQ context return doing nothing */
 
 	if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0) {
-		pr_info("rx_enter_critical: sigprocmask failed");
+		pr_dbg("rx_enter_critical: sigprocmask failed");
 		exit(1);
 	}
 	__critical = 0;
@@ -36,7 +36,7 @@ unsigned int __disable_irq_global(void)
 		return 0;
 
     if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0) {
-		pr_info("rx_enter_critical: sigprocmask failed");
+		pr_dbg("rx_enter_critical: sigprocmask failed");
 		exit(1);
     }
     __critical = 1;

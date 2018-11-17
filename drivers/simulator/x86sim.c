@@ -23,9 +23,9 @@ struct device_ops fops;
 int x86_simulator_init()
 {
     if ( 0 == rx_register_driver("simx86", &fops)) {
-        __rx_early_printk("simx86 Driver registered\n");
+        rx_early_printk("simx86 Driver registered\n");
     }else{
-        __rx_early_printk("simx86 Driver registeration failed\n");
+        rx_early_printk("simx86 Driver registeration failed\n");
     }
 
     return 0;
