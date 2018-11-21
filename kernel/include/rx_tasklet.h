@@ -32,12 +32,10 @@ struct tasklet {
    struct tasklet *next;
 };
 
-enum tasklet_status{
-    __RX_DISABLE_TASKLE,
-    __RX_ENABLE_TASKLET,
-    __RX_SCHED_TASKLET,
-    __RX_RUNNING_TASKLET,
-};
+#define __RX_DISABLE_TASKLET 	0
+#define __RX_ENABLE_TASKLET     (1 << 0)
+#define __RX_SCHED_TASKLET      (1 << 1)
+#define __RX_RUNNING_TASKLET    (1 << 2)
 
 #define RX_DEFINE_TASKLET(name, func, data)    \
       struct tasklet (name) = __TASKLET_INIT(name, func, data)

@@ -66,16 +66,21 @@ void rx_disable_tasklet(struct tasklet *t)
 
     imask = rx_enter_critical();
     if(t->status != __RX_DISABLE_TASKLET){
-        if(t->status == __RX_SCHED_TASKLET) {
+        if(t->status & __RX_SCHED_TASKLET) {
           /* Remove the task from the global tasklet list */
         }
         /* If the task is already running then it will run and gets disabled */
-        t->status == __RX_DISABLE_TASKLET;
+        t->status = __RX_DISABLE_TASKLET;
     }
     rx_exit_critical(imask);
 
 }
 
+/* 1. When called schedule tasklet will be added to the global system tasklist to be processed
+   2. Tasklet can be schedule multiple times but runs only once if it is not already running.
+   3. A schedule call when a taslet is already running will run again after completion
+   4. If the tasklet is disabled while running it will complete its run and then gets disabled
+*/
 void rx_schedule_tasklet(struct tasklet *t)
 {
     unsigned int imask;
