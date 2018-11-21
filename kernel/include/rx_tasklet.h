@@ -43,12 +43,14 @@ struct tasklet {
 
 #define __TASKLET_INIT(m)           \
            {                      \
+             .status = __RX_DISABLE_TASKLET,  \
              .func = func,  \
-             .data = data,       \
+             .data = data,  \
+             .next = NULL,  \
+             .data = NULL,       \
            }
 
-int rx_create_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned long data);
-void rx_delete_tasklet(struct tasklet *);
+int rx_init_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned long data);
 void rx_enable_tasklet(struct tasklet *);
 void rx_disable_tasklet(struct tasklet *);
 void rx_schedule_tasklet(struct tasklet *);

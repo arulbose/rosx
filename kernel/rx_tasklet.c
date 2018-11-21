@@ -20,9 +20,9 @@
 struct tasklet * sys_tasklet_list = NULL;
 /* Under construction */
 
-int rx_create_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned long data)
+int rx_init_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned long data)
 {
-    if((t == NULL) || (func == NULL) ){
+    if((!t) || (!func) ){
         return OS_ERR;
     }
 
@@ -36,18 +36,13 @@ int rx_create_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned lo
 
 }
 
-void rx_delete_tasklet(struct tasklet *t)
-{
-
-}
-
 /* Enable the tasklet if it is disabled */
 void rx_enable_tasklet(struct tasklet *t)
 {
     unsigned int imask;
 
-    if(t == NULL) {
-        return OS_ERR;
+    if(!t) {
+        return;
     }
 
     imask = rx_enter_critical();
@@ -65,14 +60,31 @@ void rx_disable_tasklet(struct tasklet *t)
 {
     unsigned int imask;
 
-    if(t == NULL) {
-        return OS_ERR;
+    if(!t) {
+        return;
     }
 
     imask = rx_enter_critical();
     if(t->status != __RX_DISABLE_TASKLET){
         if(t->status & __RX_SCHED_TASKLET) {
           /* Remove the task from the global tasklet list */
+            if(!(t->prev) && !(t->next)) {
+                sys_tasklet_list = NULL;
+            }else{
+                if(t->prev){
+                    /* In between */
+                    t->prev->next = t->next;
+                }else {
+                    /* In head */
+                    sys_tasklet_list = t->next;
+                }
+
+                if(t->next){
+                    t->next->prev = t->prev;
+                }
+            }
+            t->next = NULL; 
+            t->prev = NULL;
         }
         /* If the tasklet is already running then it will run and gets disabled */
         t->status = __RX_DISABLE_TASKLET;
@@ -88,40 +100,45 @@ void rx_disable_tasklet(struct tasklet *t)
 */
 void rx_schedule_tasklet(struct tasklet *t)
 {
+    struct tasklet *ride;
     unsigned int imask;
 
-    if(t == NULL) {
-        return OS_ERR;
-    }
-
-    imask = rx_enter_critical();
-    if(t->status & __RX_SCHED_TASKLET ) {
-        /* Already scheduled; just return*/
+    if(!t) {
         return;
     }
 
-    /* Add the taslket to the global tasklet list */
-    t->status |= __RX_SCHED_TASKLET;
-    if(!sys_tasklet_list) {
-	
-    }else{
-
+    imask = rx_enter_critical();
+    if(!(t->status & __RX_SCHED_TASKLET)) {
+        t->status |= __RX_SCHED_TASKLET;
+        /* Add the taslket to the global tasklet list */
+        if(!sys_tasklet_list) {
+            sys_tasklet_list = t;	
+        }else{
+            ride = sys_tasklet_list;
+            while(ride->next){
+                ride = ride->next;
+            }
+            ride->next = t;
+            t->prev = ride;
+        }
     }
 	  
     rx_exit_critical(imask);
-
 }
 
 void rx_bh_thread()
 {
+    struct tasklet *run;
+
     RX_DEFINE_WAITQUEUE(w);
 
     while(1) {
 
          if(0 == rx_wait_queue(&w, (sys_tasklet_list != NULL))) {
-         /* Process the tasklet serially */
-
-
+             /* Process the tasklet serially */
+             run = sys_tasklet_list;
+             sys_tasklet_list = sys_tasklet_list->next;
+             run->func(run->data);
          }
 
     }
