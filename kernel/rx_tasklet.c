@@ -30,6 +30,7 @@ int rx_create_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned lo
     t->func = func;
     t->data = data;
     t->next = NULL;
+    t->prev = NULL;
   
     return OS_OK;
 
@@ -40,6 +41,7 @@ void rx_delete_tasklet(struct tasklet *t)
 
 }
 
+/* Enable the tasklet if it is disabled */
 void rx_enable_tasklet(struct tasklet *t)
 {
     unsigned int imask;
@@ -55,7 +57,10 @@ void rx_enable_tasklet(struct tasklet *t)
     rx_exit_critical(imask);
 
 }
-
+/* Disable the tasklet if enabled; In case 
+ * it is already scheduled remove from the global task list
+ * and then disable; If tasklet is running than it will complete 
+ * and will get disabled */
 void rx_disable_tasklet(struct tasklet *t)
 {
     unsigned int imask;
@@ -69,7 +74,7 @@ void rx_disable_tasklet(struct tasklet *t)
         if(t->status & __RX_SCHED_TASKLET) {
           /* Remove the task from the global tasklet list */
         }
-        /* If the task is already running then it will run and gets disabled */
+        /* If the tasklet is already running then it will run and gets disabled */
         t->status = __RX_DISABLE_TASKLET;
     }
     rx_exit_critical(imask);
@@ -90,9 +95,19 @@ void rx_schedule_tasklet(struct tasklet *t)
     }
 
     imask = rx_enter_critical();
-    if(t->status != __RX_SCHED_TASKLET) {
-        t->status = __RX_SCHED_TASKLET;
+    if(t->status & __RX_SCHED_TASKLET ) {
+        /* Already scheduled; just return*/
+        return;
     }
+
+    /* Add the taslket to the global tasklet list */
+    t->status |= __RX_SCHED_TASKLET;
+    if(!sys_tasklet_list) {
+	
+    }else{
+
+    }
+	  
     rx_exit_critical(imask);
 
 }
@@ -104,7 +119,6 @@ void rx_bh_thread()
     while(1) {
 
          if(0 == rx_wait_queue(&w, (sys_tasklet_list != NULL))) {
-
          /* Process the tasklet serially */
 
 

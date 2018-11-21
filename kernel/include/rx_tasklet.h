@@ -30,6 +30,7 @@ struct tasklet {
    void (*func)(unsigned long); 
    unsigned long data;
    struct tasklet *next;
+   struct tasklet *prev;
 };
 
 #define __RX_DISABLE_TASKLET 	0
