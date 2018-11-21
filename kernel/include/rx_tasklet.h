@@ -26,10 +26,17 @@
 */
 
 struct tasklet {
-
+   int status;
    void (*func)(unsigned long); 
-   unsigned long data; 
+   unsigned long data;
    struct tasklet *next;
+};
+
+enum tasklet_status{
+    __RX_DISABLE_TASKLE,
+    __RX_ENABLE_TASKLET,
+    __RX_SCHED_TASKLET,
+    __RX_RUNNING_TASKLET,
 };
 
 #define RX_DEFINE_TASKLET(name, func, data)    \

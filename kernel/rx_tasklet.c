@@ -26,6 +26,7 @@ int rx_create_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned lo
         return OS_ERR;
     }
 
+    t->status = __RX_DISABLE_TASKLET;
     t->func = func;
     t->data = data;
     t->next = NULL;
@@ -41,16 +42,53 @@ void rx_delete_tasklet(struct tasklet *t)
 
 void rx_enable_tasklet(struct tasklet *t)
 {
+    unsigned int imask;
+
+    if(t == NULL) {
+        return OS_ERR;
+    }
+
+    imask = rx_enter_critical();
+    if(t->status == __RX_DISABLE_TASKLET) {
+        t->status = __RX_ENABLE_TASKLET;
+    }
+    rx_exit_critical(imask);
 
 }
 
 void rx_disable_tasklet(struct tasklet *t)
 {
+    unsigned int imask;
+
+    if(t == NULL) {
+        return OS_ERR;
+    }
+
+    imask = rx_enter_critical();
+    if(t->status != __RX_DISABLE_TASKLET){
+        if(t->status == __RX_SCHED_TASKLET) {
+          /* Remove the task from the global tasklet list */
+        }
+        /* If the task is already running then it will run and gets disabled */
+        t->status == __RX_DISABLE_TASKLET;
+    }
+    rx_exit_critical(imask);
 
 }
 
 void rx_schedule_tasklet(struct tasklet *t)
 {
+    unsigned int imask;
+
+    if(t == NULL) {
+        return OS_ERR;
+    }
+
+    imask = rx_enter_critical();
+    if(t->status != __RX_SCHED_TASKLET) {
+        t->status = __RX_SCHED_TASKLET;
+    }
+    rx_exit_critical(imask);
 
 }
 
