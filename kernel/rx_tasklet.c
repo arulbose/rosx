@@ -110,7 +110,7 @@ void rx_schedule_tasklet(struct tasklet *t)
     imask = rx_enter_critical();
     if(!(t->status & __RX_SCHED_TASKLET)) {
         t->status |= __RX_SCHED_TASKLET;
-        /* Add the taslket to the global tasklet list */
+        /* Add the tasklet to the global tasklet list */
         if(!sys_tasklet_list) {
             sys_tasklet_list = t;	
         }else{
@@ -126,9 +126,11 @@ void rx_schedule_tasklet(struct tasklet *t)
     rx_exit_critical(imask);
 }
 
+/* Process the tasklets */
 void rx_bh_thread()
 {
     struct tasklet *run;
+    unsigned int imask;
 
     RX_DEFINE_WAITQUEUE(w);
 
@@ -136,10 +138,19 @@ void rx_bh_thread()
 
          if(0 == rx_wait_queue(&w, (sys_tasklet_list != NULL))) {
              /* Process the tasklet serially */
+             imask = rx_enter_critical();
              run = sys_tasklet_list;
              sys_tasklet_list = sys_tasklet_list->next;
+             run->status |= __RX_RUNNING_TASKLET;
+             run->status &= ~(__RX_SCHED_TASKLET);
+             rx_exit_critical(imask);
+             
+             /* Should run without sleeping with interrupts enabled */
              run->func(run->data);
-         }
 
+             imask = rx_enter_critical();
+             run->status &= ~(__RX_RUNNING_TASKLET);
+             rx_exit_critical(imask);
+         }
     }
 }

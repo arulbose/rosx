@@ -38,17 +38,18 @@ struct tasklet {
 #define __RX_SCHED_TASKLET      (1 << 1)
 #define __RX_RUNNING_TASKLET    (1 << 2)
 
-#define RX_DEFINE_TASKLET(name, func, data)    \
-      struct tasklet (name) = __TASKLET_INIT(name, func, data)
+#define RX_DEFINE_TASKLET(name, handler, dev)    \
+      struct tasklet name = __TASKLET_INIT(handler, dev)
 
-#define __TASKLET_INIT(m)           \
-           {                      \
-             .status = __RX_DISABLE_TASKLET,  \
-             .func = func,  \
-             .data = data,  \
-             .next = NULL,  \
-             .data = NULL,       \
-           }
+
+#define __TASKLET_INIT(handler, dev)     \
+           {                             \
+             .status = 0,                \
+             .func = handler,            \
+             .data = dev,                \
+             .next = NULL,               \
+             .prev = NULL,              \
+           }				 
 
 int rx_init_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned long data);
 void rx_enable_tasklet(struct tasklet *);
