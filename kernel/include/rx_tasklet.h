@@ -26,23 +26,32 @@
 */
 
 struct tasklet {
-
+   int status;
    void (*func)(unsigned long); 
-   unsigned long data; 
+   unsigned long data;
    struct tasklet *next;
+   struct tasklet *prev;
 };
 
-#define RX_DEFINE_TASKLET(name, func, data)    \
-      struct tasklet (name) = __TASKLET_INIT(name, func, data)
+#define __RX_DISABLE_TASKLET 	0
+#define __RX_ENABLE_TASKLET     (1 << 0)
+#define __RX_SCHED_TASKLET      (1 << 1)
+#define __RX_RUNNING_TASKLET    (1 << 2)
 
-#define __TASKLET_INIT(m)           \
-           {                      \
-             .func = func,  \
-             .data = data,       \
-           }
+#define RX_DEFINE_TASKLET(name, handler, dev)    \
+      struct tasklet name = __TASKLET_INIT(handler, dev)
 
-int rx_create_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned long data);
-void rx_delete_tasklet(struct tasklet *);
+
+#define __TASKLET_INIT(handler, dev)     \
+           {                             \
+             .status = 0,                \
+             .func = handler,            \
+             .data = dev,                \
+             .next = NULL,               \
+             .prev = NULL,              \
+           }				 
+
+int rx_init_tasklet(struct tasklet *t, void(*func)(unsigned long), unsigned long data);
 void rx_enable_tasklet(struct tasklet *);
 void rx_disable_tasklet(struct tasklet *);
 void rx_schedule_tasklet(struct tasklet *);
