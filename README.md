@@ -39,7 +39,10 @@ Below are the services supported by the kernel.
 ##### 10. Interrupt management service
       Dynamic request and free of interrupt. 
       Supports interrupt sharing
-##### 11. Device driver management
+##### 11. Kernel bottom-half using Tasklet
+      Static and dynamic initialization of tasklet.
+      Tasklet run at system priority.
+##### 12. Device driver management
       Driver core support Linux like open/release/read/write/ioctl/poll api calls
       
 ## Getting Started
