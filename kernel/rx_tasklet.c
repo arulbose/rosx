@@ -108,7 +108,7 @@ void rx_schedule_tasklet(struct tasklet *t)
     }
 
     imask = rx_enter_critical();
-    if(!(t->status & __RX_SCHED_TASKLET)) {
+    if(!(t->status & __RX_SCHED_TASKLET) && ((t->status & __RX_ENABLE_TASKLET))) {
         t->status |= __RX_SCHED_TASKLET;
         /* Add the tasklet to the global tasklet list */
         if(!sys_tasklet_list) {
