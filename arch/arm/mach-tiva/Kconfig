@@ -1,0 +1,17 @@
+if TARGET_TIVA
+
+choice 
+	prompt "TIVA TI board select"
+	default BOARD_TM4C1294NCPDT
+
+config BOARD_TM4C1294NCPDT
+	bool "TIVA TI TM4C1294NCPDT EK"
+	select CPU_ARMV7M
+
+endchoice
+
+config LDSCRIPT
+	string
+        default "arch/arm/mach-tiva/tm4c1294ncpdt/rosx.lds" if BOARD_TM4C1294NCPDT
+
+endif
