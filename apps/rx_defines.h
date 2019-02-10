@@ -60,21 +60,6 @@
 #define CONFIG_IRQS		__CONFIG_IRQS
 #define CONFIG_IRQ_COUNT	__CONFIG_IRQ_COUNT 
 
-/* Byte pool */
-#define CONFIG_BYTEPOOL
-#define CONFIG_BYTEPOOL_SIZE 2048
-#define CONFIG_4_BYTES_BLOCK	31 /* Max count is 32 */
-#define CONFIG_8_BYTES_BLOCK	10 /* Max count is 32 */
-#define CONFIG_16_BYTES_BLOCK	10 /* Max count is 32 */
-#define CONFIG_32_BYTES_BLOCK	5  /* Max count is 32 */
-#define CONFIG_64_BYTES_BLOCK	5  /* Max count is 32 */
-#define CONFIG_128_BYTES_BLOCK	0  /* Max count is 32 */
-#define CONFIG_256_BYTES_BLOCK	0  /* Max count is 32 */
-#define CONFIG_512_BYTES_BLOCK	0  /* Max count is 32 */
-#define CONFIG_1024_BYTES_BLOCK	0  /* Max count is 32 */
-#define CONFIG_2048_BYTES_BLOCK	0  /* Max count is 32 */
-#define CONFIG_4096_BYTES_BLOCK	0  /* Max count is 32 */
-
 /* Device */
 #define CONFIG_MAX_DEVICE_DESC 5
 #define CONFIG_SERIAL "simx86"
