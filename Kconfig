@@ -11,6 +11,7 @@ config ROSXVERSION
 
 # Allow defaults in arch-specific code to override any given here
 source "arch/Kconfig"
+source "kernel/Kconfig"
 
 menu "General setup"
 
