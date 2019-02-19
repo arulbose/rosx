@@ -1,0 +1,72 @@
+
+TOOLCHAIN ?= /usr
+CC = $(TOOLCHAIN)/bin/arm-none-eabi-gcc
+CFLAGS = -Wall -mcpu=cortex-m4 -mthumb -mabi=aapcs -mapcs-frame @$(OUT)/$(CONFIG)/compiler.opt -O3
+CFLAGS += -std=c99 -ffunction-sections -fdata-sections
+CFLAGS += -DTIVAWARE -DPART_$(PART) -DTARGET_IS_TM4C129_RA1 -Dgcc
+CFLAGS += -I$(OCWARE_DIR)/src/ -I$(OCWARE_DIR)/common/ -I$(OCWARE_DIR)/
+CFLAGS += -isystem$(XDC_PATH) -isystem$(BIOS_PATH) -isystem$(TIDRIVER_PATH) -isystem$(NDK_INC) -isystem$(TIVAWARE_DIR)
+
+LD = $(TOOLCHAIN)/bin/arm-none-eabi-gcc
+AS = gcc
+MKDIR_P = mkdir -p
+
+#CFLAGS = -I include -Wall -m32 -g -fvar-tracking -DCONFIG_X86_SIMULATOR -D__KERNEL__ -D__GNUC__=4 -I kernel/include -I apps
+CFLAGS = -I include -Wall -m32 -g -fvar-tracking -DCONFIG_X86_SIMULATOR -D__KERNEL__ -I kernel/include -I apps
+LDFLAGS += -m32
+OBJDIR = out
+OUTDIR = out/apps out/kernel out/arch/x86 out/lib out/drivers/simulator
+
+OBJS_GCC = apps/main.o \
+       kernel/rx_sched.o \
+       kernel/rx_task.o \
+       kernel/rx_queue.o \
+       kernel/rx_event.o \
+       kernel/rx_irq.o \
+       kernel/rx_init.o \
+       kernel/rx_mutex.o \
+       kernel/rx_timer.o \
+       kernel/rx_semaphore.o \
+       kernel/rx_logger.o \
+       kernel/rx_terminal.o \
+       kernel/rx_device.o \
+       kernel/rx_wait.o \
+       kernel/rx_blockpool.o \
+       kernel/rx_tasklet.o \
+       drivers/simulator/x86sim.o \
+       lib/vsprintf.o \
+       lib/strto.o \
+       lib/string.o \
+       lib/charset.o \
+       lib/div64.o \
+       lib/rbtree.o \
+       lib/ctype.o \
+       arch/x86/x86_sim.o \
+       arch/x86/osport.o	
+
+OBJS_AS = arch/x86/preempt.o
+
+OBJECTS_GCC = $(patsubst %,$(OBJDIR)/%,$(OBJS_GCC))
+OBJECTS_AS = $(patsubst %,$(OBJDIR)/%,$(OBJS_AS))
+
+.PHONY: directories rosx86 clean
+
+all: directories rosx86
+
+directories: $(OUTDIR)
+
+$(OUTDIR):
+	${MKDIR_P} $(OUTDIR)
+	ln -s ../arch/x86 include/asm
+	
+$(OBJDIR)/%.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+$(OBJDIR)/%.o: %.S
+	$(AS) -c -o $@ $< $(CFLAGS)
+
+rosx86: $(OBJECTS_GCC) $(OBJECTS_AS)
+	$(LD) -o $@ $^ $(LDFLAGS)
+         
+clean:
+	make -f scripts/Makefile.clean

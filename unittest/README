@@ -1,0 +1,2 @@
+This folder contains kernel unit test routines to debug the kernel in x86_sim mode. The .c files are indiviual
+unit test cases which has to be name and copied to apps apps/x86_sim folder to test the kernel functionality.
